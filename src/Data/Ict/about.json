@@ -1,0 +1,1067 @@
+{
+  "usict": {
+    "dean": {
+      "name": "Dr. Arpit Bhardwaj",
+      "title": "Dean, University School of Information and Communication Technology (USICT)",
+      "image": "https://www.gbu.ac.in/USICT/media/img/arpit%20bhardwaj.jpg",
+      "description": "University School of Information and Communication Technology came into existence in 2008 with the primary objective of catering to all academic and research requirements in fields of electronics communication and computer science. The first academic session consisting of post-graduate program started in July 2009, and at present, it is successfully running undergraduate, post-graduate, and research programs in all emerging areas related to information and communication technology. The school is committed towards providing highest quality teaching education and producing technocrats who can work on the latest available technologies in the global context. To fulfill this aim and to provide education according to industrial requirement the extra academic activities like lectures from outside expert / workshops / symposiums / conferences are organized on a regular basis.\n\nFirst batch of postgraduate students has successfully passed in 2011. School has wonderful infrastructure having classrooms equipped with state-of-the-art audio-visual support and a large number of functional laboratories equipped with state-of-the-art instruments / hardware / software and highly committed and dedicated faculty. School has already made a roadmap for its development for next 10 years in the form of “Vision 2020” document and is in real spirit marching on this roadmap for fulfilling the defined objectives.\n\nSchool aims to become a hub of higher-end research activities and has started successfully its research program and has many research scholars on its roll, carrying research in all prominent areas of electronics / communication / computer engineering.\n\nI am more than confident to tell you that the best, most effective and finest weapon an academic organization can ever have is “knowledge” and it is a common quote in ICT field that “knowledge is power”. The USICT works on the sole objective of acquiring and propagating as much knowledge as possible to the students."
+    }
+  },
+  "drone_technology": {
+    "hero": {
+      "title": "Center of Excellence in Drone Technology",
+      "subtitle": "Empowering Innovation in Drone Technology",
+      "bgTheme": 4
+    },
+    "about": {
+      "sectionTitle": "About Us",
+      "aboutDescription": [
+        "The Centre of Excellence - Drone Technology is a joint initiative of Gautam Buddha University Industry partner Omnipresent Robot Tech, and IASC SSC (Organization under the aegis of MSDE, Gov. of India).",
+        "It provides a platform where experts, professionals, and researchers in drone technology can share their expertise on design, innovations, utilization, research, and applications.",
+        "It is a battalion of drone learners, enthusiasts, designers, and pilots. The Centre is fully functional in the division of design & manufacturing, skill development, pilot training, App development, testing, research, and development activities."
+      ],
+      "visionTitle": "Our Vision",
+      "visionDescription": [
+        "To be a national leader in drone innovation, education, and capacity-building, driving sustainable solutions and technological excellence.",
+        "The CEDT is committed to systematizing knowledge, assistance, and skill-building concerning technical and social aspects of drone technology.",
+        "It is functional with the perception that it will meet the most sophisticated indigenous drone requirements in the NCR and Uttar Pradesh region contributing to the nation's technological advancements."
+      ],
+      "missionTitle": "Our Mission",
+      "missionPoints": [
+        "Train skilled drone pilots and technicians",
+        "Develop indigenous drone systems and applications",
+        "Foster research and innovation in aerial robotics",
+        "Collaborate with industry and government bodies",
+        "Promote safe and responsible use of drone technology"
+      ],
+      "storyTitle": "Our Story",
+      "storyText": "The Centre of Excellence – Drone Technology (CEDT) is a pioneering initiative of the School of ICT, Gautam Buddha University, in collaboration with Omnipresent Robot Tech and IASC SSC. From its inception, CEDT has focused on designing, assembling, and testing advanced drone systems for government, industry, and healthcare applications.",
+      "whatWeDoTitle": "What We Do",
+      "whatWeDoText": "CEDT offers drone pilot training, data processing and analysis, app development, and drone design and repair. We provide education and skill development programs that blend classroom learning with hands-on experience.",
+      "commitmentTitle": "Our Commitment",
+      "commitmentText": "We are dedicated to systematizing knowledge, assistance, and skill-building across technical and social aspects of drone technology. The Centre aspires to meet sophisticated indigenous requirements in NCR and Uttar Pradesh, contributing to India’s technological advancement.",
+      "photos": [
+        "https://static.wixstatic.com/media/bc6a73_a51fa15dce7d4c229f9090932d2071f3~mv2.jpg"
+      ]
+    },
+    "mentors": {
+      "sectionTitle": "Meet Our Mentors",
+      "mentorsData": [
+        {
+          "type": "GBU",
+          "image": "http://meow.tilchattaas.com/media/leadership/Screenshot_2025-06-24_at_10.41.43AM.png",
+          "name": "Prof. Rana Pratap Singh",
+          "role": "Honorable Vice Chancellor, GBU",
+          "qualifications": "Ph.D. in Environmental Science",
+          "expertise": "Leadership, Research Management, Academic Planning, Innovation in Higher Education",
+          "linkedin": "#"
+        },
+        {
+          "type": "GBU",
+          "image": "https://static.wixstatic.com/media/bc6a73_1c329570feed4f78806f073b4bcc0ba1~mv2.jpeg/v1/fill/w_280,h_280,al_c,lg_1,q_80,enc_avif,quality_auto/rajeshsir.jpeg",
+          "name": "Dr. Rajesh Mishra",
+          "role": "Chairperson - CEDT",
+          "qualifications": "Ph.D. (IIT Kharagpur), M.Tech. (IIT Kharagpur), B.E. (Electronics Engineering)",
+          "expertise": "Networks, Signal Processing, Communication Systems, RAMS",
+          "linkedin": "#"
+        },
+        {
+          "type": "GBU",
+          "image": "https://static.wixstatic.com/media/bc6a73_8732c239a1204d73892af15235075ed2~mv2.jpg/v1/fill/w_683,h_683,al_c,q_85,enc_avif,quality_auto/14141679_10155181884145752_7398975048469234012_n.jpg",
+          "name": "Dr. O. V. Singh",
+          "role": "Member - CEDT",
+          "qualifications": "Ph.D. (Jamia Milia Islamia, New Delhi)",
+          "expertise": "Power Systems, Renewable Energy Sources, Electric Vehicles, Artificial Intelligence",
+          "linkedin": "#"
+        },
+        {
+          "type": "GBU",
+          "image": "https://static.wixstatic.com/media/bc6a73_6467647a6cf347f9866c0c8fb36a0a60~mv2.jpg/v1/fill/w_315,h_314,al_c,lg_1,q_80,enc_avif,quality_auto/download.jpg",
+          "name": "Dr. Navaid Zafar Rizvi",
+          "role": "Coordinator & Convener - CEDT",
+          "qualifications": "Ph.D., MS (TU Darmstadt, Germany), MS (HFU, Germany)",
+          "expertise": "ML for ICs, VLSI Design, HF Electronics and Communication, Microsystems",
+          "linkedin": "#"
+        },
+        {
+          "type": "GBU",
+          "image": "https://static.wixstatic.com/media/bc6a73_102fff24585e46f2b02c4176769d4eed~mv2.png/v1/fill/w_417,h_420,al_c,lg_1,q_85,enc_avif,quality_auto/sanjay_sharma.png",
+          "name": "Prof. Sanjay Kumar Sharma",
+          "role": "Dean, USICT",
+          "qualifications": "Ph.D. in Computer Science",
+          "expertise": "Information Technology, Artificial Intelligence, Nanotechnology, Research Methodology, Research & Publication Ethics",
+          "linkedin": "#"
+        },
+        {
+          "type": "GBU",
+          "image": "https://static.wixstatic.com/media/bc6a73_1b0d7a2245df4ef5865a85fe43d235c9~mv2.jpeg/v1/fill/w_315,h_314,al_c,lg_1,q_80,enc_avif,quality_auto/mm.jpeg",
+          "name": "Dr. Manmohan Singh Shishodia",
+          "role": "Member - CEDT",
+          "qualifications": "Ph.D. (IIT Delhi)",
+          "expertise": "Plasmonics, Nanoplasmonics, Semiconductor Optoelectronics, Theoretical and Computational Physics",
+          "linkedin": "#"
+        },
+        {
+          "type": "GBU",
+          "image": "https://static.wixstatic.com/media/bc6a73_6467647a6cf347f9866c0c8fb36a0a60~mv2.jpg/v1/fill/w_315,h_314,al_c,lg_1,q_80,enc_avif,quality_auto/download.jpg",
+          "name": "Dr. Navin Kumar",
+          "role": "Member - CEDT",
+          "qualifications": "Ph.D. (JNU)",
+          "expertise": "Animal Biotechnology, Regenerative Medicine, Immunology, Host-Pathogen Interaction, Human Physiology, Medical Lab Technology, Molecular Medicine",
+          "linkedin": "#"
+        },
+        {
+          "type": "GBU",
+          "image": "https://static.wixstatic.com/media/bc6a73_3e157489177a4f9492e16b65c58e32b3~mv2.jpg/v1/fill/w_280,h_350,al_c,lg_1,q_80,enc_avif,quality_auto/vimlesh.jpg",
+          "name": "Dr. Vimlesh Kumar Ray",
+          "role": "Co-coordinator - CEDT",
+          "qualifications": "Ph.D. (GBU)",
+          "expertise": "Adhoc and Sensor Networks, Wireless Communications, UAV Communications, Control Systems",
+          "linkedin": "#"
+        },
+        {
+          "type": "Collaborator",
+          "image": "https://static.wixstatic.com/media/bc6a73_71c225d7c0744bbd961a16764f9e6798~mv2.jpg/v1/crop/x_0,y_0,w_1167,h_848/fill/w_1090,h_792,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/D6tYrEFVsAAWNA8.jpg",
+          "name": "Mr. Aakash Sinha",
+          "role": "Founder & CEO Omnipresent Robo Tech",
+          "qualifications": "MS (Robotics) – Carnegie Mellon University, USA",
+          "about": "Professor of Practice at Shiv Nadar University. Has rich drone-making experience with Lockheed-Martin and iRobot Corp. Founder of India's leading drone-based services company.",
+          "linkedin": "#"
+        },
+        {
+          "type": "Collaborator",
+          "image": "https://static.wixstatic.com/media/bc6a73_639b87b5a2cc4fd68b0497c522ff34c1~mv2.jpg/v1/crop/x_0,y_0,w_436,h_427/fill/w_523,h_512,al_c,lg_1,q_80,enc_avif,quality_auto/WhatsApp%20Image%202022-07-31%20at%201_21_edited.jpg",
+          "name": "Mr. Souraj S R",
+          "role": "R&D Lead, Omnipresent Robo Tech",
+          "qualifications": "Mechatronics Engineering (Nehru Institute of Engineering and Technology)",
+          "about": "Expertise in assemblies, hardware integration, PCB design, piloting, RPA design, and manufacturing of drones. Successfully developed India's longest 50km-range drone and led major Survey of India mapping projects.",
+          "linkedin": "#"
+        },
+        {
+          "type": "Collaborator",
+          "image": "https://static.wixstatic.com/media/bc6a73_68329b038d14431092ba634b9d899470~mv2.jpg/v1/crop/x_0,y_3,w_200,h_197/fill/w_280,h_276,al_c,lg_1,q_80,enc_avif,quality_auto/1516872346233.jpg",
+          "name": "Ms. Jyoti Vashishtha",
+          "role": "CTO, Omnipresent Robo Tech",
+          "qualifications": "MS (University of California, US), MS (TU Munich, Germany)",
+          "about": "Expert in wireless communications, robotics, and AI. Winner of the Top 20 Women in Comp Sc award from US NSF and Dept. of Science and Technology, Gold Medalist.",
+          "linkedin": "#"
+        },
+        {
+          "type": "Collaborator",
+          "image": "https://static.wixstatic.com/media/4e2fa9_944cf62acf634307a39c5ebc6d762c3f~mv2.jpg/v1/crop/x_13,y_31,w_787,h_769/fill/w_787,h_769,al_c,q_85,enc_avif,quality_auto/shravan%20yadav%20photmo.jpg",
+          "name": "Mr. Shravan Yadav",
+          "role": "Drone Expert, Omnipresent Robo Tech",
+          "qualifications": "B.Tech. in Aeronautical Engineering",
+          "about": "Specialist in drone piloting and operations with experience in developing advanced UAV platforms and training programs.",
+          "linkedin": "#"
+        }
+      ]
+    },
+    "partners": {
+      "sectionTitle": "Our Collaborators",
+      "sectionSubtitle": "Strategic partners supporting our mission",
+      "interval": 5000,
+      "partnersData": [
+        {
+          "name": "Omnipresent Robot Tech",
+          "type": "Industrial Partner",
+          "description": "India's leading drone-based services company with expertise in drone manufacturing, aerial mapping, and robotics solutions.",
+          "image": "https://static.wixstatic.com/media/bc6a73_2275e7e08d2b4d9baa997a767c832f43~mv2.jpeg/v1/fill/w_280,h_280,al_c,lg_1,q_80,enc_avif,quality_auto/IASCLogo_edited.jpeg",
+          "year": "2021"
+        },
+        {
+          "name": "IASC Sector Skill Council",
+          "type": "Training Partner",
+          "description": "Committed to developing a skilled workforce in instrumentation, automation, and communication through specialized training programs.",
+          "image": "https://static.wixstatic.com/media/bc6a73_954898b7b20e46ccbd227f643a21e05c~mv2.png/v1/fill/w_405,h_162,al_c,lg_1,q_85,enc_avif,quality_auto/IASCLogo_edited.png",
+          "year": "2020"
+        }
+      ]
+    },
+    "projects": {
+      "title": "Our Projects",
+      "subtitle": "Innovative initiatives transforming ideas into reality",
+      "coedtProjects": [
+        {
+          "name": "X8 Drones",
+          "snippet_description": "X8 PRO multirotor frame is a professional UAV platform designed to be lightweight, rigid, and powerful for various aerial applications.",
+          "page_description": "(not available)",
+          "category": "UAV Platform",
+          "year": "2023",
+          "status": "Prototype",
+          "technologies": [
+            "Multirotor",
+            "Composite Materials"
+          ]
+        },
+        {
+          "name": "Talon to VTOL Drone",
+          "snippet_description": "VTOL stands for vertical take-off and landing and, as the name suggests, refers to aircraft that can take off, hover, and land vertically.Talon is a fixed wing drone, and our objective is to convert talon to the specifications of VTOL.",
+          "page_description": "(not available)",
+          "image": "https://static.wixstatic.com/media/bc6a73_8c7745ab40aa4003ad1b0117ce094170~mv2.jpeg/v1/fill/w_1280,h_793,al_c,q_85,enc_auto/bc6a73_8c7745ab40aa4003ad1b0117ce094170~mv2.jpeg",
+          "category": "R&D",
+          "year": "2024",
+          "status": "Ongoing",
+          "technologies": [
+            "VTOL",
+            "Aero Design"
+          ]
+        },
+        {
+          "name": "GCS Team (Ground Control System)",
+          "snippet_description": "Currently working on web app which will be providing the functionality of mission planner Ardu pilot in a web app.",
+          "page_description": "(not available)",
+          "image": "https://static.wixstatic.com/media/bc6a73_4bcecbc100194617ad3d93ab74b0d053~mv2.jpeg/v1/fill/w_1125,h_697,al_c,q_85,enc_auto/bc6a73_4bcecbc100194617ad3d93ab74b0d053~mv2.jpeg",
+          "category": "Software",
+          "year": "2024",
+          "status": "Ongoing",
+          "technologies": [
+            "Web App",
+            "ArduPilot"
+          ]
+        },
+        {
+          "name": "Battery Management System",
+          "snippet_description": "Designing an intelligent battery management system to monitor and optimize drone power performance and safety.",
+          "page_description": "(not Available)",
+          "image": "https://static.wixstatic.com/media/bc6a73_78f89ef573894fc58f855af77da18166~mv2.jpeg/v1/fill/w_1280,h_793,al_c,q_85,enc_auto/bc6a73_78f89ef573894fc58f855af77da18166~mv2.jpeg",
+          "category": "Electronics",
+          "year": "2023",
+          "status": "Prototype",
+          "technologies": [
+            "BMS",
+            "Embedded Systems"
+          ]
+        },
+        {
+          "name": "Anti-Drone Systems",
+          "snippet_description": "The rapid growth in drone technology has also increased the misuse of the technology. So, to safeguard our border and essential places, we are designing an Anti-Drone system that not only acts as defence barrier but also provides a counter mechanism for the security of our own drones within the range.",
+          "page_description": "(not available)",
+          "image": "https://static.wixstatic.com/media/bc6a73_039543bc259544819016aedd87e4ef8a~mv2.jpeg/v1/fill/w_1043,h_646,al_c,q_85,enc_auto/bc6a73_039543bc259544819016aedd87e4ef8a~mv2.jpeg",
+          "category": "Security",
+          "year": "2024",
+          "status": "Research",
+          "technologies": [
+            "RF Jamming",
+            "AI Detection"
+          ]
+        }
+      ]
+    },
+    "course": {
+      "sectionTitle": "Courses Offered by CEDT",
+      "sectionSubtitle": "Innovative initiatives transforming ideas into reality",
+      "imageSrc": "https://static.wixstatic.com/media/bc6a73_3e2930e1dc9c4470ad30f1ecb2798f1d~mv2.jpeg/v1/fill/w_686,h_634,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/WhatsApp%20Image%202022-07-31%20at%203_40_50%20AM.jpeg",
+      "imageAlt": "Drone Training Course",
+      "badgeText": "NEW",
+      "courseTitle": "Training & Certification in Drone Designing & Piloting",
+      "courseDescription": "Become a certified professional drone pilot. Master drone designing, flight concepts, assembly, maintenance, and real-time applications like agriculture, mapping, and flood damage assessment.",
+      "duration": "5 + 1 Weeks",
+      "price": "₹49,000",
+      "eligibility": "2nd Year+ Engineering, Diploma & Science Graduates",
+      "startDate": "6th September 2022",
+      "venue": "CEDT, USICT, Gautam Buddha University, Greater Noida",
+      "highlights": [
+        "Industry and Academic Instructors",
+        "DGCA Rules & Regulations",
+        "25 Hours of Drone Flying Practice",
+        "Job Placement Assistance"
+      ],
+      "syllabusLink": "https://7a2bea21-c5bc-4fa1-b8be-086c5a1eee6c.filesusr.com/ugd/bc6a73_592d5b8fa98a44f986866c8476395b7e.pdf"
+    },
+    "facilities": {
+      "sectionTitle": "Facilities Offered",
+      "coedtFacilities": [
+        {
+          "title": "CEDT Research & Development Laboratory",
+          "description": "Equipped for end-to-end drone manufacturing with frameworks, propulsion, aerodynamics, communication, automation, payloads, security, and control systems.",
+          "image": "https://iirc.jnec.org/images/uav1.jpg"
+        },
+        {
+          "title": "Designing Lab",
+          "description": "Executed with expert guidance and AI-powered modeling, layout, and visualization software for precise design analysis.",
+          "image": "http://meow.tilchattaas.com/media/realtedimg/drone_center.webp"
+        },
+        {
+          "title": "Flying Zone",
+          "description": "511-acre campus with open spaces simplifying and streamlining the flight test process.",
+          "image": "https://images.shiksha.com/mediadata/images/articles/1648028576phpVlRT31.jpeg"
+        },
+        {
+          "title": "Assembly Lab",
+          "description": "In-house rapid prototyping and advanced manufacturing tools for streamlined assembly.",
+          "image": "https://www.grenonews.com/wp-content/uploads/2022/06/GBU.jpg"
+        },
+        {
+          "title": "Smart Classroom",
+          "description": "Modern teaching spaces with projectors, LCD panels, and an integrated learning management system.",
+          "image": "https://www.gbu.ac.in/facilities/assets/images/audi-04_1.jpeg"
+        }
+      ]
+    },
+    "talks": {
+      "sectionTitle": "Recent Talks and Sessions",
+      "coedtTalks": [
+        {
+          "title": "How Drones Will Bring Big Disruptions in Industry and Jobs",
+          "speaker": "Akash Sinha",
+          "dateTime": "10th March 2022 · 3 PM",
+          "venue": "Main Auditorium, GBU",
+          "description": "Mr. Aakash Sinha (Founder & CEO, Omnipresent Robot Tech) discussed how drone technology will transform industry and create new job opportunities.",
+          "image": "https://static.wixstatic.com/media/bc6a73_2f88081adf9b46e78e93c605386874a6~mv2.jpeg/v1/crop/x_0,y_1,w_904,h_1278/fill/w_478,h_676,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/talk1.jpeg.",
+          "youtubeLink": "https://youtu.be/B3W3wQ4ZRPQ?si=fFNMi3zv43gu1PoJ"
+        }
+      ]
+    },
+    "media": {
+      "sectionTitle": "Media Coverage",
+      "sectionSubtitle": "Explore how our work is making headlines",
+      "mediaItems": [
+        {
+          "title": "Drone Pilot Course at Gautam Buddha University",
+          "date": "2022-04-23",
+          "image": "https://static.wixstatic.com/media/bc6a73_ed122f7cc89e48619d459f4272eba491~mv2.jpg",
+          "description": "Gautam Buddha University to launch drone pilot training courses with short-term modules for aspiring drone operators.",
+          "link": "https://www.navodayatimes.in/news/khabre/drone-pilot-will-also-now-have-a-course-in-gautam-buddha-university/197826/"
+        },
+        {
+          "title": "GBU to Make History with First Drone Course in UP",
+          "date": "2022-05-20",
+          "image": "../../assets/project1.png",
+          "description": "Gautam Buddha University to launch UP’s first-ever drone certification course, marking a significant milestone.",
+          "link": ""
+        },
+        {
+          "title": "Drone Courses to Boost Youth Employment at GBU",
+          "date": "2022-05-01",
+          "image": "https://static.wixstatic.com/media/bc6a73_009334d175304d4485f3f7eabe50dad5~mv2.jpeg/v1/fill/w_815,h_358,al_c,lg_1,q_80,enc_avif,quality_auto/11062b_fd5c21cdc57f4b19b00f8ec0988396fe_.jpeg",
+          "description": "Three new drone technology programs launching at GBU to support youth employment and skilling in drone manufacturing, piloting, and technology.",
+          "link": "https://www.patrika.com/noida-news/gautam-buddha-university-will-conduct-3-type-short-term-drone-course-7470045"
+        },
+        {
+          "title": "GBU to Become Smart Campus with Drone Manufacturing & Training",
+          "date": "2022-06-01",
+          "image": "https://static.wixstatic.com/media/bc6a73_d4a5adff6b184bd39773f481faab5635~mv2.jpg/v1/fill/w_815,h_358,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_fd5c21cdc57f4b19b00f8ec0988396fe_.jpg",
+          "description": "New developments at GBU to open employment avenues through drone manufacturing and pilot training initiatives.",
+          "link": ""
+        },
+        {
+          "title": "GBU at Bharat Drone Mahotsav 2022",
+          "date": "2022-05-27",
+          "image": "https://static.wixstatic.com/media/bc6a73_39c8b7fad71449f4814235f25c45bf6f~mv2.jpg/v1/fill/w_792,h_347,al_c,lg_1,q_80,enc_avif,quality_auto/11062b_fd5c21cdc57f4b19b00f8ec0988396fe_.jpg",
+          "description": "Gautam Buddha University showcased its drone technology centre at the Bharat Drone Mahotsav 2022 with student participation.",
+          "link": "https://www.grenonews.com/?p=57408"
+        },
+        {
+          "title": "Students at GBU Building Delivery Drones",
+          "date": "2022-07-01",
+          "image": "https://static.wixstatic.com/media/bc6a73_c395997f244f43d5bccd5310bd8deae2~mv2.jpeg/v1/fill/w_749,h_329,al_c,q_80,enc_avif,quality_auto/11062b_fd5c21cdc57f4b19b00f8ec0988396fe_.jpeg",
+          "description": "GBU students actively engaged in drone manufacturing projects including delivery drones for smart solutions.",
+          "link": "https://www.amarujala.com/delhi-ncr/noida/gbu-students-are-making-delivery-drones-noida-news-noi6522566115"
+        },
+        {
+          "title": "GBU to Make History with First Drone Course in UP",
+          "date": "2022-05-20",
+          "image": "project1",
+          "description": "Gautam Buddha University to launch UP’s first-ever drone certification course, marking a significant milestone.",
+          "link": ""
+        },
+        {
+          "title": "Centre for Drone Studies Established at GBU",
+          "date": "2022-06-15",
+          "image": "https://static.wixstatic.com/media/bc6a73_069991b6d1a843e8a6867111d103a6ab~mv2.jpeg/v1/fill/w_815,h_358,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_fd5c21cdc57f4b19b00f8ec0988396fe_.jpeg",
+          "description": "Gautam Buddha University sets up a dedicated Centre for Drone Studies focusing on research, training, and development.",
+          "link": "https://www.shiksha.com/news/college-gautam-buddha-university-establishes-centre-for-drone-studies-blogId-86279"
+        }
+      ]
+    }
+  },
+  "raem": {
+    "hero": {
+      "title": "Center for Rapid and Alternative Energy Mobility",
+      "subtitle": "Empowering Sustainable Mobility and Clean Energy Innovation",
+      "bgTheme": 4
+    },
+    "aboutRAEM": {
+      "visionText": [
+        "To be a national leader in research, innovation, and capacity-building for sustainable, rapid, and alternative energy mobility systems.",
+        "RAEM aspires to create a robust ecosystem that bridges academia, industry, and government to advance railways, metro systems, hydrogen mobility, and renewable energy technologies."
+      ],
+      "missionPoints": [
+        "Conduct research & develop solutions in railway signaling, telecom, and RAMS",
+        "Undertake collaborative and contract research with Indian Railways and industry",
+        "Offer specialized Diploma, Certificate, and M.Tech. programs",
+        "Provide hands-on training and internships in rapid and alternative energy mobility",
+        "Promote sustainable, innovative transport solutions for India’s future"
+      ],
+      "sections": [
+        {
+          "heading": "Our Story",
+          "text": "The Centre for Rapid and Alternative Energy Mobility (RAEM) is an initiative of Gautam Buddha University dedicated to advancing education, research, and innovation in rapid mobility systems, metro rail engineering, and alternative energy transportation such as hydrogen-powered vehicles and maglev trains."
+        },
+        {
+          "heading": "What We Do",
+          "text": "RAEM offers specialized Diploma, Certificate, and M.Tech programs in Railway Signaling, Telecom, and RAMS. The Centre undertakes collaborative and contract research, provides training workshops, and develops indigenous solutions for the challenges faced by India's growing transportation sector."
+        },
+        {
+          "heading": "Our Commitment",
+          "text": "We are committed to empowering the next generation of engineers, technologists, and innovators through industry-driven education, advanced R&D infrastructure, and meaningful partnerships with Indian Railways, NMRC, and DMRC."
+        }
+      ],
+      "photos": "../../assets/Raem.png"
+    },
+    "functionalAreas": [
+      {
+        "title": "Signal, Telecom and RAMS",
+        "description": "Specialized focus on Railway Signaling, Telecom & Optical Fiber Technology, and RAMS to enhance safety, reliability, and efficiency in railway operations.",
+        "image": "../../assets/fnarea1.png"
+      },
+      {
+        "title": "Education & Training Programs",
+        "description": "Short-term courses, Certificate Programs, One-Year Diploma, and Two-Year M.Tech in Railway Signaling, Telecom, and RAMS to develop skilled professionals.",
+        "image": "../../assets/fnarea2.png"
+      },
+      {
+        "title": "Research and Development in Mobility",
+        "description": "Product development, lab establishment for ERTMS Level 1 & 2, and advanced R&D in traffic signaling, rolling stock, and reliability solutions.",
+        "image": "../../assets/fnarea3.png"
+      },
+      {
+        "title": "Alternative Energy Solutions",
+        "description": "Exploring hydrogen-powered vehicles, solar energy, and other renewable techniques to promote sustainable transportation systems.",
+        "image": "../../assets/fnarea4.png"
+      },
+      {
+        "title": "Maintenance & Optimization",
+        "description": "Forecasting reliability, managing inventory, preventive and corrective maintenance, and developing optimization solutions for smooth operations.",
+        "image": "https://img.freepik.com/premium-photo/smart-grid-optimization-renewable-energy_1022456-162721.jpg"
+      }
+    ],
+    "courses": [
+      {
+        "title": "Reliability Availability Maintainability & Safety (RAMS)",
+        "duration": "3 Months / 6 Months / 2 Years",
+        "description": "Learn theoretical concepts, methodologies, models, and tools for function preservation and failure prevention across asset life cycles.",
+        "eligibility": "B.Tech/B.E with 2 years experience / Diploma holders with 3 years work experience.",
+        "fee": "₹50,000 – ₹4,00,000",
+        "highlights": [
+          "Function Preservation",
+          "Failure Prevention",
+          "Reliability Modelling",
+          "System Safety",
+          "RAMS Tools",
+          "Lifecycle Management"
+        ],
+        "gradient": "from-blue-500 to-blue-600",
+        "bgImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhVIlJrs7nn3dc8dqjjmkDMV4uco-oPkYtwg&s",
+        "syllabusLinks": [
+          {
+            "label": "Fundamentals",
+            "url": "https://example.com/rams-fundamentals.pdf"
+          },
+          {
+            "label": "Advanced",
+            "url": "http://raem.gbu.ac.in/pdf's/rams%20advanced.pdf"
+          }
+        ]
+      },
+      {
+        "title": "Prognostics & Health Management (PHM)",
+        "duration": "3 Months / 6 Months",
+        "description": "Develop tools and methods for assessing and managing the remaining useful life (RUL) of assets aligned with business objectives.",
+        "eligibility": "B.Tech/B.E with 2 years experience / Diploma holders with 3 years work experience.",
+        "fee": "₹45,000 – ₹90,000",
+        "highlights": [
+          "RUL Prediction",
+          "Condition Monitoring",
+          "Failure Forecasting",
+          "Data Analytics",
+          "Health Assessment",
+          "Decision Support"
+        ],
+        "gradient": "from-purple-500 to-purple-600",
+        "bgImage": "https://eda.europa.eu/images/default-source/images/battage-cropped?auto=format&fit=crop&w=800&q=80",
+        "syllabusLinks": [
+          {
+            "label": "Basic",
+            "url": "http://raem.gbu.ac.in/pdf's/PHM%20basic.pdf"
+          },
+          {
+            "label": "Advanced",
+            "url": "https://example.com/phm-advanced.pdf"
+          }
+        ]
+      },
+      {
+        "title": "Maintenance Engineering (ME)",
+        "duration": "3 Months / 6 Months",
+        "description": "Gain foundational knowledge of maintenance engineering for industrial assets and infrastructure, covering life cycle perspectives.",
+        "eligibility": "B.Tech/B.E with 2 years experience / Diploma holders with 3 years work experience.",
+        "fee": "₹45,000 – ₹90,000",
+        "highlights": [
+          "Maintenance Planning",
+          "Preventive Maintenance",
+          "Asset Management",
+          "Reliability Improvement",
+          "Lifecycle Costing",
+          "Industrial Application"
+        ],
+        "gradient": "from-green-500 to-green-600",
+        "bgImage": "https://www.aviationjobsearch.com/storage/AJS/uploads/hub/advices/QnNoMqGb8rk4SV01DyNOOSZXATjxnQ8voaBk5Y5T.png?auto=format&fit=crop&w=800&q=80",
+        "syllabusLinks": [
+          {
+            "label": "Fundamentals",
+            "url": "http://raem.gbu.ac.in/pdf's/Maintenance.pdf"
+          }
+        ]
+      }
+    ],
+    "events": [
+      {
+        "id": 1,
+        "title": "DMRC Visit",
+        "date": "2024-09-10",
+        "category": "Workshop",
+        "images": [
+          {
+            "url": "http://raem.gbu.ac.in/images/demo/gallery/square/IMG_20190423_134947.jpg",
+            "caption": "Group Photo"
+          },
+          {
+            "url": "http://raem.gbu.ac.in/images/demo/gallery/v_long/20190423_132338.jpg",
+            "caption": "Discussion during visit"
+          },
+          {
+            "url": "http://raem.gbu.ac.in/images/demo/gallery/long/samsung%20pics%20dec%202019%20197.jpg",
+            "caption": "Hands-on demonstration"
+          },
+          {
+            "url": "http://raem.gbu.ac.in/images/demo/gallery/square/nmrc1.jpg",
+            "caption": "Interactive session"
+          }
+        ]
+      }
+    ]
+  },
+  "board_of_studies": {
+    "departments": [
+      {
+        "name": "Department of IT",
+        "members": [
+          {
+            "name": "Dr. Arpit Bhardwaj",
+            "designation": "Dean, School of ICT",
+            "university": "Gautam Buddha University",
+            "location": "Greater Noida",
+            "role": "Chairperson",
+            "phone": "+91-8878853111",
+            "email": "arpit.bhardwaj@gbu.ac.in"
+          },
+          {
+            "name": "Dr. Neeta Singh",
+            "designation": "Department of IT, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "HoD",
+            "phone": "+91-9990715153",
+            "email": "neeta@gbu.ac.in"
+          },
+          {
+            "name": "Dr. Arun Solanki",
+            "designation": "Department of CSE, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "Member",
+            "email": "asolanki@gbu.ac.in"
+          },
+          {
+            "name": "Dr. Vidushi Sharma",
+            "designation": "Department of ECE",
+            "university": "Delhi Technological University",
+            "location": "Delhi",
+            "role": "Member",
+            "email": "vidushi@gbu.ac.in"
+          },
+          {
+            "name": "Dr. Maneet Singh",
+            "designation": "Department of IT, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "Member",
+            "email": "maneet.singh@gbu.ac.in"
+          },
+          {
+            "name": "Dr. Akash Kumar",
+            "designation": "Department of IT, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "Member",
+            "phone": "9549539572",
+            "email": "akash.kumar@gbu.ac.in"
+          },
+          {
+            "name": "Prof. Kapil Sharma",
+            "designation": "Department of IT, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "External Expert"
+          }
+        ]
+      },
+      {
+        "name": "Department of CSE",
+        "members": [
+          {
+            "name": "Dr. Arpit Bhardwaj",
+            "designation": "Dean, School of ICT",
+            "university": "Gautam Buddha University",
+            "location": "Greater Noida",
+            "role": "Chairperson",
+            "phone": "+91-8878853111",
+            "email": "arpit.bhardwaj@gbu.ac.in"
+          },
+          {
+            "name": "Dr. Arun Solanki",
+            "designation": "Department of CSE, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "Member",
+            "email": "asolanki@gbu.ac.in"
+          },
+          {
+            "name": "Dr. Vidushi Sharma",
+            "designation": "Department of ECE, School of ICT",
+            "university": "Gautam Buddha University",
+            "location": "Delhi",
+            "role": "Member",
+            "email": "vidushi@gbu.ac.in"
+          },
+          {
+            "name": "Dr. Neeta Singh",
+            "designation": "Department of IT, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "Member",
+            "phone": "+91-9990715153",
+            "email": "neeta@gbu.ac.in"
+          },
+          {
+            "name": "Dr. Pradeep Tomar",
+            "designation": "Department of CSE, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "Member",
+            "phone": "+91-9899874830",
+            "email": "pradeep.tomar@gbu.ac.in"
+          },
+          {
+            "name": "Dr. R.B. Singh",
+            "designation": "Department of CSE, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "Member",
+            "email": "rajendra@gbu.ac.in"
+          },
+          {
+            "name": "Prof. Komal Bhatia",
+            "designation": "JC Bose University of Science and Technology",
+            "university": "JC Bose University",
+            "location": "Faridabad",
+            "role": "External Member"
+          },
+          {
+            "name": "Prof. Arun Sharma",
+            "designation": "IGDTUW",
+            "university": "Indira Gandhi Delhi Technical University for Women",
+            "location": "Delhi",
+            "role": "External Member"
+          }
+        ]
+      },
+      {
+        "name": "Department of ECE",
+        "members": [
+          {
+            "name": "Dr. Arpit Bhardwaj",
+            "designation": "Dean, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "Chairperson",
+            "phone": "+91-8878853111",
+            "email": "arpit.bhardwaj@gbu.ac.in"
+          },
+          {
+            "name": "Prof. Brahmjit Singh",
+            "designation": "Professor",
+            "university": "NIT Kurukshetra",
+            "role": "External Expert"
+          },
+          {
+            "name": "Prof. D.K. Lobiyal",
+            "designation": "Professor",
+            "university": "Jawaharlal Nehru University",
+            "location": "Delhi",
+            "role": "External Expert"
+          },
+          {
+            "name": "Dr. Vidushi Sharma",
+            "designation": "HoD, Department of ECE",
+            "university": "Gautam Buddha University",
+            "role": "Member",
+            "email": "vidushi@gbu.ac.in"
+          },
+          {
+            "name": "Dr. Rajesh Mishra",
+            "designation": "Department of ECE, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "Member",
+            "phone": "+919717949251",
+            "email": "rmishra@gbu.ac.in"
+          },
+          {
+            "name": "Dr. Priyanka Goyal",
+            "designation": "Department of ECE, School of ICT",
+            "university": "Gautam Buddha University",
+            "role": "Member",
+            "email": "priyankag@gbu.ac.in"
+          }
+        ]
+      }
+    ]
+  },
+  "staff_members": [
+    {
+      "department": "Electronics and Communication Engineering",
+      "short": "ECE",
+      "members": [
+        {
+          "name": "Mr. Ravindra Kumar",
+          "designation": "Technical Superintendent",
+          "phone": "9560539604",
+          "email": "ravindra@gbu.ac.in"
+        },
+        {
+          "name": "Mr. Himanshu Saini",
+          "designation": "Technical Superintendent",
+          "phone": "9540593279",
+          "email": "himanshu@gbu.ac.in"
+        },
+        {
+          "name": "Mr. Anmol Nagar",
+          "designation": "Technical Superintendent",
+          "phone": "9910997540",
+          "email": "anmol@gbu.ac.in"
+        },
+        {
+          "name": "Mr. Amit Kumar",
+          "designation": "Lab Assistant",
+          "phone": "9266097577",
+          "email": "amitk2193@gmail.com"
+        },
+        {
+          "name": "Mr. Chandra Pal Sharma",
+          "designation": "Lab Assistant",
+          "phone": "7703842834",
+          "email": "sharmachandrapal855@gmail.com"
+        },
+        {
+          "name": "Mr. Amar Singh",
+          "designation": "Lab Assistant",
+          "phone": "7275294737",
+          "email": "amaripec2006@gmail.com"
+        }
+      ]
+    },
+    {
+      "department": "Computer Science and Engineering",
+      "short": "CSE",
+      "members": [
+        {
+          "name": "Mr. Sanjeev Kumar",
+          "designation": "Technical Assistant",
+          "phone": "9760070427",
+          "email": "sanjeev@gbu.ac.in"
+        },
+        {
+          "name": "Mrs. Sunita",
+          "designation": "Technical Assistant",
+          "phone": "9871741203",
+          "email": "sunita@gbu.ac.in"
+        },
+        {
+          "name": "Mr. Nitin Kumar",
+          "designation": "Lab Assistant",
+          "phone": "8650431181",
+          "email": "nitinkumarmathur1968@gmail.com"
+        },
+        {
+          "name": "Mr. Arjit",
+          "designation": "Lab Assistant",
+          "phone": "9313404138",
+          "email": "arjitkumar38@gmail.com"
+        },
+        {
+          "name": "Mr. Rahul Kumar",
+          "designation": "Lab Assistant",
+          "phone": "9319799226",
+          "email": "davidrahulk1019@gmail.com"
+        },
+        {
+          "name": "Mrs. Kirti Chaudhary",
+          "designation": "Lab Assistant",
+          "phone": "9457714863",
+          "email": "kirtitevatiya43@gmail.com"
+        }
+      ]
+    },
+    {
+      "department": "Administration",
+      "short": "Admin",
+      "members": [
+        {
+          "name": "Mr. Shamem Raza",
+          "designation": "Executive Assistant",
+          "phone": "9910300194",
+          "email": "shamem@gbu.ac.in"
+        },
+        {
+          "name": "Mr. Salendra Kumar",
+          "designation": "Office Attendant",
+          "phone": "7701809870",
+          "email": "salendra@gbu.ac.in"
+        },
+        {
+          "name": "Mr. Lalit Sharma",
+          "designation": "Office Assistant",
+          "phone": "8510927518",
+          "email": "lalit.sharma812@gmail.com"
+        },
+        {
+          "name": "Mr. Arvind Kumar",
+          "designation": "Office Attendant",
+          "phone": "9625397081",
+          "email": "talibarvind@gmail.com"
+        },
+        {
+          "name": "Mr. Ritesh Kumar",
+          "designation": "Lab Attendant",
+          "phone": "9458876635",
+          "email": "ritesh945887@gmail.com"
+        },
+        {
+          "name": "Mr. Raghuveer Verma",
+          "designation": "Office Attendant",
+          "phone": "8506929538",
+          "email": "raghuveervermagbu@gmail.com"
+        },
+        {
+          "name": "Mr. Anish",
+          "designation": "Office Attendant",
+          "phone": "7505056660",
+          "email": "anishkhansofiya75075000@gmail.com"
+        },
+        {
+          "name": "Mr. Vivek",
+          "designation": "Office Attendant",
+          "phone": "8433209830",
+          "email": "Vivekkumar897961@gmail.com"
+        },
+        {
+          "name": "Mr. Monu Tevatiya",
+          "designation": "Office Attendant",
+          "phone": "7599497598",
+          "email": "teotiamonu98@gmail.com"
+        }
+      ]
+    }
+  ],
+  "laboratories": [
+    {
+      "name": "Advance Analog and Digital Communication Lab",
+      "faculty": "Dr. Priyanka Goyal",
+      "support": "Mr. Anmol Nagar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "isNew": true,
+      "category": "Communication"
+    },
+    {
+      "name": "Advance DSP Lab",
+      "faculty": "Dr. Rajesh Mishra",
+      "support": "Mr. Himanshu Saini",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "isNew": true,
+      "category": "Processing"
+    },
+    {
+      "name": "Artificial Intelligence and Robotic Lab",
+      "faculty": "Dr. Anurag Singh Baghel",
+      "support": "Mr. Anmol Nagar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "AI/Robotics"
+    },
+    {
+      "name": "Basic Electronics Lab",
+      "faculty": "Dr. Priyanka Goyal",
+      "support": "Ms. Ravindra Kumar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Electronics"
+    },
+    {
+      "name": "Computer Laboratory-I",
+      "faculty": "Dr. Pradeep Tomar",
+      "support": "Mrs. Sunita",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Computing"
+    },
+    {
+      "name": "Computer Laboratory-II",
+      "faculty": "Dr. Arun Solanki",
+      "support": "Mrs. Sunita",
+      "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80",
+      "category": "Computing"
+    },
+    {
+      "name": "Computer Networking Lab",
+      "faculty": "Dr. Neeta Singh",
+      "support": "Ms. Sanjeev Kumar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Networking"
+    },
+    {
+      "name": "Cyber Security Lab",
+      "faculty": "Dr. Aarti Gautam Dinker",
+      "support": "Mr. Sanjeev Kumar",
+      "image": "https://images.unsplash.com/photo-1591696205602-2f950c417cb9?auto=format&fit=crop&w=800&q=80",
+      "category": "Security"
+    },
+    {
+      "name": "Design Lab (WCN)",
+      "faculty": "Dr. Neeta Singh",
+      "support": "Mr. Sanjeev Kumar",
+      "image": "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80",
+      "category": "Design"
+    },
+    {
+      "name": "Design Lab (VLSI Design)",
+      "faculty": "Dr. Navid Zafar Rizvi",
+      "support": "Mr. Anmol Nagar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Design"
+    },
+    {
+      "name": "Digital Electronics Lab",
+      "faculty": "Dr. R. B. Singh",
+      "support": "Mr. Himanshu Saini",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Electronics"
+    },
+    {
+      "name": "Digital IC Design Lab",
+      "faculty": "Dr. Navid Zafar Rizvi",
+      "support": "Mr. Anmol Nagar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Design"
+    },
+    {
+      "name": "Electronics Circuits Lab",
+      "faculty": "Dr. Priyanka Goyal",
+      "support": "Ms. Ravindra Kumar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Electronics"
+    },
+    {
+      "name": "Electronics Workshop",
+      "faculty": "Dr. Vimlesh Kumar",
+      "support": "Ms. Himanshu Saini",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Electronics"
+    },
+    {
+      "name": "Expert System Lab",
+      "faculty": "Dr. Arun Solanki",
+      "support": "Mrs. Sunita",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "AI/Robotics"
+    },
+    {
+      "name": "Logic Design Lab",
+      "faculty": "Dr. Anurag Singh Baghel",
+      "support": "Mr. Anmol Nagar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Design"
+    },
+    {
+      "name": "Multimedia Technology",
+      "faculty": "Dr. Pradeep Tomar",
+      "support": "Mrs. Sunita",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Computing"
+    },
+    {
+      "name": "Microwave and Antenna Lab",
+      "faculty": "Dr. Navid Zafar Rizvi",
+      "support": "Mr. Ravindra Kumar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Communication"
+    },
+    {
+      "name": "Microwave Engineering Lab",
+      "faculty": "Dr. Navid Zafar Rizvi",
+      "support": "Mr. Ravindra Kumar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Communication"
+    },
+    {
+      "name": "Microprocessor and Interface Lab",
+      "faculty": "Dr. Navid Zafar Rizvi",
+      "support": "Mr. Anmol Nagar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Processing"
+    },
+    {
+      "name": "Optical Communication Lab",
+      "faculty": "Dr. Rajesh Mishra",
+      "support": "Mr. Ravindra Kumar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Communication"
+    },
+    {
+      "name": "Parallel Processing Lab",
+      "faculty": "Dr. Neeta Singh",
+      "support": "Ms. Sanjeev Kumar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Processing"
+    },
+    {
+      "name": "Research Project Lab",
+      "faculty": "Dr. Pradeep Tomar",
+      "support": "Mrs. Sunita",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Research"
+    },
+    {
+      "name": "Software Engineering Lab",
+      "faculty": "Dr. Sandhya Tarar",
+      "support": "Ms. Sanjeev Kumar",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtLAeCAdQnVrZ6GOZwqQsLI4WMz9LHaF7W0A&s",
+      "category": "Computing"
+    }
+  ],
+  "conferences": [
+    {
+      "title": "1st International Conference on Artificial Intelligence and Sustainable Computing for Smart Cities (AIS2C2: 2021)",
+      "details": "This international conference served as a collaborative platform for researchers, academicians, and industry experts from India, Poland, Romania, Bulgaria, and Nigeria to explore innovative applications of Artificial Intelligence (AI) in developing sustainable smart city solutions. Key discussions included intelligent transportation systems, energy-efficient infrastructure, smart governance models, urban IoT networks, and ethical AI deployment. The event emphasized interdisciplinary research and global cooperation to address urban challenges through AI.",
+      "date": "March 22nd - 23rd, 2021"
+    },
+    {
+      "title": "Two Days 1st Online International Conference on Rebuilding Bharat with Artificial Intelligence (AI) Interventions after COVID-19 Pandemic: Opportunity and Challenges",
+      "details": "In the aftermath of the COVID-19 pandemic, this online conference focused on how AI can play a transformative role in rebuilding India's socio-economic fabric. Experts presented papers and case studies on AI applications in public health, education, agriculture, smart governance, and disaster response. The conference aimed to bridge the gap between AI theory and real-world implementation for national resilience and future preparedness.",
+      "date": "May 02-03, 2020"
+    },
+    {
+      "title": "International Conference on 2012 Emerging Paradigms and Practices in Information & Communication Technology and Management (2012 EPPICTM)",
+      "details": "EPPICTM 2012 brought together scholars and professionals from both academia and industry across the globe, particularly the USA and India, to discuss disruptive paradigms in ICT and management. The sessions covered cloud computing, business analytics, enterprise mobility, cybersecurity, and strategic information systems. It also facilitated global academic exchange and research partnerships through its collaborations with reputed American universities.",
+      "date": "26th - 28th July, 2012"
+    },
+    {
+      "title": "1st International Conference on Innovations and Advancements in Information and Communication Technology, 2012 (ICIAICT 2012)",
+      "details": "ICIAICT 2012 was organized to showcase emerging trends and breakthrough innovations in computing and communication technologies. Co-hosted with the Computer Society of India, the conference included technical tracks on wireless networks, data mining, embedded systems, software engineering, and human-computer interaction. Researchers, students, and practitioners exchanged ideas for advancing technology to meet next-generation demands.",
+      "date": "30th - 31st March, 2012"
+    },
+    {
+      "title": "COMMUNE Conference on Advancements in Communication, Computing & Signal Processing-2011 (COMMUNE CACCS, 2011)",
+      "details": "The COMMUNE CACCS 2011 conference aimed to provide a research forum for discussing current developments in signal processing, communication systems, and computing technologies. Scholars presented findings on speech and image processing, next-gen wireless protocols, high-performance computing, and embedded communication architectures. The event was particularly valuable for early-stage researchers and students to gain exposure to the evolving digital landscape.",
+      "date": "16th - 17th April, 2011"
+    }
+  ]
+}

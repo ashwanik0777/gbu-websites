@@ -1,0 +1,573 @@
+{
+  "slides": [
+    {
+      "image": "/assets/ICT.png",
+      "title": "School Of ICT",
+      "subtitle": "Shaping Tomorrow's Engineers Today"
+    },
+    {
+      "image": "/assets/CyberLab.jpeg",
+      "title": "State-of-the-Art Laboratories",
+      "subtitle": "Where Innovation Meets Technology"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=1920&h=1080&fit=crop",
+      "title": "Research & Development",
+      "subtitle": "Pioneering Solutions for Tomorrow"
+    }
+  ],
+  "componentName": "AboutSection",
+  "enabled": true,
+  "position": 2,
+  "props": {
+    "data": {
+      "heading": "About Us",
+      "subtitle": "School of Information and Communication Technology",
+      "floatingIcons": [
+        {
+          "iconName": "Code",
+          "size": 40,
+          "color": "text-blue-400",
+          "style": "top-20 left-10"
+        },
+        {
+          "iconName": "Lightbulb",
+          "size": 35,
+          "color": "text-purple-400",
+          "style": "top-32 right-20"
+        },
+        {
+          "iconName": "Rocket",
+          "size": 45,
+          "color": "text-indigo-400",
+          "style": "bottom-20 left-1/4"
+        }
+      ],
+      "cards": [
+        {
+          "title": "Our Mission",
+          "iconName": "Target",
+          "size": 28,
+          "bgGradient": "from-blue-500 to-purple-600",
+          "content": [
+            "The School of Information and Communication Technology (SOICT/USICT) is a premier institution committed to nurturing future-ready technocrats, innovators, and entrepreneurs in the dynamic field of ICT (Information and Communication Technology)."
+          ],
+          "highlight": [
+            "Guided by our vision of excellence and ethics, we empower students with cutting-edge knowledge, hands-on experience, and a strong value system to thrive in the global digital economy."
+          ]
+        },
+        {
+          "title": "Our Commitment",
+          "iconName": "Trophy",
+          "size": 28,
+          "bgGradient": "from-purple-500 to-pink-600",
+          "content": [
+            "At SOICT, we don't just teach technology—we inspire future pioneers. Through interdisciplinary research, hackathons, and mentorship, we foster a culture of curiosity and excellence."
+          ],
+          "bullets": [
+            "Skilled, motivated, and ethically grounded professionals",
+            "Ready to tackle global challenges",
+            "Transform the ICT landscape"
+          ]
+        }
+      ]
+    }
+  },
+  "ourNumbers": {
+    "title": "Our numbers speak for themselves",
+    "stats": [
+      { "value": 3, "label": "Departments", "suffix": "+" },
+      { "value": 15, "label": "Courses", "suffix": "+" },
+      { "value": 1200, "label": "Students", "suffix": "+" },
+      { "value": 45, "label": "Faculty", "suffix": "+" },
+      { "value": 200, "label": "Publications", "suffix": "+" },
+      { "value": 95, "label": "Placement Rate", "suffix": "%" }
+    ]
+  },
+  "dean": {
+    "name": "Dr. Arpit Bhardwaj",
+    "title": "Dean (I/C) – School of ICT, GBU",
+    "image": "https://www.gbu.ac.in/USICT/media/img/arpit%20bhardwaj.jpg",
+    "description": "University School of Information and Communication Technology came into existence in 2008 with the primary objective ... the sole objective of acquiring and propagating as much knowledge as possible to the students."
+  },
+  "departments": [
+    {
+      "name": "Department of Computer Science and Engineering",
+      "code": "DCSE",
+      "description": "The Department of Computer Science and Engineering offers programs in Computer Science, AI, ML, IoT, Data Science, and Cyber Security. ... and collaborates with IBM for industry-driven learning.",
+      "courses": [
+        "B.Tech. Computer Science and Engineering",
+        "B.Tech. CSE with specialization in Artificial Intelligence",
+        "B.Tech. CSE with specialization in Data Science",
+        "B.Tech. CSE with specialization in Cyber Security",
+        "M.Tech. CSE (Software Engineering)",
+        "M.Tech. CSE (Data Science)",
+        "M.Tech. CSE (Artificial Intelligence and Robotics)",
+        "M.Tech. CSE for Working Professionals",
+        "Integrated B.Tech.-M.Tech. (CSE) with specialization in Artificial Intelligence and Robotics, Data Science, Software Engineering",
+        "Ph.D. Computer Science Engineering"
+      ],
+      "faculty": 15,
+      "labs": [
+        "Cyber Security Centre of Excellence",
+        "Drone Centre of Excellence",
+        "State-of-the-art Computer Labs"
+      ],
+      "facilities": [
+        "Industry Visits",
+        "Workshops",
+        "Expert Lectures",
+        "National and International Conferences"
+      ],
+      "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop",
+      "gradient": "from-indigo-400 to-indigo-600",
+      "link": "/schools/soict/departments/computer-science-engineering"
+    },
+    {
+      "name": "Department of Information Technology",
+      "code": "DIT",
+      "description": "The Department of Information Technology focuses on Computer Applications, AI, Data Science, and IT. ... It emphasizes skill enhancement through workshops, industry visits, and up-to-date curriculum.",
+      "courses": [
+        "Bachelors in Computer Application (BCA)",
+        "B.Tech. Information Technology",
+        "B.Tech. IT Specialization in Data Science and Machine Learning",
+        "Masters in Computer Application (MCA)",
+        "MCA Specialization in Artificial Intelligence",
+        "MCA Specialization in Data Science",
+        "M.Tech. Information & Communication Technology",
+        "M.Tech. IT Specialization in Data Science and Machine Learning",
+        "Ph.D. Information Technology"
+      ],
+      "faculty": 4,
+      "labs": ["Modern IT Labs", "IoT and AI Labs"],
+      "facilities": [
+        "Skill Enhancement Workshops",
+        "Industry Visits",
+        "Guest Lectures",
+        "Research Guidance"
+      ],
+      "image": "https://images.unsplash.com/photo-1581090700227-4c4b2b65d6d0?w=400&h=250&fit=crop",
+      "gradient": "from-pink-400 to-pink-600",
+      "link": "/schools/soict/departments/information-technology"
+    },
+    {
+      "name": "Department of Electronics and Communication Engineering",
+      "code": "DECE",
+      "description": "The Department of Electronics and Communication Engineering offers cutting-edge programs in ECE, covering wireless communication, VLSI design, railway signaling and telecommunication. The department nurtures students for industry and research roles, delivering an updated curriculum with strong practical and theoretical foundations.",
+      "courses": [
+        "B.Tech. Electronics and Communication Engineering",
+        "Integrated B.Tech.-M.Tech. (ECE)",
+        "M.Tech. Wireless Communication and Networks",
+        "M.Tech. VLSI Design",
+        "M.Tech. Railway Signaling, Telecommunication and RAMS",
+        "Ph.D. Electronics and Communication Engineering"
+      ],
+      "faculty": 6,
+      "labs": [
+        "Wireless Communication Labs",
+        "VLSI Design Labs",
+        "Advanced ECE Research Labs"
+      ],
+      "facilities": [
+        "Industry Collaboration",
+        "Hands-on Research",
+        "Workshops and Seminars"
+      ],
+      "image": "https://images.unsplash.com/photo-1559136656-6ecfbb0f7f5d?w=400&h=250&fit=crop",
+      "gradient": "from-yellow-400 to-yellow-600",
+      "link": "/schools/soict/departments/electronics-communication-engineering"
+    }
+  ],
+  "programs": [
+    {
+      "name": "B.Tech. Computer Science & Engineering",
+      "code": "CSE",
+      "duration": "4 Years",
+      "specializations": ["Artificial Intelligence", "Data Science", "Cyber Security"],
+      "image": "https://images.unsplash.com/photo-1662638600476-d563fffbb072?w=600&auto=format&fit=crop&q=60",
+      "description": "UG program in CSE with specializations in AI, Data Science, Cyber Security."
+    },
+    {
+      "name": "Integrated B.Tech.–M.Tech. (CSE)",
+      "code": "CSE–Dual",
+      "duration": "5 Years",
+      "specializations": ["Artificial Intelligence and Robotics", "Data Science", "Software Engineering"],
+      "image": "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=600&h=400",
+      "description": "5‑year integrated CSE dual‑degree granting B.Tech + M.Tech in AI & Robotics, Data Science or Software Engineering."
+    },
+    {
+      "name": "M.Tech. CSE",
+      "code": "M.Tech CSE",
+      "duration": "2 Years",
+      "specializations": ["Artificial Intelligence and Robotics", "Data Science", "Software Engineering"],
+      "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&h=400",
+      "description": "Postgraduate program in CSE offering specializations in AI & Robotics, Data Science, Software Engineering."
+    },
+    {
+      "name": "Ph.D. CSE",
+      "code": "Ph.D CSE",
+      "duration": "Varies",
+      "specializations": ["Computer Science & Engineering Research"],
+      "image": "https://plus.unsplash.com/premium_photo-1716396586363-4b942672c2ca?w=600&auto=format&fit=crop&q=60",
+      "description": "Doctoral research in CSE across AI, ML, Cybersecurity, IoT and related areas."
+    },
+    {
+      "name": "Bachelors in Computer Application (BCA)",
+      "code": "BCA",
+      "duration": "3 Years",
+      "specializations": [],
+      "image": "https://images.unsplash.com/photo-1581090700227-4c4b2b65d6d0?w=600&auto=format&fit=crop&q=60",
+      "description": "Undergraduate BCA program focusing on foundational computer applications."
+    },
+    {
+      "name": "B.Tech. Information Technology",
+      "code": "IT",
+      "duration": "4 Years",
+      "specializations": ["Data Science and Machine Learning"],
+      "image": "https://images.unsplash.com/photo-1687603917313-ccae1a289a9d?w=600&auto=format&fit=crop&q=60",
+      "description": "UG IT program with specialization in Data Science and Machine Learning."
+    },
+    {
+      "name": "Masters in Computer Application (MCA)",
+      "code": "MCA",
+      "duration": "2 Years",
+      "specializations": ["Artificial Intelligence", "Data Science"],
+      "image": "https://images.unsplash.com/photo-1653564142033-ab3532091515?w=600&auto=format&fit=crop&q=60",
+      "description": "Postgraduate MCA program with specializations in AI and Data Science."
+    },
+    {
+      "name": "M.Tech. IT / ICT",
+      "code": "M.Tech IT",
+      "duration": "2 Years",
+      "specializations": ["Data Science and Machine Learning"],
+      "image": "https://images.unsplash.com/photo-1653564142033-ab3532091515?w=600&auto=format&fit=crop&q=60",
+      "description": "Postgraduate ICT/IT program focused on Data Science and Machine Learning."
+    },
+    {
+      "name": "Ph.D. IT",
+      "code": "Ph.D IT",
+      "duration": "Varies",
+      "specializations": ["Information & Communication Technology Research"],
+      "image": "https://plus.unsplash.com/premium_photo-1742926583033-56159b3cbf1c?w=600&auto=format&fit=crop&q=60",
+      "description": "Doctoral research in Information & Communication Technology."
+    },
+    {
+      "name": "B.Tech. Electronics & Communication Engineering",
+      "code": "ECE",
+      "duration": "4 Years",
+      "specializations": [],
+      "image": "https://images.unsplash.com/photo-1744640326166-433469d102f2?w=600&auto=format&fit=crop&q=60",
+      "description": "UG ECE program covering core Electronics & Communication fundamentals."
+    },
+    {
+      "name": "Integrated B.Tech.–M.Tech. (ECE)",
+      "code": "ECE–Dual",
+      "duration": "5 Years",
+      "specializations": ["Wireless Communication and Networks", "VLSI Design"],
+      "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&h=400",
+      "description": "5‑year integrated ECE dual‑degree programs in Wireless Communication, VLSI Design."
+    },
+    {
+      "name": "M.Tech. ECE",
+      "code": "M.Tech ECE",
+      "duration": "2 Years",
+      "specializations": [
+        "Wireless Communication and Networks",
+        "VLSI Design",
+        "Railway Signaling, Telecommunication and RAMS"
+      ],
+      "image": "https://images.unsplash.com/photo-1664526936810-ec0856d31b92?w=600&auto=format&fit=crop&q=60",
+      "description": "Postgraduate ECE specializing in Wireless Networks, VLSI Design, Railway Signaling and RAMS."
+    },
+    {
+      "name": "Ph.D. ECE",
+      "code": "Ph.D ECE",
+      "duration": "Varies",
+      "specializations": ["Electronics & Communication Engineering Research"],
+      "image": "https://plus.unsplash.com/premium_photo-1726880460027-fab1b079b37a?w=600&auto=format&fit=crop&q=60",
+      "description": "Doctoral research in ECE areas including signal processing, VLSI, communication networks."
+    }
+  ],
+  "noticesEvents": {
+    "componentName": "NoticeEvents",
+    "enabled": true,
+    "position": 8,
+    "props": {
+      "notices": [
+        {
+          "title": "Date Sheet of Special Back Paper Examination for the pass-out students",
+          "date": "2025-07-24",
+          "type": "Important"
+        },
+        {
+          "title": "Important Notice for Students Regarding Exam Results",
+          "date": "2025-07-23",
+          "type": "Important"
+        },
+        {
+          "title": "End Semester Exam Result for M.Tech (CSE and ECE) May 2025",
+          "date": "2025-07-23",
+          "type": "Academic"
+        },
+        {
+          "title": "End Semester Exam Result for MCA (Data Sciences) May 2025",
+          "date": "2025-07-23",
+          "type": "Academic"
+        },
+        {
+          "title": "End Semester Exam Result for Integrated B.Tech+M.Tech Computer Science and Engineering May 2025",
+          "date": "2025-07-23",
+          "type": "Academic"
+        },
+        {
+          "title": "Back Paper Examination Date Sheet – Even Semester 2024–25",
+          "date": "2025-05-16",
+          "type": "Important"
+        },
+        {
+          "title": "Notice for Aadhaar e‑kyc through UPDESCO",
+          "date": "2025-06-03",
+          "type": "Administrative"
+        },
+        {
+          "title": "Tablet Distribution Program Scheduled",
+          "date": "2025-05-24",
+          "type": "General"
+        },
+        {
+          "title": "Office Order for Hostel & Mess Exemption",
+          "date": "2025-05-13",
+          "type": "Administrative"
+        },
+        {
+          "title": "Office Order for Hostel & Mess2 Exemption",
+          "date": "2025-05-13",
+          "type": "Administrative"
+        },
+        {
+          "title": "PhD Thesis Submission Guidelines Update",
+          "date": "2025-05-12",
+          "type": "Academic"
+        },
+        {
+          "title": "Summer Internship Opportunities 2025",
+          "date": "2025-05-10",
+          "type": "Placement"
+        },
+        {
+          "title": "Library Working Hours Extended",
+          "date": "2025-05-09",
+          "type": "General"
+        },
+        {
+          "title": "Research Grant Applications Open",
+          "date": "2025-05-08",
+          "type": "Research"
+        },
+        {
+          "title": "Campus Recruitment Drive - TCS",
+          "date": "2025-05-07",
+          "type": "Placement"
+        },
+        {
+          "title": "Student Council Elections Schedule",
+          "date": "2025-05-06",
+          "type": "Important"
+        },
+        {
+          "title": "Student Council Elections Schedule",
+          "date": "2025-05-06",
+          "type": "Important"
+        }
+      ],
+      "events": [
+        {
+          "title": "Online National Article Writing Competition (GST)",
+          "date": "2025-06-30",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTK2NnCSPRdgMAEkEafMhZojs0fdgEv6hFY0A&s",
+          "description": "Organized by School of Law, extended submission date."
+        },
+        {
+          "title": "Six‑Day Residential Vipassana Program",
+          "date": "2025-06-09",
+          "image": "https://data.gbu.ac.in/Events/1714148988_FIVE%20DAY%20VIPASSANA%20COURSE%20FEB2024_page-0001.jpg",
+          "description": "Well‑being retreat by School of Buddhist Studies."
+        },
+        {
+          "title": "World Environment Day Report",
+          "date": "2025-06-05",
+          "image": "https://images.timesnownews.com/thumb/msid-151788925,thumbsize-1151391,width-1280,height-720,resizemode-75/151788925.jpg",
+          "description": "Activities report by Department of Environmental Science."
+        },
+        {
+          "title": "SOBSC Vesak Day Celebrations",
+          "date": "2025-05-03",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCwXCDOopXvx7WxXSEcJJJ86SzCi_HjeITTQ&s",
+          "description": "Celebration at School of Buddhist Studies & Civilization."
+        },
+        {
+          "title": "ICSSR‑Sponsored AI Research Methodology Course",
+          "date": "2024-12-03",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvQud5sjoe92WQkeO2ddUOccbSRysoFo6K5GvgRZzSeMy1a2DsromFso3Hp7ctE8W-e94&usqp=CAU",
+          "description": "10‑day course on integrating AI in research, sponsored by ICSSR."
+        },
+        {
+          "title": "Digital India Talk Show",
+          "date": "2024-11-20",
+          "image": "https://negd.gov.in/wp-content/uploads/2025/01/gatishakti.jpeg",
+          "description": "Awareness session on e‑governance chaired by VC Prof. R.K. Sinha."
+        }
+      ],
+      "initialNoticeCount": 5,
+      "sectionTitle": "Notices & Events",
+      "sectionSubtitle": "Stay updated with all updates"
+    }
+  },
+  "eventsGallery": {
+    "events": [
+      {
+        "title": "Cyber Awareness Beyond Boundaries!",
+        "date": "2025-06-10",
+        "image": "https://media.licdn.com/dms/image/v2/D4D22AQHbjy0sDlyd7Q/feedshare-shrink_800/B4DZd.1zvzHAAo-/0/1750179725114?e=1756339200&v=beta&t=4_Zoa6nchZaR8hDtPtXtuJVOliwhbsB-83a6_Fa2IO8",
+        "description": "Dr. Gaurav Kumar delivered a session on 'Cyber Crime Untold Story: A Case Study' at Galgotias College, addressing digital frauds, sextortion, and social engineering."
+      },
+      {
+        "title": "Informative Session on Pepper Contest",
+        "date": "2025-06-12",
+        "image": "https://media.licdn.com/dms/image/v2/D4D22AQGvxu80b13HUA/feedshare-shrink_800/B4DZd.zmpIG8Ag-/0/1750179147150?e=1756339200&v=beta&t=nF2UjqT_TzYbkZxmh8BE6D_rkeURF7tLPwKY7fqdRtM",
+        "description": "Pantherun Technologies' Pepper Contest promotes student innovation in AI, security, embedded systems, and networking through open source projects."
+      },
+      {
+        "title": "UP Govt Signs MoU with Monash University",
+        "date": "2025-05-28",
+        "image": "https://media.licdn.com/dms/image/v2/D4D22AQFYcTmiyDZxFg/feedshare-shrink_2048_1536/B4DZcfAppMGkAo-/0/1748571954430?e=1756339200&v=beta&t=mjl3OyMmpwHIq9myfMOdCTPhrDX4fPoRL7TsHOyPWss",
+        "description": "UP Government signs MoU with Monash University, Australia (ranked 37th globally); delegation visits Gautam Buddha University for academic collaboration."
+      },
+      {
+        "title": "Congratulations to the Class of 2025!",
+        "date": "2025-05-25",
+        "image": "https://media.licdn.com/dms/image/v2/D4D22AQHc_0-ixGGLCw/feedshare-shrink_2048_1536/B4DZbnE5z0G0Ao-/0/1747633545100?e=1756339200&v=beta&t=bsLeqlTFhBb7eGqPd7LDfSF_NdPmhgJy15YRgW-kSfc",
+        "description": "School of ICT, GBU, celebrates the success of 12th board students and welcomes them to a future of growth, learning, and innovation."
+      },
+      {
+        "title": "Cyber Crime Awareness Session at GIMS",
+        "date": "2025-05-18",
+        "image": "https://media.licdn.com/dms/image/v2/D4D22AQGQwk-ospJXlw/feedshare-shrink_2048_1536/B4DZa88zEZHsAs-/0/1746926792201?e=1756339200&v=beta&t=sXSqBxdieAoJkKeRm3lMzdAOtNsOHrHVBg5xxp4XS3E",
+        "description": "Dr. Gaurav Kumar conducted an awareness session at GIMS on digital scams like sextortion and WhatsApp frauds, promoting cyber safety among medical students."
+      }
+    ]
+  },
+  "recruitersData": [
+    { "name": "Samsung", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/samsung.png" },
+    { "name": "TCS", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/tcs.png" },
+    { "name": "Adobe", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/adobe.png" },
+    { "name": "Tech Mahindra", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/tech.png" },
+    { "name": "Adobe", "logo": "https://logo.clearbit.com/adobe.com" },
+    { "name": "Metro", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/metro.png" },
+    { "name": "HCL", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/hcl.png" },
+    { "name": "Byjus", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/byjus.png" },
+    { "name": "Nagrro", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/nagrro.png" },
+    { "name": "Apple", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/apple.png" },
+    { "name": "Byju's", "logo": "https://logo.clearbit.com/byjus.com" },
+    { "name": "White Hat Junior", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/white.png" },
+    { "name": "Hexaware", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/hexaware.png" },
+    { "name": "Blinkit", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/blink-it-logo.png" },
+    { "name": "Toppr", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/Toppr_logo.png" },
+    { "name": "Wipro", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/wipro.png" },
+    { "name": "Scaler", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/scaler.png" },
+    { "name": "Chegg", "logo": "https://www.gbu.ac.in/USICT/media/img/recute/Chegg-Logo.png" }
+  ],
+  "achievements": [
+    {
+      "title": "Smart India Hackathon 2024 (USICT Internal Round)",
+      "achievement": "224 Participants",
+      "year": "2024",
+      "student": "USICT Students",
+      "department": "CSE/IT/ECE",
+      "image": "https://i.ytimg.com/vi/znMbKz6ZPno/maxresdefault.jpg?w=400&h=250&fit=crop",
+      "description": "GBU hosted the internal SIH 2024 with 224 participants from USICT solving real-world challenges."
+    },
+    {
+      "title": "AI Centre of Excellence Establishment",
+      "achievement": "₹50 Cr UP Govt Funding",
+      "year": "2024",
+      "student": "USICT Researchers",
+      "department": "CSE/IT",
+      "image": "https://pg-p.ctme.caltech.edu/wp-content/uploads/sites/4/2023/03/future_of_ai.jpg?w=400&h=250&fit=crop",
+      "description": "UP Govt & industry partners funded AI CoE at GBU to boost advanced tech research."
+    }
+  ],
+  "placementSection": {
+    "data": {
+      "title": "Placements",
+      "subTitle": "Connecting talent with opportunities",
+      "heroImage": "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=1200&h=300&fit=crop",
+      "placementStats": [
+        {
+          "label": "Placement Rate",
+          "value": "85‑90%",
+          "color": "bg-green-500"
+        },
+        {
+          "label": "Highest Package",
+          "value": "₹51 LPA",
+          "color": "bg-blue-500"
+        },
+        {
+          "label": "Average Package",
+          "value": "₹6 LPA",
+          "color": "bg-purple-500"
+        },
+        {
+          "label": "Companies Visited",
+          "value": "150+",
+          "color": "bg-yellow-500"
+        }
+      ]
+    }
+  },
+  "recentPlacement": {
+    "data": {
+      "heading": "Recent Placements",
+      "subheading": "Our students securing positions at top companies",
+      "sectionTitle": "Success Stories",
+      "students": [
+        {
+          "name": "Swapnil",
+          "company": "Astrea IT Services",
+          "package": "4.5 LPA",
+          "department": "B.Tech CSE",
+          "photo": "https://media.licdn.com/dms/image/v2/D5603AQFH6hRJG0fvNQ/profile-displayphoto-scale_400_400/B56ZfWTb_NGQAg-/0/1751647109684?e=1756339200&v=beta&t=RiRVjtexb-uOP8hY3g59vs9blnqLW7BPi9-EIpIscpo"
+        },
+        {
+          "name": "Saavi",
+          "company": "Astrea IT Services",
+          "package": "4.5 LPA",
+          "department": "B.Tech CSE",
+          "photo": "https://media.licdn.com/dms/image/v2/D5603AQEZOfdV6eAvGg/profile-displayphoto-shrink_400_400/B56ZP.MsHtH0Ag-/0/1735136560728?e=1756339200&v=beta&t=Ia6kBwdXOtga1wgknlG_M2KYb87TmDsTZTYuP2_yDRs"
+        },
+        {
+          "name": "Sachin",
+          "company": "Astrea IT Services",
+          "package": "4.5 LPA",
+          "department": "Integrated B.Tech-M.Tech",
+          "photo": "https://media.licdn.com/dms/image/v2/D5603AQHULuJyvQMF0Q/profile-displayphoto-shrink_400_400/B56ZUIJyB8HsAg-/0/1739598537276?e=1756339200&v=beta&t=PkyC8FZJd1IRug99TEF17SEpH8fjDbdJeTE63lI0XJ4"
+        },
+        {
+          "name": "Ananya Pandey",
+          "company": "Pratinidhi AI",
+          "package": "12 LPA",
+          "department": "B.Tech CSE",
+          "photo": "https://media.licdn.com/dms/image/v2/D5603AQGtueN_wTBJAg/profile-displayphoto-shrink_400_400/B56ZQD4Z4PG4Ag-/0/1735231906365?e=1756339200&v=beta&t=5Kheg9VIiPrVK8QpcFZVXm42QKngDqM5EPzJrQPWb1o"
+        },
+        {
+          "name": "Om Sharma",
+          "company": "Microsoft",
+          "package": "51 LPA",
+          "department": "B.Tech",
+          "photo": "https://media.licdn.com/dms/image/v2/D5603AQGwpDRJnn_hGg/profile-displayphoto-shrink_400_400/B56ZTMPiPeGQAg-/0/1738593413278?e=1756339200&v=beta&t=IfPtlc6OAGJ-OUJ9vo8A8BQypSwfEcJ2agV6bfwocCc"
+        }
+      ]
+    }
+  }
+}

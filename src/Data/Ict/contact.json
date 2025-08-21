@@ -1,0 +1,101 @@
+{
+  "data": [
+    {
+      "name": "Centre of Excellence in Drone Technology",
+      "department": "School of ICT, Gautam Buddha University",
+      "address": "Greater Noida, Gautam Buddh Nagar, PIN - 201312",
+      "email": "cedt.gbu@gmail.com",
+      "phone": "",
+      "socials": {
+        "linkedin": "https://www.linkedin.com/in/centre-of-excellence-drone-technology-73b042245/",
+        "twitter": "",
+        "instagram": "",
+        "youtube": "https://www.youtube.com/channel/UCjY4VPv8jk3wXSLJy8ZCLUQ/featured"
+      },
+      "color": "from-purple-500 to-indigo-500",
+      "textColor": "text-purple-600"
+    },
+    {
+      "name": "Centre for Rapid and Alternative Energy Mobility",
+      "department": "School of ICT, Gautam Buddha University",
+      "address": "Greater Noida, Gautam Buddh Nagar, PIN - 201312",
+      "email": "info@gbu.ac.in",
+      "phone": "0120 234 4200",
+      "socials": {
+        "linkedin": "",
+        "twitter": "",
+        "instagram": "",
+        "youtube": "https://www.youtube.com/channel/UClBWls_W9SAfR-O0PNXqPwQ/featured"
+      },
+      "color": "from-blue-500 to-green-500",
+      "textColor": "text-blue-500"
+    }
+  ],
+  "departments": [
+    {
+      "name": "Computer Science & Engineering",
+      "hod": "Dr. Arun Solanki",
+      "phone": " 0120-234 6083",
+      "email": "cse@usict.ac.in",
+      "hodEmail": "asolanki@gbu.ac.in",
+      "office": "Room 301, Block A",
+      "color": "from-blue-500 to-blue-600"
+    },
+    {
+      "name": "Electronics & Communication Engineering",
+      "hod": "Dr. Vidushi Sharma",
+      "phone": " 0120-234 6087",
+      "email": "ece@usict.ac.in",
+      "hodEmail": "vidushi@gbu.ac.in",
+      "office": "Room 201, Block B",
+      "color": "from-orange-500 to-red-500"
+    },
+    {
+      "name": "Information Technology",
+      "hod": "Dr. Neeta Singh",
+      "phone": "9990715153",
+      "email": "it@usict.ac.in",
+      "hodEmail": "neeta@gbu.ac.in",
+      "office": "Room 401, Block A",
+      "color": "from-green-500 to-blue-500"
+    }
+  ],
+  "officeHours": [
+    {
+      "day": "Monday - Friday",
+      "time": "9:00 AM - 5:00 PM"
+    },
+    {
+      "day": "Saturday",
+      "time": "9:00 AM - 1:00 PM"
+    },
+    {
+      "day": "Sunday",
+      "time": "Closed"
+    }
+  ],
+  "generalInfo": {
+    "heading": "Contact Us",
+    "subheading": "Get in touch with our departments and COE.",
+    "backgroundImage": "https://images.unsplash.com/photo-1494891848038-7bd202a2afeb?auto=format&fit=crop&w=1920&q=80",
+    "cards": [
+      {
+        "title": "Address",
+        "content": "University School of ICT\nGautam Buddha University\nGreater Noida, Uttar Pradesh\nPIN: 201312",
+        "gradient": "bg-gradient-to-br from-blue-500 to-blue-600"
+      },
+      {
+        "title": "Phone",
+        "content": "Main Office: 0120-234 6070\nAdmissions:01202344200 \nFax: +91-11331412XX",
+        "gradient": "bg-gradient-to-br from-green-500 to-green-600"
+      },
+      {
+        "title": "Email",
+        "content": "General: soict@gbu.ac.in\nAdmissions: admissions@gbu.ac.in\nAcademic: academic@usict.ac.in",
+        "gradient": "bg-gradient-to-br from-purple-500 to-purple-600"
+      }
+    ]
+  }
+}
+
+
