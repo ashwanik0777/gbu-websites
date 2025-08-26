@@ -1,7 +1,6 @@
 import TendersTable from '../../components/tenders/TendersTable';
 import { motion } from "framer-motion";
 import BannerSection from '../../components/HeroBanner.jsx';
-import SearchableWrapper from '../../components/Searchbar/SearchableWrapper.jsx';
 const TenderMain = () => {
 
   return (
