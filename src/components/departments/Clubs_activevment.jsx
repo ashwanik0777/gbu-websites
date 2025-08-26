@@ -22,7 +22,8 @@ const ClubsAchievements = () => {
       youtube: `${baseClass} text-gray-600 hover:text-red-600`,
     }[platform];
 
-    const openLink = () => {
+    const openLink = (e) => {
+      e.stopPropagation(); // Prevent card click when clicking social icons
       if (platform === "email") {
         window.open(`mailto:${url}`, "_blank");
       } else {
@@ -40,7 +41,9 @@ const ClubsAchievements = () => {
     };
 
     const Icon = icons[platform];
-    return Icon ? <Icon className={getClass} onClick={openLink} /> : null;
+    if (!Icon) return null; // Prevent rendering undefined
+
+    return <Icon className={getClass} onClick={openLink} />;
   };
 
   return (
