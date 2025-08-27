@@ -169,7 +169,7 @@ import ContactBanner from "../pages/Contact/ContactBanner.jsx";
 
 
 export default function AppRouter() {
-  return (
+   return (
     <Suspense
       fallback={
         <div className="flex justify-center items-center h-screen">
