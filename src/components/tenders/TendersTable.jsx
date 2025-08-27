@@ -1,10 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-
-// import SearchableWrapper from "../../components/Searchbar/SearchableWrapper.jsx";
 import ButtonGroup from '../TabsData.jsx';
 
-// ✅ Modern Card with subtle lift effect on hover
 const Card = ({ children, className = '' }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -206,10 +203,8 @@ const TenderTable = ({ tenders, variant }) => (
   </motion.div>
 );
 
-// ✅ Final TendersTable
 const TendersTable = () => {
   return (
-    // <SearchableWrapper>
       <div className="w-full bg-white shadow-xl border border-gray-200 p-8 sm:p-10 rounded-2xl">
         <Tabs defaultValue="current" className="w-full ">
             <TabsList />
@@ -228,7 +223,6 @@ const TendersTable = () => {
           </TabsContent>
         </Tabs>
       </div>
-    // </SearchableWrapper>
   );
 };
 

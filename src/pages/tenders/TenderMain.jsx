@@ -1,5 +1,5 @@
 // import TendersTable from '../../components/tenders/TendersTable';
-// import { motion } from "framer-motion";
+import { motion } from "framer-motion";
 import BannerSection from '../../components/HeroBanner.jsx';
 import SearchableWrapper from '../../components/Searchbar/SearchableWrapper.jsx';
 const TenderMain = () => {
@@ -12,7 +12,7 @@ const TenderMain = () => {
       subtitle="Explore active opportunities and submit your bids before deadlines."
       bgTheme={9}
     />
-        {/* <div className="container mx-auto px-6 py-12 max-w-7xl">
+        <div className="container mx-auto px-6 py-12 max-w-7xl">
 
         
           <motion.div
@@ -50,10 +50,10 @@ const TenderMain = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <TendersTable />
+            {/* <TendersTable /> */}
           </motion.div>
 
-        </div> */}
+        </div>
       </div>
 
     </SearchableWrapper>
