@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import ButtonGroup from '../TabsData.jsx';
+// import ButtonGroup from '../TabsData.jsx';
 
 const Card = ({ children, className = '' }) => (
   <motion.div
