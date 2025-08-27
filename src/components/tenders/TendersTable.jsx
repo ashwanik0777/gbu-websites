@@ -45,7 +45,7 @@ const tabButtons = [
 
 const TabsList = ({ active, setActive }) => (
   <div className="flex justify-center mb-8">
-    <ButtonGroup
+    {/* <ButtonGroup
       buttons={tabButtons}
       onClick={setActive}
       activeButton={active}
@@ -55,7 +55,7 @@ const TabsList = ({ active, setActive }) => (
       rounded="lg"
       gap={true}
       animated={true}
-    />
+    /> */}
   </div>
 );
 
