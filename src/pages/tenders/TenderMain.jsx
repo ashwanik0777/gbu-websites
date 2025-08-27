@@ -1,17 +1,17 @@
 import TendersTable from '../../components/tenders/TendersTable';
 import { motion } from "framer-motion";
-import BannerSection from '../../components/HeroBanner';
+// import BannerSection from '../../components/HeroBanner';
 // import SearchableWrapper from '../../components/Searchbar/SearchableWrapper';
 const TenderMain = () => {
 
   return (
     // <SearchableWrapper >
       <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-300 font-sans">
-        <BannerSection
+        {/* <BannerSection
           title="Tenders / RFPs / RFE / RFQ"
           subtitle="Explore active opportunities and submit your bids before deadlines."
           bgTheme={9}
-        />
+        /> */}
         <div className="container mx-auto px-6 py-12 max-w-7xl">
 
           {/* Page Header */}
