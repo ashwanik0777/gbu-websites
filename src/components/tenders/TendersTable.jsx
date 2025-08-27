@@ -189,14 +189,14 @@ const TendersTable = () => {
   return (
       <div className="w-full bg-white shadow-xl border border-gray-200 p-8 sm:p-10 rounded-2xl">
         <Tabs defaultValue="current" className="w-full ">
-            <TabsList />
+            {/* <TabsList /> */}
 
           <TabsContent value="current">
-            {/* <TenderTable tenders={currentTenders} variant="current" /> */}
+            <TenderTable tenders={currentTenders} variant="current" />
           </TabsContent>
 
           <TabsContent value="archived">
-            {/* <TenderTable tenders={archivedTenders} variant="archived" /> */}
+            <TenderTable tenders={archivedTenders} variant="archived" />
             <div className="mt-6 p-4 bg-gray-50 rounded-lg border-l-4 border-orange-400">
               <p className="text-sm text-gray-600 italic">
                 These tenders are no longer active and are shown for reference only.
