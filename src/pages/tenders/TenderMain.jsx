@@ -5,7 +5,7 @@ import SearchableWrapper from '../../components/Searchbar/SearchableWrapper';
 const TenderMain = () => {
 
   return (
-    <SearchableWrapper exclude={['#footer', '.no-search']}>
+    <SearchableWrapper >
       <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-300 font-sans">
         <BannerSection
           title="Tenders / RFPs / RFE / RFQ"
