@@ -1,11 +1,11 @@
 import TendersTable from '../../components/tenders/TendersTable';
 import { motion } from "framer-motion";
 import BannerSection from '../../components/HeroBanner';
-import SearchableWrapper from '../../components/Searchbar/SearchableWrapper';
+// import SearchableWrapper from '../../components/Searchbar/SearchableWrapper';
 const TenderMain = () => {
 
   return (
-    <SearchableWrapper >
+    // <SearchableWrapper >
       <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-300 font-sans">
         <BannerSection
           title="Tenders / RFPs / RFE / RFQ"
@@ -58,7 +58,7 @@ const TenderMain = () => {
         </div>
       </div>
 
-    </SearchableWrapper>
+    // </SearchableWrapper>
   );
 };
 
