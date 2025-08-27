@@ -1,18 +1,18 @@
 // import TendersTable from '../../components/tenders/TendersTable';
 // import { motion } from "framer-motion";
-// import BannerSection from '../../components/HeroBanner.jsx';
+import BannerSection from '../../components/HeroBanner.jsx';
 import SearchableWrapper from '../../components/Searchbar/SearchableWrapper.jsx';
 const TenderMain = () => {
 
   return (
     <SearchableWrapper exclude={['#footer', '.no-search']}>
-      {/* <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-300 font-sans">
+      <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-300 font-sans">
         <BannerSection
       title="Tenders / RFPs / RFE / RFQ"
       subtitle="Explore active opportunities and submit your bids before deadlines."
       bgTheme={9}
     />
-        <div className="container mx-auto px-6 py-12 max-w-7xl">
+        {/* <div className="container mx-auto px-6 py-12 max-w-7xl">
 
         
           <motion.div
@@ -53,8 +53,8 @@ const TenderMain = () => {
             <TendersTable />
           </motion.div>
 
-        </div>
-      </div> */}
+        </div> */}
+      </div>
 
     </SearchableWrapper>
   );
