@@ -260,7 +260,7 @@ const Collaboration = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
 
             <a href={cta.url1} className="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700">{cta.button1_text}</a>
-            <a href={cta.url2} className="border border-blue-600 text-blue-600 px-6 py-2 rounded-xl hover:bg-blue-50">{cta.button2_text}</a>
+            <a href={"/contactUs"} className="border border-blue-600 text-blue-600 px-6 py-2 rounded-xl hover:bg-blue-50">{cta.button2_text}</a>
           </div>
         </section>
       </div>

@@ -163,6 +163,7 @@ import CyberSecurity from "../pages/departments/CyberSecurity.jsx";
 import DAC from "../pages/dac/DAC.jsx";
 import PlacementDashboard from "../pages/departments/PlacementDashboard.jsx";
 import ContactBanner from "../pages/Contact/ContactBanner.jsx";
+import ComingSoon from "../components/ComingSoon.jsx";
 // import DACmain from "../pages/dac/DACmain.jsx";
 
 
@@ -180,6 +181,8 @@ export default function AppRouter() {
       <AuthProvider>
         <Routes>
           {/* About Us Routes */}
+
+          <Route path="/comingSoon" element={<ComingSoon />} />
           <Route path="/" element={<Home />} />
           <Route path="/about-us/About GBU" element={<AboutGbu />} />
           <Route path="/aboutUs/GBUHistory" element={<History />} />

@@ -136,7 +136,7 @@ const quickLinks = [
     desc: "Schedules, Results & Guideline",
     icon: <FaPenNib className="text-white text-2xl" />,
     color: "bg-blue-700",
-    link: "https://buddha-university-portal.lovable.app/campus/infrastructure",
+    link: "/comingSoon",
     external: true,
   },
   {
@@ -144,7 +144,7 @@ const quickLinks = [
     desc: "Beyond Classroom",
     icon: <FaBook className="text-white text-2xl" />,
     color: "bg-blue-700",
-    link: "https://buddha-university-portal.lovable.app/campus/infrastructure",
+    link: "/comingSoon",
     external: true,
   },
   {
