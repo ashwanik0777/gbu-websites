@@ -1,79 +1,7 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from "react";
 import ButtonGroup from '../TabsData.jsx';
 
-const Card = ({ children, className = '' }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(0,0,0,0.1)' }}
-    transition={{ duration: 0.4, ease: 'easeOut' }}
-    className={`rounded-2xl border shadow-sm transition duration-300 ${className}`}
-  >
-    {children}
-  </motion.div>
-);
-
-const CardContent = ({ children, className = '' }) => (
-  <div className={`p-6 ${className}`}>{children}</div>
-);
-
-// ✅ Tabs
-const Tabs = ({ children, defaultValue, className = '' }) => {
-  const [active, setActive] = React.useState(defaultValue);
-  const triggers = React.Children.toArray(children).filter(
-    (child) => child.type.name === 'TabsList'
-  );
-  const contents = React.Children.toArray(children).filter(
-    (child) => child.type.name === 'TabsContent'
-  );
-
-  return (
-    <div className={className}>
-      {React.cloneElement(triggers[0], { active, setActive })}
-      {contents.map((content, idx) =>
-        React.cloneElement(content, { active, key: idx })
-      )}
-    </div>
-  );
-};
-
-const tabButtons = [
-  { id: "current", label: "Current Opportunities", tooltip: "View current opportunities" },
-  { id: "archived", label: "Archived Opportunities", tooltip: "View archived opportunities" },
-];
-
-const TabsList = ({ active, setActive }) => (
-  <div className="flex justify-center mb-8">
-    <ButtonGroup
-      buttons={tabButtons}
-      onClick={setActive}
-      activeButton={active}
-      theme="primary"
-      size="lg"
-      fullWidth={false}
-      rounded="lg"
-      gap={true}
-      animated={true}
-    />
-  </div>
-);
-
-
-const TabsContent = ({ value, active, children, className = '' }) => {
-  if (value !== active) return null;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-};
-
+// ✅ Sample Data
 const currentTenders = [
   {
     id: 1,
@@ -120,92 +48,89 @@ const archivedTenders = [
   },
 ];
 
-// ✅ Card for each tender
-const TenderCard = ({ tender, index, variant = 'current' }) => (
-  <Card
-    className={`mb-5 ${
-      variant === 'archived'
-        ? 'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200'
-        : 'bg-gradient-to-br from-white to-teal-50 border-teal-200'
+// ✅ Tender Card UI
+const TenderCard = ({ tender, index, variant = "current" }) => (
+  <div
+    className={`rounded-xl border p-6 transition hover:shadow-lg ${
+      variant === "archived"
+        ? "bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200"
+        : "bg-gradient-to-br from-white to-teal-50 border-teal-200"
     }`}
   >
-    <CardContent>
-      <h3
-        className={`text-lg font-bold mb-2 ${
-          variant === 'archived' ? 'text-gray-800' : 'text-indigo-800'
-        }`}
-      >
-        {index + 1}. {tender.title}
-      </h3>
-      <p className="text-sm text-gray-600 mb-3">{tender.description}</p>
-      <p className="text-sm mb-2">
-        <span className="font-semibold">Closing Date:</span> {tender.closingDate}
-      </p>
-      <a
-        href={tender.documentUrl}
-        className={`inline-block text-sm font-semibold underline transition-colors duration-200 ${
-          variant === 'archived'
-            ? 'text-orange-600 hover:text-orange-800'
-            : 'text-teal-600 hover:text-teal-800'
-        }`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        View Document
-      </a>
-    </CardContent>
-  </Card>
+    <h3
+      className={`text-lg font-bold mb-2 ${
+        variant === "archived" ? "text-gray-800" : "text-indigo-800"
+      }`}
+    >
+      {index + 1}. {tender.title}
+    </h3>
+    <p className="text-sm text-gray-600 mb-3">{tender.description}</p>
+    <p className="text-sm mb-2">
+      <span className="font-semibold">Closing Date:</span> {tender.closingDate}
+    </p>
+    <a
+      href={tender.documentUrl}
+      className={`inline-block text-sm font-semibold underline transition-colors duration-200 ${
+        variant === "archived"
+          ? "text-orange-600 hover:text-orange-800"
+          : "text-teal-600 hover:text-teal-800"
+      }`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      View Document
+    </a>
+  </div>
 );
 
-// ✅ Container with stagger effect
-const TenderTable = ({ tenders, variant }) => (
-  <motion.div
-    initial="hidden"
-    animate="visible"
-    variants={{
-      visible: {
-        transition: {
-          staggerChildren: 0.1,
-        },
-      },
-    }}
-    className="space-y-4"
-  >
-    {tenders.map((tender, idx) => (
-      <motion.div
-        key={tender.id}
-        variants={{
-          hidden: { opacity: 0, y: 15 },
-          visible: { opacity: 1, y: 0 },
-        }}
-      >
-        <TenderCard tender={tender} index={idx} variant={variant} />
-      </motion.div>
-    ))}
-  </motion.div>
-);
-
+// ✅ Tenders Table Page
 const TendersTable = () => {
+  const [activeTab, setActiveTab] = useState("current");
+
+  const tabButtons = [
+    { id: "current", label: "Current Opportunities", tooltip: "View active tenders" },
+    { id: "archived", label: "Archived Opportunities", tooltip: "View past tenders" },
+  ];
+
   return (
-      <div className="w-full bg-white shadow-xl border border-gray-200 p-8 sm:p-10 rounded-2xl">
-        <Tabs defaultValue="current" className="w-full ">
-            {/* <TabsList /> */}
+    <div className="w-full bg-white shadow-xl border border-gray-200 p-8 sm:p-10 rounded-2xl">
+      {/* Tabs */}
+      <ButtonGroup
+        buttons={tabButtons}
+        onClick={setActiveTab}
+        activeButton={activeTab}
+        size="lg"
+        fullWidth={false}
+        rounded="xl"
+        animated={true}
+        theme="primary"
+        gap={true}
+        className="flex justify-center mb-8"
+      />
 
-          <TabsContent value="current">
-            <TenderTable tenders={currentTenders} variant="current" />
-          </TabsContent>
+      {/* Tab Content */}
+      {activeTab === "current" && (
+        <div className="space-y-5">
+          {currentTenders.map((t, i) => (
+            <TenderCard tender={t} index={i} key={t.id} variant="current" />
+          ))}
+        </div>
+      )}
 
-          <TabsContent value="archived">
-            <TenderTable tenders={archivedTenders} variant="archived" />
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg border-l-4 border-orange-400">
-              <p className="text-sm text-gray-600 italic">
-                These tenders are no longer active and are shown for reference only.
-              </p>
-            </div>
-          </TabsContent>
-        </Tabs>
-        
-      </div>
+      {activeTab === "archived" && (
+        <div className="space-y-5">
+          {archivedTenders.map((t, i) => (
+            <TenderCard tender={t} index={i} key={t.id} variant="archived" />
+          ))}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg border-l-4 border-orange-400">
+            <p className="text-sm text-gray-600 italic">
+              These tenders are no longer active and are shown for reference
+              only.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
