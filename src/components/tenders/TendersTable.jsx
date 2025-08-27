@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import ButtonGroup from '../TabsData.jsx';
 
-// ✅ Sample Data
 const currentTenders = [
   {
     id: 1,
