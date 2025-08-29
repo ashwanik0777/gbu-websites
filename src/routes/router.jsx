@@ -68,6 +68,7 @@ import SitemapAcademics from "../pages/Sitemap/SitemapAcademics.jsx";
 import InstitutionInnovation from "../pages/Reasearch/InstitutionInnovation.jsx";
 import GBUHistory from "../pages/Aboutus/History.jsx";
 import Registration from "../pages/Admission/NewRegistration.jsx";
+import LoginNewStudent from "../pages/Admission/login.jsx";
 
 const AcademicCalendar = React.lazy(() =>
   import("../pages/Academic/AcademicCalendar.jsx")
@@ -209,6 +210,7 @@ export default function AppRouter() {
           {/* Academics */}
           <Route path="/academics" element={<h1>Academics</h1>} />
           <Route path="/new-registration" element={<Registration/>} />
+          <Route path="/login" element={<LoginNewStudent/>} />
           <Route
             path="/academics/academic-calendar"
             element={<AcademicCalendar />}

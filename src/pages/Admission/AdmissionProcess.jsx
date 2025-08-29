@@ -111,7 +111,7 @@ const AdmissionProcess = () => {
 
         <div className="mt-12 text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/new-registration" className="bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-2 px-6 rounded">
+            <Link to="/login" className="bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-2 px-6 rounded">
               Start Application
             </Link>
             <button className="flex items-center justify-center border border-gray-300 border-solid text-gray-700 hover:bg-gray-100 text-lg font-semibold py-2 px-6 rounded">
