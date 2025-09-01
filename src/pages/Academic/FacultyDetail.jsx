@@ -19,7 +19,7 @@ const FacultyDetail = () => {
       try {
         const res = await fetch(`https://meow.tilchattaas.com/academic/faculty/members/`);
         const data = await res.json();
-        const member = data.find((f) => String(f.id) === id); // match by ID
+        const member = data.find((f) => String(f.id) === id); 
         if (member) {
           setFaculty({
             ...member,

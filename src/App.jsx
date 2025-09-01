@@ -59,6 +59,7 @@ import Navbar from "../src/components/home/Navbar.jsx";
 import DepartmentNavbar from "../src/components/departments/Navbar.jsx";
 import Footer from "../src/components/home/Footer.jsx";
 import UnderDevLogin from "../src/components/underdevelopmentLogin.jsx"; 
+import ScrollToTop from "./hooks/scrollToTop.jsx";
 
 function App() {
   const [isPreloadComplete, setIsPreloadComplete] = useState(() => {
@@ -89,6 +90,7 @@ function App() {
           <PreLoad onComplete={() => setIsPreloadComplete(true)} />
         ) : (
           <>
+          <ScrollToTop>
             <Primarynavbar />
             {isICTPage ? (
               <div className="mt-9">
@@ -101,6 +103,7 @@ function App() {
               <AppRouter />
             </div>
             <Footer />
+            </ScrollToTop>
           </>
         )}
       </Suspense>
