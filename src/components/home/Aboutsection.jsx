@@ -71,7 +71,7 @@ export default function AboutSection() {
           />
 
           <div className="absolute bottom-4 right-4 bg-orange-600 text-white text-center px-5 py-3 rounded-lg shadow-lg text-sm sm:text-base">
-            <div className="text-xl sm:text-2xl font-bold">15+</div>
+            <div className="text-xl sm:text-2xl font-bold">17+</div>
             <div>Years of Excellence</div>
           </div>
         </div>

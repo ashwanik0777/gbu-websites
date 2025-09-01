@@ -125,10 +125,10 @@ const SchoolCard = ({ imageUrl, label, description, path, features }) => {
 
 const HoverCards = () => {
   const stats = [
-    { icon: Users, numberText: "4K+", title: "Students" },
+    { icon: Users, numberText: "6500+", title: "Students" },
     { icon: BookOpen, number: 8, title: "Schools" },
-    { icon: Award, numberText: "200+", title: "Programs" },
-    { icon: Globe, numberText: "10+", title: "Countries" }
+    { icon: Award, numberText: "160+", title: "Programs" },
+    { icon: Users, numberText: "200+", title: "Faculty Members" }
   ];
 
   const schools = [

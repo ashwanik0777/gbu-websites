@@ -151,10 +151,10 @@ const aboutData = {
   },
 
   statistics: [
-    { icon: MapPin, number: 511, numberText: "511+", title: "Acres Campus", iconColor: "#3b82f6" },
-    { icon: Users, numberText: "4K+", title: "Students", iconColor: "#10b981" },
+    { icon: MapPin, number: 511, title: "Acres Campus", iconColor: "#3b82f6" },
+    { icon: Users, numberText: "6500+", title: "Students", iconColor: "#10b981" },
     { icon: Award, numberText: "200+", title: "Faculty Members", iconColor: "#8b5cf6" },
-    { icon: BookOpen, number: 150, title: "Programs", iconColor: "#f97316" },
+    { icon: BookOpen, numberText: "160+", title: "Programs", iconColor: "#f97316" },
 
   ],
 
@@ -319,7 +319,7 @@ const aboutData = {
   sportsFeatures: [
     { title: "47-Acre Sports Zone", icon: "Target", description: "Comprehensive outdoor facilities" },
     { title: "Multi-Sport Facilities", icon: "Dumbbell", description: "Cricket, Football, Squash, Gym" },
-    { title: "₹78 Cr Indoor Stadium", icon: "Trophy", description: "Coming in 2025" }
+    { title: "World Class Indoor Stadium", icon: "Trophy", description: "State of Arts Indoor Multi-Sports" }
   ],
 
   researchStats: [

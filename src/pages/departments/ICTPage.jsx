@@ -121,9 +121,9 @@ export default function DepartmentDynamicPage() {
             title: "Our numbers speak for themselves",
             stats: [
               { value: 3, label: "Departments", suffix: "+" },
-              { value: 15, label: "Courses", suffix: "+" },
-              { value: 1200, label: "Students", suffix: "+" },
-              { value: 45, label: "Faculty", suffix: "+" },
+              { value: 25, label: "Courses", suffix: "+" },
+              { value: 3000, label: "Students", suffix: "+" },
+              { value: 80, label: "Faculty", suffix: "+" },
               { value: 200, label: "Publications", suffix: "+" },
               { value: 95, label: "Placement Rate", suffix: "%" },
             ],

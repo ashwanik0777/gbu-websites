@@ -91,7 +91,7 @@ const ViceChancellor = () => {
 
           <div className="bg-gray-50 p-3 rounded-lg mt-4">
             <p className="text-sm">
-              <strong>Publications:</strong> 150+ peer-reviewed papers
+              <strong>Publications:</strong> 200+ peer-reviewed papers
             </p>
             <p className="text-sm">
               <strong>h-index:</strong> 78
@@ -245,15 +245,15 @@ const ViceChancellor = () => {
                       <div className="space-y-3">
                         <div className="bg-yellow-50 p-3 rounded-lg">
                           <p className="text-sm font-semibold text-yellow-800">Gold Medalist</p>
-                          <p className="text-xs text-gray-600">B.Tech First Class with Distinction</p>
+                          <p className="text-xs text-gray-600">B.Sc. in Zoology, Botany & Chemistry</p>
                         </div>
                         <div className="bg-indigo-50 p-3 rounded-lg">
                           <p className="text-sm font-semibold text-indigo-800">IIT Delhi Alumni</p>
-                          <p className="text-xs text-gray-600">Ph.D. in Computer Science</p>
+                          <p className="text-xs text-gray-600">Ph.D. in Cancer Biology</p>
                         </div>
                         <div className="bg-red-50 p-3 rounded-lg">
                           <p className="text-sm font-semibold text-red-800">IISc Graduate</p>
-                          <p className="text-xs text-gray-600">M.Tech in AI Specialization</p>
+                          <p className="text-xs text-gray-600">M.Sc. in Life Sciences</p>
                         </div>
                       </div>
                     </>
@@ -268,7 +268,7 @@ const ViceChancellor = () => {
                           <p className="text-xs text-gray-600">High research impact factor</p>
                         </div>
                          <div className="bg-emerald-50 p-3 rounded-lg">
-                          <p className="text-sm font-semibold text-emerald-800">180+ Publications</p>
+                          <p className="text-sm font-semibold text-emerald-800">200+ Publications</p>
                           <p className="text-xs text-gray-600">Peer-reviewed research papers</p>
                         </div>
                         <div className="bg-teal-50 p-3 rounded-lg">
