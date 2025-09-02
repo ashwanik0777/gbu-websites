@@ -248,11 +248,11 @@ const ViceChancellor = () => {
                           <p className="text-xs text-gray-600">B.Sc. in Zoology, Botany & Chemistry</p>
                         </div>
                         <div className="bg-indigo-50 p-3 rounded-lg">
-                          <p className="text-sm font-semibold text-indigo-800">IIT Delhi Alumni</p>
+                          <p className="text-sm font-semibold text-indigo-800">Jawaharlal Nehru University, New Delhi, India</p>
                           <p className="text-xs text-gray-600">Ph.D. in Cancer Biology</p>
                         </div>
                         <div className="bg-red-50 p-3 rounded-lg">
-                          <p className="text-sm font-semibold text-red-800">IISc Graduate</p>
+                          <p className="text-sm font-semibold text-red-800">Jawaharlal Nehru University, New Delhi, India</p>
                           <p className="text-xs text-gray-600">M.Sc. in Life Sciences</p>
                         </div>
                       </div>
