@@ -17,7 +17,7 @@ const FacultyDetail = () => {
   useEffect(() => {
     const fetchFaculty = async () => {
       try {
-        const res = await fetch(`https://meow.tilchattaas.com/academic/faculty/members/`);
+        const res = await fetch(`${import.meta.env.VITE_HOST}/academic/faculty/members/`);
         const data = await res.json();
         const member = data.find((f) => String(f.id) === id); 
         if (member) {

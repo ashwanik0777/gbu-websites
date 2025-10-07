@@ -286,7 +286,7 @@ const Faculty = () => {
                         <div className="p-6">
                           <div className="flex flex-col items-center text-center">
                             <img
-                              src={`https://meow.tilchattaas.com/media/${faculty.image}`}
+                              src={`${VITE_HOST}/media/${faculty.image}`}
                               alt={faculty.name}
                               className="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-100 group-hover:border-blue-200 transition-colors"
                             />

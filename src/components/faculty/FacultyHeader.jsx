@@ -119,7 +119,7 @@ const FacultyHeader = ({ faculty }) => {
         <div className="flex-shrink-0">
           <div className="w-48 h-48 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
             <img
-              src={`https://meow.tilchattaas.com/media/${faculty?.image || 'default.png'}`}
+              src={`${import.meta.env.VITE_HOST}/media/${faculty?.image || 'default.png'}`}
               alt={faculty?.name || 'Faculty'}
               className="w-full h-full object-cover"
             />

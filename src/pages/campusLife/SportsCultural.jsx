@@ -127,7 +127,7 @@ const SportsWellness = () => {
     const fetchFacilities = async () => {
       try {
         const res = await axios.get(
-          "https://meow.tilchattaas.com/campuslife/sport-facilities/"
+          `${process.env.VITE_HOST}/campuslife/sport-facilities/`
         );
         const transformed = res.data.map((item) => ({
           id: item.id,

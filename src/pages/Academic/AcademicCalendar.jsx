@@ -8,7 +8,7 @@ import StatsCard from "../../components/StatsCard.jsx";
 import SearchableWrapper from "../../components/Searchbar/SearchableWrapper.jsx";
 import ButtonGroup from '../../components/TabsData.jsx';
 
-const BASE_URL = 'https://meow.tilchattaas.com/academic';
+const BASE_URL = `${process.env.VITE_HOST}/academic`;
 
 const AcademicCalendar = () => {
   const [events, setEvents] = useState([]);

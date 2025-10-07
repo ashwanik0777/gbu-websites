@@ -155,7 +155,7 @@ const Footer = () => {
 
       {/* Bottom Line */}
       <div className="mt-6 border-t border-gray-700 pt-4 text-sm text-gray-400 flex flex-col md:flex-row justify-between">
-        <p>© 2025 Gautam Buddha University. All rights reserved.</p>
+        <p>Copyright © 2024 NSS- GBU | All Rights Reserved</p>
         <div>
           <p>
             Designed and developed by{" "}
