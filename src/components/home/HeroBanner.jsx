@@ -9,7 +9,6 @@ export default function WelcomePage() {
   const BANNER = import.meta.env.VITE_HOST;
   const BASE = (BANNER || "").replace(/\/$/, "");
 
-  // Memoize the fetch function to prevent unnecessary re-renders
   const fetchBannerData = useCallback(async () => {
     if (!BASE) {
       setError("Base URL not configured");
@@ -21,9 +20,9 @@ export default function WelcomePage() {
       setLoading(true);
       setError(null);
       
-      // Add timeout and optimize axios config
+
       const res = await axios.get(`${BASE}/landing/banner/`, {
-        timeout: 5000, // 5 second timeout
+        timeout: 5000, 
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
