@@ -83,8 +83,6 @@ export default function WelcomePage() {
     ? bannerData.video
     : `${BASE}/${bannerData.video.startsWith("media") ? "" : "media/"}${bannerData.video}`;
 
-  // Heights: primary navbar = 48px (py-2), secondary navbar = 48px (py-3 + logo height)
-  // Total offset = 48px + 48px = 96px (adjust if your navbars are different)
   return (
     <>
       {/* Main welcome section */}

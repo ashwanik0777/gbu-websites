@@ -37,22 +37,23 @@ const Primarynavbar = () => {
         <div className="hidden xl:flex w-full justify-between">
           {/* Left links */}
           <div className="flex flex-wrap gap-4 items-center">
-            <a href="/tender" className="flex items-center gap-1 hover:underline">
+            <Link to="/tender" className="flex items-center gap-1 hover:underline">
               <Send size={14} /> Tenders
-            </a>
-            <a href="/recruitments" className="flex items-center gap-1 hover:underline">
+            </Link>
+            <Link to="/recruitments" className="flex items-center gap-1 hover:underline">
               <Send size={14} /> Recruitments
-            </a>
+            </Link>
 
-            <a href="/booking" className="hover:underline">Booking</a>
+            <Link to="/booking" className="hover:underline">Booking</Link>
             
 
           
-            <a href="/rti" className="flex items-center gap-1 hover:underline">
+            <Link to="/rti" className="flex items-center gap-1 hover:underline">
 
               <Info size={14} /> RTI
-            </a>
-            <a href="/sitemapMain" className="hover:underline">Sitemap</a>
+            </Link>
+            <Link to="/sitemapMain" className="hover:underline">Sitemap</Link>
+
 
 
 
