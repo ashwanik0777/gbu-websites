@@ -1,4 +1,5 @@
 export const DUMMY_FACULTY_ID = "gbu-faculty-demo-1";
+export const FACULTY_PROFILE_STORAGE_PREFIX = "gbu_faculty_profile_";
 
 export const DUMMY_FACULTY_MEMBER = {
   id: DUMMY_FACULTY_ID,

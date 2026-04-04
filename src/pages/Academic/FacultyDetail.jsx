@@ -6,11 +6,21 @@ import SummaryDashboard from '../../components/faculty/SummaryDashboard';
 import FacultyTabs from '../../components/faculty/FacultyTabs';
 import TabContent from '../../components/faculty/TabContent';
 import { TrendingUp, BookOpenCheck, Presentation, FolderOpen, FileText, FlaskConical, GraduationCap, Newspaper } from 'lucide-react';
-import { DUMMY_FACULTY_ID, DUMMY_FACULTY_DETAIL } from '../../Data/facultyDummyData';
+import { DUMMY_FACULTY_ID, DUMMY_FACULTY_DETAIL, FACULTY_PROFILE_STORAGE_PREFIX } from '../../Data/facultyDummyData';
 
 import SearchableWrapper from "../../components/Searchbar/SearchableWrapper.jsx";
 
 const FacultyDetail = () => {
+    const getSavedDummyProfile = () => {
+      try {
+        const raw = localStorage.getItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${DUMMY_FACULTY_ID}`);
+        if (!raw) return DUMMY_FACULTY_DETAIL;
+        return { ...DUMMY_FACULTY_DETAIL, ...JSON.parse(raw) };
+      } catch {
+        return DUMMY_FACULTY_DETAIL;
+      }
+    };
+
   const { id } = useParams(); // 👈 get id from URL
   const [faculty, setFaculty] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
@@ -55,12 +65,12 @@ const FacultyDetail = () => {
         }
 
         if (String(id) === String(DUMMY_FACULTY_ID)) {
-          setFaculty(normalizeFacultyProfile(DUMMY_FACULTY_DETAIL));
+          setFaculty(normalizeFacultyProfile(getSavedDummyProfile()));
         }
       } catch (err) {
         console.error('Error loading faculty:', err);
         if (String(id) === String(DUMMY_FACULTY_ID)) {
-          setFaculty(normalizeFacultyProfile(DUMMY_FACULTY_DETAIL));
+          setFaculty(normalizeFacultyProfile(getSavedDummyProfile()));
         }
       }
     };
