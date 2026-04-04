@@ -8,6 +8,7 @@ import { Mail, Phone, Globe, Award, BookOpen, Users, Search, X } from 'lucide-re
 import BannerSection from "../../components/HeroBanner.jsx";
 import StatsCard from "../../components/StatsCard.jsx";
 import SearchableWrapper from "../../components/Searchbar/SearchableWrapper.jsx";
+import { DUMMY_FACULTY_MEMBER } from "../../Data/facultyDummyData";
 
 const VITE_HOST = import.meta.env.VITE_HOST;
 
@@ -32,12 +33,15 @@ const Faculty = () => {
           axios.get(`${VITE_HOST}/academic/faculty/directory/`),
           axios.get(`${VITE_HOST}/academic/faculty/join/`)
         ]);
-        setFacultyMembers(facultyRes.data);
+        const fetchedMembers = Array.isArray(facultyRes.data) ? facultyRes.data : [];
+        const hasDummy = fetchedMembers.some((member) => String(member.id) === String(DUMMY_FACULTY_MEMBER.id));
+        setFacultyMembers(hasDummy ? fetchedMembers : [...fetchedMembers, DUMMY_FACULTY_MEMBER]);
         setDirectoryStats(directoryRes.data[0]);
         setJoinData(joinRes.data[0]);
         console.log('✅ Fetched all faculty data.');
       } catch (err) {
         console.error('❌ Failed to fetch:', err);
+        setFacultyMembers([DUMMY_FACULTY_MEMBER]);
       }
     };
     fetchAllData();
@@ -286,7 +290,7 @@ const Faculty = () => {
                         <div className="p-6">
                           <div className="flex flex-col items-center text-center">
                             <img
-                              src={`${VITE_HOST}/media/${faculty.image}`}
+                              src={faculty.image_url || `${VITE_HOST}/media/${faculty.image}`}
                               alt={faculty.name}
                               className="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-100 group-hover:border-blue-200 transition-colors"
                             />
