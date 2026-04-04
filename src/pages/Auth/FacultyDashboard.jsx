@@ -58,6 +58,9 @@ const FacultyDashboard = () => {
   const [message, setMessage] = useState("");
   const [newAreaTitle, setNewAreaTitle] = useState("");
   const [newAreaDesc, setNewAreaDesc] = useState("");
+  const [tagsInput, setTagsInput] = useState(
+    Array.isArray(getInitialProfile().tags) ? getInitialProfile().tags.join(", ") : ""
+  );
   const [activeSection, setActiveSection] = useState("dashboard-header");
 
   const sidebarSections = [
@@ -81,6 +84,16 @@ const FacultyDashboard = () => {
 
   const updateField = (key, value) => {
     setProfile((prev) => ({ ...prev, [key]: value }));
+    setMessage("");
+  };
+
+  const updateTags = (value) => {
+    setTagsInput(value);
+    const parsedTags = value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    setProfile((prev) => ({ ...prev, tags: parsedTags }));
     setMessage("");
   };
 
@@ -268,6 +281,9 @@ const FacultyDashboard = () => {
               <Field label="Designation">
                 <input className={inputClass} value={profile.designation || ""} onChange={(e) => updateField("designation", e.target.value)} />
               </Field>
+              <Field label="Specialization">
+                <input className={inputClass} value={profile.specialization || ""} onChange={(e) => updateField("specialization", e.target.value)} />
+              </Field>
               <Field label="Department">
                 <input className={inputClass} value={profile.department || ""} onChange={(e) => updateField("department", e.target.value)} />
               </Field>
@@ -312,6 +328,9 @@ const FacultyDashboard = () => {
               <Field label="Faculty Profile URL">
                 <input className={inputClass} value={profile.faculty_url || ""} onChange={(e) => updateField("faculty_url", e.target.value)} />
               </Field>
+              <Field label="Profile Image URL">
+                <input className={inputClass} value={profile.image_url || ""} onChange={(e) => updateField("image_url", e.target.value)} />
+              </Field>
               <div className="grid gap-4 md:grid-cols-2">
                 <Field label="CV Link">
                   <input className={inputClass} value={profile.cv || ""} onChange={(e) => updateField("cv", e.target.value)} />
@@ -322,6 +341,14 @@ const FacultyDashboard = () => {
               </div>
               <Field label="ORCID Link">
                 <input className={inputClass} value={profile.orcid || ""} onChange={(e) => updateField("orcid", e.target.value)} />
+              </Field>
+              <Field label="Profile Tags (comma separated)">
+                <input
+                  className={inputClass}
+                  value={tagsInput}
+                  onChange={(e) => updateTags(e.target.value)}
+                  placeholder="PhD, AI, Research Mentor"
+                />
               </Field>
             </div>
           </div>
