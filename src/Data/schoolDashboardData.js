@@ -75,4 +75,52 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
     { id: "ann-1", text: "Admissions open for PG programs.", active: true },
     { id: "ann-2", text: "School research colloquium on Monday.", active: true }
   ],
+  tabContent: {
+    home: {
+      heroTitle: "School of Information and Communication Technology",
+      heroSubtitle: "Innovation, research, and future-ready learning.",
+    },
+    faculty: {
+      facultyPagePath: "/schools/ict/faculty",
+      title: "Faculty Excellence",
+      totalFacultyText: "40+ Experienced Faculty Members",
+      description:
+        "Our faculty group combines academic depth with industry-focused teaching and mentorship.",
+    },
+    about: {
+      introTitle: "About the School",
+      overviewText:
+        "The school nurtures strong technical foundations and interdisciplinary problem-solving through advanced labs and active research.",
+      deanMessage:
+        "We are committed to high-quality education and impactful research for societal progress.",
+      deanPath: "/schools/ict/about/dean",
+      boardPath: "/schools/ict/about/board",
+      staffPath: "/schools/ict/about/staff",
+      labsPath: "/schools/ict/about/labs",
+      activitiesPath: "/schools/ict/about/activities",
+    },
+    research: {
+      introText:
+        "Research clusters across AI, cybersecurity, communication systems, and intelligent infrastructure.",
+      profilePath: "/schools/ict/research/profile",
+      consultancyPath: "/schools/ict/research/consultancy",
+      scholarsPath: "/schools/ict/research/scholars",
+      projectsPath: "/schools/ict/research/projects",
+      patentsPath: "/schools/ict/research/patents",
+    },
+    placement: {
+      path: "/schools/ict/placement",
+      overview:
+        "The placement cell drives internships and final placements with strong recruiter partnerships.",
+      statsText: "High placement participation across UG and PG programs.",
+      recruiters: ["TCS", "Infosys", "Wipro", "HCL"],
+    },
+    contact: {
+      path: "/schools/ict/contact",
+      officeHours: "Monday to Friday, 9:30 AM to 5:30 PM",
+      helpdeskEmail: "soict.helpdesk@gbu.ac.in",
+      helpdeskPhone: "+91-120-234-9988",
+      mapUrl: "https://maps.google.com/?q=Gautam+Buddha+University",
+    },
+  },
 };
