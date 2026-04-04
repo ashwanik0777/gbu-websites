@@ -169,11 +169,12 @@ const FacultyDashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-stone-100 p-4 md:p-8">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:flex-row">
-        <aside className="lg:sticky lg:top-6 lg:h-fit lg:w-72">
-          <div className="rounded-2xl border border-stone-300 bg-white p-4 shadow-sm">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">Faculty Navigation</h2>
+        <aside className="lg:sticky lg:top-0 lg:w-72 lg:min-h-screen lg:self-start">
+          <div className="flex h-full min-h-screen flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Faculty Navigation</h2>
+            <p className="mt-1 text-xs text-slate-500">Profile management panel</p>
             <div className="mt-3 space-y-2">
               {sidebarSections.map((section) => {
                 const Icon = section.icon;
@@ -183,10 +184,10 @@ const FacultyDashboard = () => {
                     key={section.id}
                     type="button"
                     onClick={() => scrollToSection(section.id)}
-                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm transition ${
+                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition ${
                       isActive
-                        ? "bg-stone-900 text-white"
-                        : "bg-white text-stone-700 hover:bg-stone-100"
+                        ? "bg-slate-900 text-white shadow"
+                        : "bg-white text-slate-700 hover:bg-slate-100"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -196,20 +197,32 @@ const FacultyDashboard = () => {
               })}
             </div>
 
-            <div className="mt-4 rounded-xl border border-stone-200 bg-stone-50 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">Quick Actions</p>
+            <div className="mt-auto rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quick Actions</p>
               <div className="mt-2 space-y-2">
                 <button
                   onClick={handleSave}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-stone-900 px-3 py-2 text-sm font-semibold text-white hover:bg-stone-800"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
                 >
                   <Save className="h-4 w-4" /> Save
                 </button>
                 <button
+                  onClick={handleReset}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                >
+                  <RotateCcw className="h-4 w-4" /> Reset
+                </button>
+                <button
                   onClick={() => navigate(`/academics/faculty/${DUMMY_FACULTY_ID}`)}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
                 >
                   <ExternalLink className="h-4 w-4" /> View Public Profile
+                </button>
+                <button
+                  onClick={() => navigate("/login")}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-100"
+                >
+                  <LogOut className="h-4 w-4" /> Logout
                 </button>
               </div>
             </div>
@@ -222,9 +235,7 @@ const FacultyDashboard = () => {
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">Faculty Portal</p>
               <h1 className="mt-1 text-2xl font-bold text-stone-900 md:text-3xl">Faculty Dashboard</h1>
-              <p className="mt-1 text-sm text-stone-600">
-                Update all profile fields here. These updates will reflect on the public Faculty Detail page.
-              </p>
+             
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <button
@@ -235,25 +246,11 @@ const FacultyDashboard = () => {
                 Open Detail Page
               </button>
               <button
-                onClick={handleReset}
-                className="inline-flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Reset
-              </button>
-              <button
                 onClick={handleSave}
                 className="inline-flex items-center gap-2 rounded-xl bg-stone-900 px-3 py-2 text-sm font-semibold text-white hover:bg-stone-800"
               >
                 <Save className="h-4 w-4" />
                 Save Changes
-              </button>
-              <button
-                onClick={() => navigate("/login")}
-                className="inline-flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
               </button>
             </div>
           </div>
