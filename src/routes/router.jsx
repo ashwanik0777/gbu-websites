@@ -53,6 +53,7 @@ import EscalationPolicy from "../pages/grievance/EscalationPolicy";
 import ComplaintDetail from "../pages/grievance/ComplaintDetail";
 import GrievanceFacultyDashboard from "../pages/grievance/FacultyDashboard";
 import FacultyPortalDashboard from "../pages/Auth/FacultyDashboard.jsx";
+import SchoolDashboard from "../pages/Auth/SchoolDashboard.jsx";
 import Biotechnology from "../pages/departments/Biotechnology.jsx";
 import Engineering from "../pages/departments/Engineering.jsx";
 import Law from "../pages/departments/Law.jsx";
@@ -216,6 +217,7 @@ export default function AppRouter() {
           <Route path="/login" element={<LoginPortal />} />
           <Route path="/admission/login" element={<LoginNewStudent/>} />
           <Route path="/faculty-portal/dashboard" element={<FacultyPortalDashboard />} />
+          <Route path="/school-portal/dashboard" element={<SchoolDashboard />} />
           <Route
             path="/academics/academic-calendar"
             element={<AcademicCalendar />}

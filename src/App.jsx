@@ -20,6 +20,8 @@ function App() {
   const location = useLocation();
   const isICTPage = location.pathname.startsWith("/schools");
   const isFacultyPortalPage = location.pathname.startsWith("/faculty-portal");
+  const isSchoolPortalPage = location.pathname.startsWith("/school-portal");
+  const isPortalPage = isFacultyPortalPage || isSchoolPortalPage;
 
   useEffect(() => {
     if (isPreloadComplete) {
@@ -36,8 +38,8 @@ function App() {
         ) : (
           <>
           <ScrollToTop>
-            {!isFacultyPortalPage && <Primarynavbar />}
-            {!isFacultyPortalPage &&
+            {!isPortalPage && <Primarynavbar />}
+            {!isPortalPage &&
               (isICTPage ? (
                 <div className="mt-9">
                   <DepartmentNavbar />
@@ -45,10 +47,10 @@ function App() {
               ) : (
                 <Navbar />
               ))}
-            <div className={isFacultyPortalPage ? "pt-0" : isICTPage ? "pt-8" : "pt-[6.3rem]"}>
+            <div className={isPortalPage ? "pt-0" : isICTPage ? "pt-8" : "pt-[6.3rem]"}>
               <AppRouter />
             </div>
-            {!isFacultyPortalPage && <Footer />}
+            {!isPortalPage && <Footer />}
             </ScrollToTop>
           </>
         )}

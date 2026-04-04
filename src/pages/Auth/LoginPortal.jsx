@@ -51,7 +51,7 @@ const LoginPortal = () => {
     }
 
     if (role === "school") {
-      navigate("/comingSoon");
+      navigate("/school-portal/dashboard");
       return;
     }
 

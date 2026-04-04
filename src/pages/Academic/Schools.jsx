@@ -5,6 +5,7 @@ import { ChevronRight, Users, BookOpen, Award, Globe } from 'lucide-react';
 import BannerSection from "../../components/HeroBanner.jsx";
 import StatsCard from "../../components/StatsCard.jsx";
 import SearchableWrapper from "../../components/Searchbar/SearchableWrapper.jsx";
+import { DEFAULT_SCHOOL_DASHBOARD_DATA, SCHOOL_DASHBOARD_STORAGE_KEY } from "../../Data/schoolDashboardData";
 
 const GlobalStyles = () => (
   <style>{`
@@ -124,6 +125,18 @@ const SchoolCard = ({ imageUrl, label, description, path, features }) => {
 };
 
 const HoverCards = () => {
+  const getManagedSchoolData = () => {
+    try {
+      const raw = localStorage.getItem(SCHOOL_DASHBOARD_STORAGE_KEY);
+      if (!raw) return DEFAULT_SCHOOL_DASHBOARD_DATA;
+      return { ...DEFAULT_SCHOOL_DASHBOARD_DATA, ...JSON.parse(raw) };
+    } catch {
+      return DEFAULT_SCHOOL_DASHBOARD_DATA;
+    }
+  };
+
+  const managedSchool = getManagedSchoolData();
+
   const stats = [
     { icon: Users, numberText: "6500+", title: "Students" },
     { icon: BookOpen, number: 8, title: "Schools" },
@@ -133,11 +146,11 @@ const HoverCards = () => {
 
   const schools = [
     {
-      imageUrl: "https://www.gbu.ac.in/USICT/media/img/slider/1.jpg",
-      label: "School of Information and Communication Technology",
-      description: "Leading innovation in computer science, AI, cybersecurity, and digital transformation with cutting-edge research facilities and industry partnerships.",
+      imageUrl: managedSchool.bannerImage,
+      label: managedSchool.schoolName,
+      description: managedSchool.schoolDescription,
       path: "/schools/ict",
-      features: ["AI & ML", "Cybersecurity", "Software Engineering", "Data Science"]
+      features: managedSchool.highlights
     },
     {
       imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUoLwvVWxxxBLWiAC0R019yjKPhFJzb5TuFg&s",
