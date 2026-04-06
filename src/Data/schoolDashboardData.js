@@ -75,6 +75,49 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
     { id: "ann-1", text: "Admissions open for PG programs.", active: true },
     { id: "ann-2", text: "School research colloquium on Monday.", active: true }
   ],
+  navigation: {
+    tabs: [
+      { id: "home", label: "Home", subTabs: [] },
+      { id: "faculty", label: "Faculty", subTabs: [] },
+      {
+        id: "about",
+        label: "About Us",
+        subTabs: [
+          "Dean's Message",
+          "USICT COEIDrone Technologies",
+          "USICT Cyber Security Lab",
+          "USICT COEIRAEM",
+          "USICT Board of Studies",
+          "USICT Staff Members",
+          "USICT Laboratories",
+          "USICT Activities"
+        ]
+      },
+      {
+        id: "departments",
+        label: "Departments & Academic Programs",
+        subTabs: [
+          "Department of Computer Science and Engineering",
+          "Department of Information Technology",
+          "Department of Electronic & Communication"
+        ]
+      },
+      {
+        id: "research",
+        label: "Research",
+        subTabs: [
+          "Research",
+          "Research Area and Profile",
+          "Training and Consultancy",
+          "Research Scholars",
+          "Research Projects",
+          "Patents"
+        ]
+      },
+      { id: "placement", label: "Placement", subTabs: [] },
+      { id: "contact", label: "Contact Us", subTabs: [] }
+    ]
+  },
   tabContent: {
     home: {
       heroTitle: "School of Information and Communication Technology",

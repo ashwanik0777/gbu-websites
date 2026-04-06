@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Building2,
   Save,
   RotateCcw,
   LogOut,
@@ -14,6 +13,7 @@ import {
   Briefcase,
   Phone,
   ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import {
   DEFAULT_SCHOOL_DASHBOARD_DATA,
@@ -42,6 +42,13 @@ const getInitialSchoolData = () => {
       announcements: Array.isArray(parsed.announcements)
         ? parsed.announcements
         : deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.announcements),
+      navigation: {
+        ...deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.navigation),
+        ...(parsed.navigation || {}),
+        tabs: Array.isArray(parsed.navigation?.tabs)
+          ? parsed.navigation.tabs
+          : deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.navigation.tabs),
+      },
       tabContent: {
         ...deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.tabContent),
         ...(parsed.tabContent || {}),
@@ -57,6 +64,16 @@ const inputClass =
 
 const cardClass = "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
 
+const MAIN_TAB_META = [
+  { id: "home", icon: Home, hasSubTabs: false },
+  { id: "faculty", icon: Users, hasSubTabs: false },
+  { id: "about", icon: Info, hasSubTabs: true },
+  { id: "departments", icon: GraduationCap, hasSubTabs: true },
+  { id: "research", icon: FlaskConical, hasSubTabs: true },
+  { id: "placement", icon: Briefcase, hasSubTabs: false },
+  { id: "contact", icon: Phone, hasSubTabs: false },
+];
+
 const Field = ({ label, children }) => (
   <div>
     <label className="mb-1 block text-sm font-medium text-slate-700">{label}</label>
@@ -64,57 +81,13 @@ const Field = ({ label, children }) => (
   </div>
 );
 
-const MAIN_TABS = [
-  {
-    id: "home",
-    label: "Home",
-    icon: Home,
-    subTabs: ["Hero", "Highlights", "Announcements"],
-  },
-  {
-    id: "faculty",
-    label: "Faculty",
-    icon: Users,
-    subTabs: ["Directory", "Leadership", "Featured Faculty"],
-  },
-  {
-    id: "about",
-    label: "About Us",
-    icon: Info,
-    subTabs: ["Overview", "Dean Message", "Board & Staff", "Labs & Activities", "Centers of Excellence"],
-  },
-  {
-    id: "departments",
-    label: "Departments & Academic Programs",
-    icon: GraduationCap,
-    subTabs: ["Department List", "Programs", "Notices"],
-  },
-  {
-    id: "research",
-    label: "Research",
-    icon: FlaskConical,
-    subTabs: ["Profile", "Consultancy", "Scholars", "Projects", "Patents"],
-  },
-  {
-    id: "placement",
-    label: "Placement",
-    icon: Briefcase,
-    subTabs: ["Overview", "Top Recruiters", "Statistics"],
-  },
-  {
-    id: "contact",
-    label: "Contact Us",
-    icon: Phone,
-    subTabs: ["Office Details", "Map & Hours", "Helpdesk"],
-  },
-];
-
 const SchoolDashboard = () => {
   const navigate = useNavigate();
   const [data, setData] = useState(getInitialSchoolData);
   const [message, setMessage] = useState("");
   const [activeMainTab, setActiveMainTab] = useState("home");
-  const [activeSubTab, setActiveSubTab] = useState("Hero");
+  const [activeSubTab, setActiveSubTab] = useState("");
+  const [expandedTabId, setExpandedTabId] = useState("about");
 
   const summary = useMemo(
     () => [
@@ -126,12 +99,65 @@ const SchoolDashboard = () => {
     [data]
   );
 
-  const currentMainTab = MAIN_TABS.find((tab) => tab.id === activeMainTab) || MAIN_TABS[0];
+  const normalizedTabs = useMemo(() => {
+    const savedTabs = data.navigation?.tabs || [];
+    return MAIN_TAB_META.map((meta) => {
+      const saved = savedTabs.find((item) => item.id === meta.id) || {};
+      return {
+        ...meta,
+        label: saved.label || meta.id,
+        subTabs: Array.isArray(saved.subTabs) ? saved.subTabs : [],
+      };
+    });
+  }, [data.navigation]);
+
+  const currentMainTab = normalizedTabs.find((tab) => tab.id === activeMainTab) || normalizedTabs[0];
 
   const changeMainTab = (tabId) => {
-    const tab = MAIN_TABS.find((item) => item.id === tabId) || MAIN_TABS[0];
+    const tab = normalizedTabs.find((item) => item.id === tabId) || normalizedTabs[0];
     setActiveMainTab(tab.id);
-    setActiveSubTab(tab.subTabs[0]);
+    if (tab.hasSubTabs) {
+      setExpandedTabId(tab.id);
+    }
+    if (tab.hasSubTabs && tab.subTabs.length > 0) {
+      setActiveSubTab(tab.subTabs[0]);
+      return;
+    }
+    setActiveSubTab("");
+  };
+
+  const updateTabLabel = (tabId, value) => {
+    setData((prev) => ({
+      ...prev,
+      navigation: {
+        ...prev.navigation,
+        tabs: (prev.navigation?.tabs || []).map((tab) =>
+          tab.id === tabId ? { ...tab, label: value } : tab
+        ),
+      },
+    }));
+    setMessage("");
+  };
+
+  const updateSubTabLabel = (tabId, index, value) => {
+    setData((prev) => ({
+      ...prev,
+      navigation: {
+        ...prev.navigation,
+        tabs: (prev.navigation?.tabs || []).map((tab) => {
+          if (tab.id !== tabId) return tab;
+          const nextSubTabs = [...(tab.subTabs || [])];
+          nextSubTabs[index] = value;
+          return { ...tab, subTabs: nextSubTabs };
+        }),
+      },
+    }));
+    setActiveSubTab((prevSubTab) => {
+      const oldSubTab = currentMainTab?.subTabs?.[index];
+      if (prevSubTab === oldSubTab) return value;
+      return prevSubTab;
+    });
+    setMessage("");
   };
 
   const updateField = (key, value) => {
@@ -392,30 +418,67 @@ const SchoolDashboard = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:flex-row">
-        <aside className="lg:sticky lg:top-0 lg:w-72 lg:min-h-screen lg:self-start">
-          <div className="flex h-full min-h-screen flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <aside className="lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:w-80 lg:self-start">
+          <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">School Navigation</h2>
             <p className="mt-1 text-xs text-slate-500">Main tabs and sub-groups</p>
 
-            <div className="mt-3 space-y-2">
-              {MAIN_TABS.map((tab) => {
+            <div className="mt-3 flex-1 space-y-2 overflow-y-auto pr-1">
+              {normalizedTabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeMainTab === tab.id;
+                const isExpanded = expandedTabId === tab.id;
                 return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => changeMainTab(tab.id)}
-                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm transition ${
-                      isActive ? "bg-slate-900 text-white shadow" : "bg-white text-slate-700 hover:bg-slate-100"
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Icon className="h-4 w-4" />
-                      {tab.label}
-                    </span>
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
+                  <div key={tab.id} className="rounded-xl border border-slate-200 bg-white">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (tab.hasSubTabs && activeMainTab === tab.id && expandedTabId === tab.id) {
+                          setExpandedTabId("");
+                          return;
+                        }
+                        changeMainTab(tab.id);
+                      }}
+                      className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm transition ${
+                        isActive ? "bg-slate-900 text-white shadow" : "text-slate-700 hover:bg-slate-100"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <Icon className="h-4 w-4" />
+                        {tab.label}
+                      </span>
+                      {tab.hasSubTabs && isExpanded ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )}
+                    </button>
+
+                    {tab.hasSubTabs && isExpanded ? (
+                      <div className="px-2 pb-2">
+                        {(tab.subTabs || []).map((subTab) => {
+                          const subTabActive = isActive && activeSubTab === subTab;
+                          return (
+                            <button
+                              key={`${tab.id}-${subTab}`}
+                              type="button"
+                              onClick={() => {
+                                setActiveMainTab(tab.id);
+                                setActiveSubTab(subTab);
+                              }}
+                              className={`mt-1.5 w-full rounded-lg px-3 py-1.5 text-left text-xs transition ${
+                                subTabActive
+                                  ? "bg-slate-200 font-medium text-slate-900"
+                                  : "text-slate-600 hover:bg-slate-100"
+                              }`}
+                            >
+                              {subTab}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                  </div>
                 );
               })}
             </div>
@@ -459,23 +522,49 @@ const SchoolDashboard = () => {
           </section>
 
           <section className={cardClass}>
-            <div className="mb-3 flex flex-wrap gap-2">
-              {currentMainTab.subTabs.map((subTab) => (
-                <button
-                  key={subTab}
-                  type="button"
-                  onClick={() => setActiveSubTab(subTab)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
-                    activeSubTab === subTab
-                      ? "bg-slate-900 text-white"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                  }`}
-                >
-                  {subTab}
-                </button>
-              ))}
+            <div className="grid gap-3 md:grid-cols-2">
+              <Field label="Main Tab Name">
+                <input
+                  className={inputClass}
+                  value={currentMainTab.label}
+                  onChange={(e) => updateTabLabel(currentMainTab.id, e.target.value)}
+                />
+              </Field>
+              {currentMainTab.hasSubTabs ? (
+                <Field label="Sub-Tab Dropdown">
+                  <select
+                    className={inputClass}
+                    value={activeSubTab || currentMainTab.subTabs[0] || ""}
+                    onChange={(e) => setActiveSubTab(e.target.value)}
+                  >
+                    {(currentMainTab.subTabs || []).map((subTab) => (
+                      <option key={subTab} value={subTab}>
+                        {subTab}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              ) : null}
             </div>
-            <p className="mb-4 text-xs text-slate-500">Current group: {currentMainTab.label} / {activeSubTab}</p>
+
+            {currentMainTab.hasSubTabs ? (
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                {currentMainTab.subTabs.map((subTab, index) => (
+                  <Field key={`${currentMainTab.id}-${index}`} label={`Sub-Tab ${index + 1} Name`}>
+                    <input
+                      className={inputClass}
+                      value={subTab}
+                      onChange={(e) => updateSubTabLabel(currentMainTab.id, index, e.target.value)}
+                    />
+                  </Field>
+                ))}
+              </div>
+            ) : null}
+
+            <p className="mb-4 mt-4 text-xs text-slate-500">
+              Current group: {currentMainTab.label}
+              {currentMainTab.hasSubTabs && activeSubTab ? ` / ${activeSubTab}` : ""}
+            </p>
             {renderTabBody()}
           </section>
         </main>
