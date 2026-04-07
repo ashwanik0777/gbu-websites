@@ -87,7 +87,7 @@ const SchoolDashboard = () => {
   const [message, setMessage] = useState("");
   const [activeMainTab, setActiveMainTab] = useState("home");
   const [activeSubTab, setActiveSubTab] = useState("");
-  const [expandedTabId, setExpandedTabId] = useState("about");
+  const [expandedTabId, setExpandedTabId] = useState("");
 
   const summary = useMemo(
     () => [
@@ -416,12 +416,11 @@ const SchoolDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
+    <div className="min-h-screen bg-slate-50 p-2 md:p-4">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:flex-row">
         <aside className="lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:w-80 lg:self-start">
           <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">School Navigation</h2>
-            <p className="mt-1 text-xs text-slate-500">Main tabs and sub-groups</p>
 
             <div className="mt-3 flex-1 space-y-2 overflow-y-auto pr-1">
               {normalizedTabs.map((tab) => {
@@ -447,11 +446,13 @@ const SchoolDashboard = () => {
                         <Icon className="h-4 w-4" />
                         {tab.label}
                       </span>
-                      {tab.hasSubTabs && isExpanded ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4" />
-                      )}
+                      {tab.hasSubTabs ? (
+                        isExpanded ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )
+                      ) : null}
                     </button>
 
                     {tab.hasSubTabs && isExpanded ? (
@@ -484,17 +485,17 @@ const SchoolDashboard = () => {
             </div>
 
             <div className="mt-auto rounded-xl border border-slate-200 bg-slate-50 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quick Actions</p>
+              {/* <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quick Actions</p> */}
               <div className="mt-2 space-y-2">
                 <button onClick={saveAll} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
                   <Save className="h-4 w-4" /> Save All
                 </button>
-                <button onClick={resetAll} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                {/* <button onClick={resetAll} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
                   <RotateCcw className="h-4 w-4" /> Reset
                 </button>
                 <button onClick={() => navigate("/academics/schools")} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
                   <ExternalLink className="h-4 w-4" /> View Schools Page
-                </button>
+                </button> */}
                 <button onClick={() => navigate("/login")} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-100">
                   <LogOut className="h-4 w-4" /> Logout
                 </button>
@@ -506,9 +507,6 @@ const SchoolDashboard = () => {
         <main className="flex-1 space-y-6">
           <section className={cardClass}>
             <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">School Dashboard</h1>
-            <p className="mt-1 text-sm text-slate-600">
-              Full tab-wise management for school pages and sub-page groups.
-            </p>
             {message ? <p className="mt-3 text-sm font-medium text-emerald-700">{message}</p> : null}
           </section>
 
