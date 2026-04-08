@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import homeData from '../../Data/home.json';
 
 import aiLab from '../../assets/coe/aiLab.jpg'; 
 import drone from '../../assets/coe/drone.avif';
@@ -10,7 +10,6 @@ import smart from '../../assets/coe/smart.webp';
 import material from '../../assets/coe/material.jpg';
 
 const BASE = (import.meta.env.VITE_HOST || '').replace(/\/$/, '');
-const EXCELLENCE_API = `${BASE}/landing/excellence-in-education/`;
 
 const categoryMap = {
   'Centers of Excellence': 'centers of excellence',
@@ -51,39 +50,30 @@ export default function ExcellenceSection() {
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(EXCELLENCE_API);
-        const json = res.data;
+    const json = homeData?.sections?.excellence_in_education || [];
 
-        const grouped = {
-          'Centers of Excellence': [],
-          'Research Labs': [],
-          'Infrastructure': [],
-        };
-
-        json.forEach(item => {
-          const category = item.category?.toLowerCase().trim();
-
-          for (const [label, key] of Object.entries(categoryMap)) {
-            if (category === key.toLowerCase().trim()) {
-              grouped[label].push({
-                ...item,
-                gradient: gradientMap[key] || 'from-gray-500 to-gray-600',
-                icon: iconMap[key] || '📌',
-              });
-              break;
-            }
-          }
-        });
-
-        setGroupedData(grouped);
-      } catch (err) {
-        console.error('Failed to fetch excellence data:', err);
-      }
+    const grouped = {
+      'Centers of Excellence': [],
+      'Research Labs': [],
+      'Infrastructure': [],
     };
 
-    fetchData();
+    json.forEach(item => {
+      const category = item.category?.toLowerCase().trim();
+
+      for (const [label, key] of Object.entries(categoryMap)) {
+        if (category === key.toLowerCase().trim()) {
+          grouped[label].push({
+            ...item,
+            gradient: gradientMap[key] || 'from-gray-500 to-gray-600',
+            icon: iconMap[key] || '📌',
+          });
+          break;
+        }
+      }
+    });
+
+    setGroupedData(grouped);
   }, []);
 
   const tabs = Object.keys(categoryMap);
@@ -92,6 +82,8 @@ export default function ExcellenceSection() {
     if (!imgPath) return "https://via.placeholder.com/600x400?text=No+Image";
     return imgPath.includes("http")
       ? imgPath
+      : imgPath.startsWith("/")
+        ? imgPath
       : `${BASE}/${imgPath.startsWith("media") ? "" : "media/"}${imgPath}`;
   };
 

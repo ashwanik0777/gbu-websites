@@ -1,23 +1,28 @@
 import React, { useEffect, useState } from "react";
+import homeData from "../../Data/home.json";
 
 export default function CampusLifeSection() {
   const [testimonials, setTestimonials] = useState([]);
-  const BASE = import.meta.env.VITE_HOST?.replace(/\/$/, "");
-  const CAMPUS_LIFE_API = `${BASE}/landing/campus-life/`;
+  const BASE = (import.meta.env.VITE_HOST || "").replace(/\/$/, "");
+
+  const getImageUrl = (path) => {
+    if (!path) return "https://via.placeholder.com/600x400?text=No+Image";
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.startsWith("/")) return path;
+    const cleanPath = path.replace(/^\/+/, "");
+    if (BASE) {
+      return `${BASE}/${cleanPath.startsWith("media/") ? cleanPath : `media/${cleanPath}`}`;
+    }
+    return `/${cleanPath}`;
+  };
 
   useEffect(() => {
-    const fetchTestimonials = async () => {
-      try {
-        const response = await fetch(CAMPUS_LIFE_API);
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setTestimonials(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch campus life data:", error);
-      }
-    };
-    fetchTestimonials();
+    const campusLife = homeData?.sections?.campus_life || [];
+    const normalized = campusLife.map((item) => ({
+      ...item,
+      image: getImageUrl(item.image),
+    }));
+    setTestimonials(normalized);
   }, []);
 
   // Function to extract category from card_content

@@ -115,6 +115,7 @@ import {
   FaPenNib,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import homeData from "../../Data/home.json";
 
 const quickLinks = [
   {
@@ -158,6 +159,21 @@ const quickLinks = [
 ];
 
 export default function QuickLinks() {
+  const quickAccessItems = Array.isArray(homeData?.sections?.quick_access)
+    ? homeData.sections.quick_access
+    : [];
+
+  const normalizedQuickLinks = quickAccessItems.length
+    ? quickAccessItems.map((item) => ({
+        title: item.title || "Quick Link",
+        desc: item.description || "",
+        icon: <FaUniversity className="text-white text-2xl" />,
+        color: "bg-blue-700",
+        link: item.url || "/",
+        external: /^https?:\/\//i.test(item.url || ""),
+      }))
+    : quickLinks;
+
   return (
     <section
       className="bg-gray-50 py-12"
@@ -172,7 +188,7 @@ export default function QuickLinks() {
       </h2>
 
       <div className="grid gap-6 px-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-7xl mx-auto">
-        {quickLinks.map((item, idx) => {
+        {normalizedQuickLinks.map((item, idx) => {
           const Card = (
             <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 text-center transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl h-full">
               <div

@@ -1,92 +1,29 @@
-import React, { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+import React from "react";
+import homeData from "../../Data/home.json";
 
 export default function WelcomePage() {
-  const [bannerData, setBannerData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const bannerData = homeData?.sections?.banner?.[0] || null;
+  const BASE = (import.meta.env.VITE_HOST || "").replace(/\/$/, "");
 
-  const BANNER = import.meta.env.VITE_HOST;
-  const BASE = (BANNER || "").replace(/\/$/, "");
-
-  const fetchBannerData = useCallback(async () => {
-    if (!BASE) {
-      setError("Base URL not configured");
-      setLoading(false);
-      return;
+  const resolveAssetUrl = (path) => {
+    if (!path) return "";
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.startsWith("/")) return path;
+    const cleanPath = path.replace(/^\/+/, "");
+    if (BASE) {
+      return `${BASE}/${cleanPath.startsWith("media/") ? cleanPath : `media/${cleanPath}`}`;
     }
-
-    try {
-      setLoading(true);
-      setError(null);
-      
-
-      const res = await axios.get(`${BASE}/landing/banner/`, {
-        timeout: 5000, 
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        }
-      });
-      
-      const data = res.data;
-      if (Array.isArray(data) && data.length > 0) {
-        setBannerData(data[0]);
-      } else {
-        setError("No banner data available");
-      }
-    } catch (error) {
-      console.error("Error fetching banner data:", error);
-      setError("Failed to load banner data");
-    } finally {
-      setLoading(false);
-    }
-  }, [BASE]);
-
-  useEffect(() => {
-    fetchBannerData();
-  }, [fetchBannerData]);
-
-  // Loading state with better mobile styling
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="text-center p-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-sm sm:text-base">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="text-center p-4 max-w-md mx-auto">
-          <div className="text-red-500 text-4xl mb-4">⚠️</div>
-          <p className="text-gray-600 text-sm sm:text-base mb-4">{error}</p>
-          <button
-            onClick={fetchBannerData}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm sm:text-base transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
+    return `/${cleanPath}`;
+  };
 
   if (!bannerData) return null;
 
-  const videoSrc = bannerData.video?.includes("http")
-    ? bannerData.video
-    : `${BASE}/${bannerData.video.startsWith("media") ? "" : "media/"}${bannerData.video}`;
+  const videoSrc = resolveAssetUrl(bannerData.video);
 
   return (
     <>
       {/* Main welcome section */}
-      <div className="relative h-[82.4vh] w-full flex flex-col justify-center overflow-hidden">
+      <div className="relative h-[82.4vh] w-full flex flex-col justify-center  overflow-hidden">
         {/* Background video or image */}
         {bannerData.video?.endsWith(".mp4") ? (
           <video
@@ -94,7 +31,7 @@ export default function WelcomePage() {
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full z-0 video-responsive"
+            className="absolute inset-0 w-full h-full z-0 video-responsive -mt-18"
             poster={bannerData.poster_image}
             preload="metadata"
           >

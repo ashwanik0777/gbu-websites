@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import homeData from "../../Data/home.json";
 
 const cardVariants = {
   enter: { opacity: 0, x: 100 },
@@ -13,32 +13,22 @@ const VisionaryLeadership = () => {
   const [leaders, setLeaders] = useState([]);
   const [index, setIndex] = useState(0);
 
-  const BASE_URL = import.meta.env.VITE_HOST;
+  const BASE_URL = (import.meta.env.VITE_HOST || "").replace(/\/$/, "");
 useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/landing/leadership/`);
-      const data = res.data;
-      console.log("Fetched data:", data);
-      if (Array.isArray(data)) {
-        const sorted = [...data].sort((a, b) => {
-          const roles = ["Hon'ble Chancellor", "Hon'ble Vice-Chancellor"];
-          const aIndex = roles.indexOf(a.designation?.trim());
-          const bIndex = roles.indexOf(b.designation?.trim());
-          
-          if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-          if (aIndex !== -1) return -1;
-          if (bIndex !== -1) return 1;
-          return 0;
-        });
-        setLeaders(sorted);
-      }
-    } catch (error) {
-      console.error("Error fetching leadership data:", error);
-    }
-  };
+  const data = homeData?.sections?.leadership || [];
+  if (Array.isArray(data)) {
+    const sorted = [...data].sort((a, b) => {
+      const roles = ["Hon'ble Chancellor", "Hon'ble Vice-Chancellor"];
+      const aIndex = roles.indexOf(a.designation?.trim());
+      const bIndex = roles.indexOf(b.designation?.trim());
 
-  fetchData();
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+      if (aIndex !== -1) return -1;
+      if (bIndex !== -1) return 1;
+      return 0;
+    });
+    setLeaders(sorted);
+  }
 }, []);
 
 
@@ -62,7 +52,11 @@ useEffect(() => {
   const current = leaders[index];
   const fullImageUrl = current.photo?.includes("http")
     ? current.photo
-    : `${BASE_URL}/${current.photo.startsWith("media") ? "" : "media/"}${current.photo}`;
+    : current.photo?.startsWith("/")
+      ? current.photo
+      : BASE_URL
+        ? `${BASE_URL}/${current.photo.startsWith("media") ? "" : "media/"}${current.photo}`
+        : `/${current.photo}`;
 
   return (
     <section className="py-12 sm:py-16 bg-gradient-to-br from-blue-100 via-white to-green-100">

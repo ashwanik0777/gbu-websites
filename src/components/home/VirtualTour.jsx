@@ -1,27 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import homeData from '../../Data/home.json';
 import gbuimage from '../../assets/gbu.jpg';
-
-const BASE = import.meta.env.VITE_HOST?.replace(/\/$/, '');
-const VIRTUAL_TOUR_API = `${BASE}/landing/virtual-experience/`;
 
 function VirtualTour() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    const fetchVirtualTourData = async () => {
-      try {
-        const response = await axios.get(VIRTUAL_TOUR_API);
-        const json = response.data;
-        if (Array.isArray(json) && json.length > 0) {
-          setData(json[0]);
-        }
-      } catch (error) {
-        console.error('Error fetching virtual tour data:', error);
-      }
-    };
-
-    fetchVirtualTourData();
+    const virtualData = homeData?.sections?.virtual_experience?.[0] || null;
+    setData(virtualData);
   }, []);
 
   if (!data) {

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import CountUp from "react-countup";
 import { useInView } from "react-intersection-observer";
-import axios from "axios"; // <-- Added axios import
+import homeData from "../../Data/home.json";
 
 // Helper to safely build image URLs
 const BASE = import.meta.env.VITE_HOST?.replace(/\/$/, '');
@@ -9,7 +9,9 @@ const getImageUrl = (path) => {
   if (!path) return "https://via.placeholder.com/100x100?text=No+Logo";
   return path.includes("http")
     ? path
-    : `${BASE}/${path.startsWith("media") ? "" : "media/"}${path}`;
+    : path.startsWith("/")
+      ? path
+      : `${BASE}/${path.startsWith("media") ? "" : "media/"}${path}`;
 };
 
 const StatItem = ({ icon, end, duration, suffix = "", separator = "", text, start }) => {
@@ -37,22 +39,9 @@ const HiringSection = () => {
   const [time, setTime] = useState(0);
   const animationRef = useRef();
 
-  const API_URL = `${BASE}/landing/companies-hiring/`;
-
   useEffect(() => {
-    const fetchCompanyData = async () => {
-      try {
-        const res = await axios.get(API_URL); 
-        const data = res.data;
-        if (Array.isArray(data)) {
-          setCompanyData(data);
-        }
-      } catch (error) {
-        console.error("Error fetching company data:", error);
-      }
-    };
-
-    fetchCompanyData();
+    const companies = homeData?.sections?.companies_hiring || [];
+    setCompanyData(Array.isArray(companies) ? companies : []);
   }, []);
 
   useEffect(() => {

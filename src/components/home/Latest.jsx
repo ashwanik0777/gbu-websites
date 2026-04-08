@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import homeData from '../../Data/home.json';
 
 export default function LatestUpdates() {
   const [isVisible, setIsVisible] = useState(false);
   const [data, setData] = useState([]);
   const [categories, setCategories] = useState([]);
-
-  const BASE = import.meta.env.VITE_HOST?.replace(/\/$/, '');
-  const NOTICE_API = `${BASE}/landing/news-and-events/`;
 
   const mockData = [
     { id: 1, content_text: 'Orientation Program for First-Year Students will commence from 10th July.', category: 'Latest News', priority: 'high', date: '2025-06-25', url: '#' },
@@ -28,24 +25,12 @@ export default function LatestUpdates() {
 
   useEffect(() => {
     setIsVisible(true);
-    fetchNotices();
+    const noticesFromJson = homeData?.sections?.news_and_events;
+    const notices = Array.isArray(noticesFromJson) && noticesFromJson.length ? noticesFromJson : mockData;
+    setData(notices);
+    const uniqueCategories = [...new Map(notices.map(item => [item.category.trim(), item])).values()];
+    setCategories(uniqueCategories);
   }, []);
-
-  const fetchNotices = async () => {
-    try {
-      const res = await axios.get(NOTICE_API);
-      const json = res.data;
-      const notices = Array.isArray(json) && json.length ? json : mockData;
-      setData(notices);
-      const uniqueCategories = [...new Map(notices.map(item => [item.category.trim(), item])).values()];
-      setCategories(uniqueCategories);
-    } catch (err) {
-      console.error('Error fetching notices:', err);
-      setData(mockData);
-      const uniqueCategories = [...new Map(mockData.map(item => [item.category.trim(), item])).values()];
-      setCategories(uniqueCategories);
-    }
-  };
 
   const getPriorityIndicator = (priority = 'low') => {
     if (priority === 'high') return 'bg-red-500 animate-pulse';

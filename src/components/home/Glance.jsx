@@ -1,22 +1,8 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
+import homeData from "../../Data/home.json";
 
 const Glance = () => {
-  const [glanceData, setGlanceData] = useState(null);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const BASE = import.meta.env.VITE_HOST?.replace(/\/$/, '');
-        const res = await axios.get(`${BASE}/landing/glance-stat/`);
-        setGlanceData(res.data[0]);
-      } catch (err) {
-        console.error("Failed to fetch glance data:", err);
-      }
-    };
-
-    fetchStats();
-  }, []);
+  const glanceData = homeData?.sections?.glance_stat?.[0] || null;
 
   const formatStat = (label, value) => (
     <div

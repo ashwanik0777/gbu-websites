@@ -1,32 +1,20 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import homeData from "../../Data/home.json";
 import SearchableWrapper from "../Searchbar/SearchableWrapper";
 
-const BASE_URL = import.meta.env.VITE_HOST || "";
+const BASE_URL = (import.meta.env.VITE_HOST || "").replace(/\/$/, "");
 
 export default function AboutSection() {
-  const [aboutData, setAboutData] = useState(null);
-
-  useEffect(() => {
-    const fetchAboutData = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/landing/about/`);
-        const data = res.data;
-        console.log("Fetched aboutData:", data);
-        setAboutData(data[0]); 
-      } catch (error) {
-        console.error("Fetch error:", error);
-      }
-    };
-
-    fetchAboutData();
-  }, []);
+  const aboutData = homeData?.sections?.about?.[0] || null;
 
   if (!aboutData) return <div className="text-center py-10">Loading...</div>;
 
-  const imageSrc = aboutData.image?.includes("http")
+  const imageSrc = /^https?:\/\//i.test(aboutData.image || "")
     ? aboutData.image
-    : `${BASE_URL}/${aboutData.image.startsWith("media") ? "" : "media/"}${aboutData.image}`;
+    : (aboutData.image || "").startsWith("/")
+      ? aboutData.image
+    : BASE_URL
+      ? `${BASE_URL}/${(aboutData.image || "").startsWith("media/") ? aboutData.image : `media/${aboutData.image || ""}`}`
+      : `/${aboutData.image || ""}`;
 
   return (
      <SearchableWrapper>

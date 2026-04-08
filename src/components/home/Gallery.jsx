@@ -1,24 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import homeData from '../../Data/home.json';
 
 export default function CampusGallery() {
   const [galleryData, setGalleryData] = useState([]);
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const BASE = import.meta.env.VITE_HOST?.replace(/\/$/, '');
-  const API_URL = `${BASE}/landing/campus-gallery/`;
+  const BASE = (import.meta.env.VITE_HOST || '').replace(/\/$/, '');
+
+  const getImageUrl = (path) => {
+    if (!path) return 'https://via.placeholder.com/800x500/6B7280/FFFFFF?text=Image+Not+Found';
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.startsWith('/')) return path;
+    const cleanPath = path.replace(/^\/+/, '');
+    if (BASE) {
+      return `${BASE}/${cleanPath.startsWith('media/') ? cleanPath : `media/${cleanPath}`}`;
+    }
+    return `/${cleanPath}`;
+  };
 
   useEffect(() => {
-    const fetchGalleryData = async () => {
-      try {
-        const res = await axios.get(API_URL);
-        setGalleryData(res.data);
-      } catch (err) {
-        console.error('Error fetching campus gallery:', err);
-      }
-    };
-    fetchGalleryData();
+    const rawGallery = homeData?.sections?.campus_gallery || [];
+    const normalized = rawGallery.map((item) => ({
+      ...item,
+      image: getImageUrl(item.image),
+    }));
+    setGalleryData(normalized);
   }, []);
 
   useEffect(() => {

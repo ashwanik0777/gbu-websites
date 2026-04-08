@@ -1,0 +1,268 @@
+{
+  "page": "home",
+  "source": "db.sqlite3",
+  "generated_at": "2026-04-08",
+  "sections": {
+    "banner": [
+      {
+        "id": 3,
+        "title": "Welcome to Gautam Buddha University",
+        "content": "Empowering minds, shaping futures through excellence in education, research, and innovation.",
+        "video": "/GBU_drone_shot_2.mp4",
+        "button1_text": "Explore Programs",
+        "button2_text": "Virtual Tour",
+        "button1_url": "https://gbu-website.vercel.app/admissions/courses-offered",
+        "button2_url": "https://www.youtube.com/watch?v=aV-XncxVM-Q"
+      }
+    ],
+    "quick_access": [],
+    "about": [
+      {
+        "id": 2,
+        "title": "About Gautam Buddha University",
+        "description": "Established in 2008, Gautam Buddha University stands as a beacon of academic excellence in the National Capital Region. Named after Lord Buddha, the university embodies the principles of knowledge, wisdom, and enlightenment.\r\n\r\nWith state-of-the-art infrastructure, world-class faculty, and innovative research programs, GBU is committed to nurturing global citizens who can contribute meaningfully to society and the nation.",
+        "image": "/assets/about.jpg",
+        "button1_text": "Learn More",
+        "button2_text": "Our Mission",
+        "button1_url": "https://gbu-website.vercel.app/about-us/About%20GBU"
+      }
+    ],
+    "leadership": [
+      {
+        "id": 1,
+        "title": "Visionary Leadership",
+        "name": "Dr. Rana P. Singh",
+        "designation": "Hon'ble Vice-Chancellor",
+        "message": "Dr. Singh is an expert in stem cell research, tumor biology, and space medicine. With over 20 years in academia, he leads GBU with a commitment to interdisciplinary education.",
+        "url": null,
+        "photo": "/assets/leadership/Screenshot_2025-06-24_at_10.41.43AM.png"
+      },
+      {
+        "id": 2,
+        "title": "Visionary Leadership",
+        "name": "Shri Yogi Adityanath",
+        "designation": "Hon'ble Chancellor",
+        "message": "A visionary leader guiding GBU with a focus on holistic development and academic excellence. He emphasizes blending Indian knowledge systems with modern education.",
+        "url": null,
+        "photo": "/assets/leadership/Screenshot_2025-06-24_at_10.43.56AM.png"
+      }
+    ],
+    "glance_stat": [
+      {
+        "id": 1,
+        "label": "GBU at a Glance",
+        "student_count": "6500+",
+        "programs_count": "160+",
+        "faculty_member": "200+",
+        "acres_camus": 511,
+        "placement_rate": "90%",
+        "icon": "abc",
+        "background_color": "bg-gradient-to-r from-green-800 via-blue-800"
+      }
+    ],
+    "news_and_events": [],
+    "campus_gallery": [
+      {
+        "id": 9,
+        "image": "/assets/campusimg/WhatsApp_Image_2025-06-25_at_4.28.55_PM.jpeg",
+        "text": "Philippines Delegation Visits at GBU to strengthen the Academic and Cultural Collaboration",
+        "button1_text": "View more",
+        "button1_url": "http://google.com"
+      },
+      {
+        "id": 10,
+        "image": "/assets/campusimg/Yoda_Day.jpg",
+        "text": "International Yoga Day Celebration at GBU",
+        "button1_text": "View more",
+        "button1_url": "http://google.com"
+      },
+      {
+        "id": 11,
+        "image": "/assets/campusimg/5.jpg",
+        "text": "Australian Delegation Visited Gautam Buddha University (GBU) for Strengthening  Activities in the areas of Education, Training and Research.",
+        "button1_text": "View more",
+        "button1_url": "http://google.com"
+      },
+      {
+        "id": 12,
+        "image": "/assets/campusimg/Vesak_Day.jpg",
+        "text": "Vesak Day Celebration at GBU",
+        "button1_text": "View more",
+        "button1_url": "http://google.com"
+      }
+    ],
+    "excellence_in_education": [
+      {
+        "id": 1,
+        "title": "Artificial Intelligence Center",
+        "content_text": "Cutting-edge research in machine learning, deep learning, and AI applications across various domains.",
+        "category": "Centers OF EXcellence",
+        "image": "/assets/realtedimg/ai_center.jpg"
+      },
+      {
+        "id": 2,
+        "title": "Drone Technology Hub",
+        "content_text": "Advanced drone research facility focusing on autonomous systems and aerial robotics.",
+        "category": "Centers OF EXcellence",
+        "image": "/assets/realtedimg/drone_center.webp"
+      },
+      {
+        "id": 3,
+        "title": "Cybersecurity Institute",
+        "content_text": "State-of-the-art cybersecurity research and training center for digital security solutions.",
+        "category": "Centers OF EXcellence",
+        "image": "/assets/realtedimg/cyberlab1.jpeg"
+      },
+      {
+        "id": 4,
+        "title": "Bioinformatics Lab",
+        "content_text": "Pioneering research at the intersection of biology and computational science.",
+        "category": "Research Labs",
+        "image": "/assets/realtedimg/Screenshot_2025-06-24_at_10.24.53AM.png"
+      },
+      {
+        "id": 5,
+        "title": "Materials Research Facility",
+        "content_text": "Innovative lab exploring new materials and nanotechnology applications.",
+        "category": "Research Labs",
+        "image": "/assets/realtedimg/xps1_0.jpg"
+      },
+      {
+        "id": 6,
+        "title": "High Performance Computing Center",
+        "content_text": "Robust computational infrastructure supporting large-scale data processing.",
+        "category": "infrastructure",
+        "image": "/assets/realtedimg/Copy_of_Building_Central_lecture_Theatre.jpg"
+      },
+      {
+        "id": 7,
+        "title": "Smart Campus Network",
+        "content_text": "IoT-enabled infrastructure for real-time campus monitoring and management.",
+        "category": "infrastructure",
+        "image": "/assets/realtedimg/campus-network-higher-education-products-1.jpg"
+      }
+    ],
+    "campus_life": [
+      {
+        "id": 1,
+        "title": "Campus Life at GBU",
+        "description": "GBU has smart classrooms, libraries, labs, mentoring, and career support.",
+        "image": "/assets/realtedimg/gautam-buddha-university-gbu-greaternoida909284720_2023-09-22.webp",
+        "card_content": "Students Life",
+        "name": ".",
+        "course": "."
+      },
+      {
+        "id": 2,
+        "title": "Campus Life at GBU",
+        "description": "GBU has modern sports facilities, grounds, courts, gyms, and indoor stadiums.",
+        "image": "/assets/realtedimg/Indoor_Stadium_5.jpg",
+        "card_content": "Sports & Recreation",
+        "name": ".",
+        "course": "."
+      },
+      {
+        "id": 3,
+        "title": "Campus Life at GBU",
+        "description": "GBU hosts theatres and festivals like Youth Fest, promoting music, dance, drama, and arts.",
+        "image": "/assets/realtedimg/20240412_130604.jpg",
+        "card_content": "Cultural Activities",
+        "name": ".",
+        "course": "."
+      },
+      {
+        "id": 4,
+        "title": "Campus Life at GBU",
+        "description": "GBU offers secure hostels with Wi-Fi, hygienic food, medical aid, and recreation lounges.",
+        "image": "/assets/realtedimg/gautam-buddha-university-greater-noida-283008.jpg",
+        "card_content": "Hostel Life - GBU offers secure and well-maintained hostel facilities designed to feel like a home away from home. Students enjoy uninterrupted high-speed Wi-Fi for studies and leisure, clean and nutritious meals prepared in hygienic kitchens, prompt medical aid available at all hours, and lively recreation lounges where they can relax, socialize, and build lasting memories.",
+        "name": ".",
+        "course": "."
+      }
+    ],
+    "companies_hiring": [
+      {
+        "id": 1,
+        "title": "Companies Hiring",
+        "logo": "/assets/companies/pngwing_4SsB6jC.com.png",
+        "content_text": "Prestigious companies regularly hire students from G.B.U.",
+        "Companies_hiring": "600+",
+        "alumini_count": "30000+",
+        "placement_rate": "100"
+      },
+      {
+        "id": 2,
+        "title": "Companies Hiring",
+        "logo": "/assets/companies/Screenshot_2025-06-24_at_1.35.32AM.png",
+        "content_text": "Prestigious companies regularly hire students from G.B.U.",
+        "Companies_hiring": "600+",
+        "alumini_count": "30000+",
+        "placement_rate": "100%"
+      },
+      {
+        "id": 3,
+        "title": "Companies Hiring",
+        "logo": "/assets/companies/Screenshot_2025-06-24_at_1.38.14AM.png",
+        "content_text": "Prestigious companies regularly hire students from G.B.U.",
+        "Companies_hiring": "600+",
+        "alumini_count": "30000+",
+        "placement_rate": "100%"
+      },
+      {
+        "id": 4,
+        "title": "HCL",
+        "logo": "/assets/companies/pngwing.com_1.png",
+        "content_text": "Prestigious companies regularly hire students from G.B.U.",
+        "Companies_hiring": "600+",
+        "alumini_count": "30,000+",
+        "placement_rate": "100%"
+      },
+      {
+        "id": 5,
+        "title": "wipro",
+        "logo": "/assets/companies/pngwing.com.png",
+        "content_text": "wipro",
+        "Companies_hiring": "600+",
+        "alumini_count": "30,000+",
+        "placement_rate": "100%"
+      },
+      {
+        "id": 6,
+        "title": "amazon",
+        "logo": "/assets/companies/pngwing.com_2.png",
+        "content_text": "amazon",
+        "Companies_hiring": "600+",
+        "alumini_count": "30,000+",
+        "placement_rate": "100%"
+      },
+      {
+        "id": 7,
+        "title": "meta",
+        "logo": "/assets/companies/pngwing.com_3.png",
+        "content_text": "meta",
+        "Companies_hiring": "600+",
+        "alumini_count": "30,000+",
+        "placement_rate": "100%"
+      },
+      {
+        "id": 8,
+        "title": "infosis",
+        "logo": "/assets/companies/pngwing.com_4.png",
+        "content_text": "infosis",
+        "Companies_hiring": "600+",
+        "alumini_count": "30,000+",
+        "placement_rate": "100%"
+      }
+    ],
+    "virtual_experience": [
+      {
+        "id": 1,
+        "title": "Experience GBU in 360 degree",
+        "desc": "Take an immersive 360-degree tour of our state-of-the-art facilities, beautiful campus grounds, and modern infrastructure. Explore every corner of our world-class university from anywhere in the world.",
+        "button1_text": "Start 360-degree Virtual Tour",
+        "video_link": "https://vandiator.github.io/Virtual-tour/",
+        "background_color": "#155dfd"
+      }
+    ]
+  }
+}
