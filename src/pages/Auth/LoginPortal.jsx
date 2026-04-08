@@ -98,7 +98,7 @@ const LoginPortal = () => {
           <div className="mx-auto w-full max-w-xl">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-stone-900">Sign In</h2>
-              <p className="mt-1 text-sm text-stone-600">Choose your role and continue.</p>
+             
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
