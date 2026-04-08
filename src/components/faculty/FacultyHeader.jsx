@@ -112,6 +112,8 @@ const Button = ({ className = '', variant = 'solid', children, ...props }) => {
 };
 
 const FacultyHeader = ({ faculty }) => {
+  const profileImage = faculty?.image_url || `${import.meta.env.VITE_HOST}/media/${faculty?.image || 'default.png'}`;
+
   return (
     <Card className="p-8 my-8 shadow-lg mx-auto w-5/6 hover:shadow-xl transition-shadow duration-300">
       <div className="flex flex-col p-5 lg:flex-row gap-8">
@@ -119,7 +121,7 @@ const FacultyHeader = ({ faculty }) => {
         <div className="flex-shrink-0">
           <div className="w-48 h-48 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
             <img
-              src={`${import.meta.env.VITE_HOST}/media/${faculty?.image || 'default.png'}`}
+              src={profileImage}
               alt={faculty?.name || 'Faculty'}
               className="w-full h-full object-cover"
             />

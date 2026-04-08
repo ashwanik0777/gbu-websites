@@ -5,43 +5,73 @@ import FacultyHeader from '../../components/faculty/FacultyHeader';
 import SummaryDashboard from '../../components/faculty/SummaryDashboard';
 import FacultyTabs from '../../components/faculty/FacultyTabs';
 import TabContent from '../../components/faculty/TabContent';
-import { TrendingUp, BookOpenCheck, Presentation, FolderOpen } from 'lucide-react';
+import { TrendingUp, BookOpenCheck, Presentation, FolderOpen, FileText, FlaskConical, GraduationCap, Newspaper } from 'lucide-react';
+import { DUMMY_FACULTY_ID, DUMMY_FACULTY_DETAIL, FACULTY_PROFILE_STORAGE_PREFIX } from '../../Data/facultyDummyData';
 
 import SearchableWrapper from "../../components/Searchbar/SearchableWrapper.jsx";
 
 const FacultyDetail = () => {
+    const getSavedDummyProfile = () => {
+      try {
+        const raw = localStorage.getItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${DUMMY_FACULTY_ID}`);
+        if (!raw) return DUMMY_FACULTY_DETAIL;
+        return { ...DUMMY_FACULTY_DETAIL, ...JSON.parse(raw) };
+      } catch {
+        return DUMMY_FACULTY_DETAIL;
+      }
+    };
+
   const { id } = useParams(); // 👈 get id from URL
   const [faculty, setFaculty] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+
+  const normalizeFacultyProfile = (member) => ({
+    ...member,
+    image_url: member.image_url,
+    experience: `${member.experience_years || 0} years`,
+    bio: member.faculty_url ? `View detailed profile here: ${member.faculty_url}` : '',
+    shortBio: member.shortBio || member.bio || 'Faculty profile is available.',
+    fullBio: member.fullBio || member.bio || 'Faculty profile details are available.',
+    qualifications: member.qualifications || [member.education].filter(Boolean),
+    experiences: member.experiences || [],
+    researchInterests: member.researchInterests || [],
+    courses: member.courses || [],
+    administrations: member.administrations || [],
+    achievements: member.achievements || [],
+    recentPublications: member.recentPublications || [],
+    projects: member.projects || [],
+    researchGroup: member.researchGroup || [],
+    patents: member.patents || [],
+    certifications: member.certifications || [],
+    invitedTalks: member.invitedTalks || [],
+    socialImpact: member.socialImpact || [],
+    quickLinks: member.quickLinks || [
+      { label: 'Curriculum Vitae', icon: FileText, color: 'blue' },
+      { label: 'Research Profile', icon: FlaskConical, color: 'green' },
+      { label: 'Teaching Profile', icon: GraduationCap, color: 'purple' },
+      { label: 'Publications', icon: Newspaper, color: 'orange' }
+    ]
+  });
 
   useEffect(() => {
     const fetchFaculty = async () => {
       try {
         const res = await fetch(`${import.meta.env.VITE_HOST}/academic/faculty/members/`);
         const data = await res.json();
-        const member = data.find((f) => String(f.id) === id); 
+        const member = data.find((f) => String(f.id) === id);
         if (member) {
-          setFaculty({
-            ...member,
-            experience: `${member.experience_years} years`,
-            bio: `View detailed profile here: ${member.faculty_url}`,
-            qualifications: [member.education],
-            experiences: [],
-            researchInterests: [],
-            courses: [],
-            administrations: [],
-            achievements: [],
-            recentPublications: [],
-            projects: [],
-            researchGroup: [],
-            patents: [],
-            certifications: [],
-            invitedTalks: [],
-            socialImpact: [],
-          });
+          setFaculty(normalizeFacultyProfile(member));
+          return;
+        }
+
+        if (String(id) === String(DUMMY_FACULTY_ID)) {
+          setFaculty(normalizeFacultyProfile(getSavedDummyProfile()));
         }
       } catch (err) {
         console.error('Error loading faculty:', err);
+        if (String(id) === String(DUMMY_FACULTY_ID)) {
+          setFaculty(normalizeFacultyProfile(getSavedDummyProfile()));
+        }
       }
     };
 
@@ -54,15 +84,15 @@ const FacultyDetail = () => {
     { id: 'overview', label: 'OVERVIEW' },
     { id: 'qualifications', label: 'QUALIFICATIONS & EXPERIENCE' },
     { id: 'teaching', label: 'TEACHING' },
-    { id: 'administrations', label: 'ADMINISTRATIONS' },
-    { id: 'research', label: 'RESEARCH PROJECTS' },
-    { id: 'researchGroup', label: 'RESEARCH GROUP' },
+    { id: 'administration', label: 'ADMINISTRATIONS' },
+    { id: 'research-projects', label: 'RESEARCH PROJECTS' },
+    { id: 'research-group', label: 'RESEARCH GROUP' },
     { id: 'publications', label: 'PUBLICATION' },
     { id: 'patents', label: 'PATENTS' },
     { id: 'certifications', label: 'CERTIFICATIONS' },
-    { id: 'invitedTalks', label: 'INVITED-TALKS' },
-    { id: 'achievements', label: 'AWARDS & ACHIEVEMENTS' },
-    { id: 'socialImpact', label: 'SOCIAL IMPACT' }
+    { id: 'talks', label: 'INVITED-TALKS' },
+    { id: 'awards', label: 'AWARDS & ACHIEVEMENTS' },
+    { id: 'social-impact', label: 'SOCIAL IMPACT' }
   ];
 
   const summaryStats = [

@@ -345,6 +345,14 @@ const Navbar = () => {
             Contact us
           </Link>
         </motion.li>
+        <motion.li whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+          <Link
+            to="/login"
+            className="items-center rounded-lg border border-slate-300 bg-slate-50 px-4 py-1.5 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-100 hover:text-slate-900"
+          >
+            Login
+          </Link>
+        </motion.li>
         <motion.li
           className="flex items-center gap-1 cursor-pointer hover:text-purple-700 transition-colors duration-200"
           whileHover={{ scale: 1.1, y: -2 }}
@@ -437,6 +445,15 @@ const Navbar = () => {
               >
                 <Search size={16} />
                 Search
+              </motion.li>
+              <motion.li variants={mobileItemVariants}>
+                <Link
+                  to="/login"
+                  className="block py-3 px-3 font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all duration-200"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Login
+                </Link>
               </motion.li>
               <motion.li variants={mobileItemVariants}>
                 <Link

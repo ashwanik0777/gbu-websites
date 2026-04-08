@@ -51,7 +51,9 @@ import FAQ from "../pages/grievance/FAQ";
 import Contact from "../pages/grievance/Contact";
 import EscalationPolicy from "../pages/grievance/EscalationPolicy";
 import ComplaintDetail from "../pages/grievance/ComplaintDetail";
-import FacultyDashboard from "../pages/grievance/FacultyDashboard";
+import GrievanceFacultyDashboard from "../pages/grievance/FacultyDashboard";
+import FacultyPortalDashboard from "../pages/Auth/FacultyDashboard.jsx";
+import SchoolDashboard from "../pages/Auth/SchoolDashboard.jsx";
 import Biotechnology from "../pages/departments/Biotechnology.jsx";
 import Engineering from "../pages/departments/Engineering.jsx";
 import Law from "../pages/departments/Law.jsx";
@@ -69,6 +71,8 @@ import InstitutionInnovation from "../pages/Reasearch/InstitutionInnovation.jsx"
 import GBUHistory from "../pages/Aboutus/History.jsx";
 import Registration from "../pages/Admission/NewRegistration.jsx";
 import LoginNewStudent from "../pages/Admission/login.jsx";
+import LoginPortal from "../pages/Auth/LoginPortal.jsx";
+
 
 const AcademicCalendar = React.lazy(() =>
   import("../pages/Academic/AcademicCalendar.jsx")
@@ -210,7 +214,10 @@ export default function AppRouter() {
           {/* Academics */}
           <Route path="/academics" element={<h1>Academics</h1>} />
           <Route path="/new-registration" element={<Registration/>} />
-          <Route path="/login" element={<LoginNewStudent/>} />
+          <Route path="/login" element={<LoginPortal />} />
+          <Route path="/admission/login" element={<LoginNewStudent/>} />
+          <Route path="/faculty-portal/dashboard" element={<FacultyPortalDashboard />} />
+          <Route path="/school-portal/dashboard" element={<SchoolDashboard />} />
           <Route
             path="/academics/academic-calendar"
             element={<AcademicCalendar />}
@@ -697,7 +704,7 @@ export default function AppRouter() {
 
           {/* Grievance  */}
           <Route path="/grievance" element={<GrievanceMain />} />
-          <Route path="/login/:role" element={<Login />} />
+          <Route path="/grievance/login/:role" element={<Login />} />
           <Route
             path="/student"
             element={
@@ -726,7 +733,7 @@ export default function AppRouter() {
             path="/faculty-dashboard"
             element={
               <ProtectedRoute allowedRoles={["faculty"]}>
-                <FacultyDashboard />
+                <GrievanceFacultyDashboard />
               </ProtectedRoute>
             }
           />

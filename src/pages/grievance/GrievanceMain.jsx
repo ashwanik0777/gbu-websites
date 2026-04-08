@@ -289,7 +289,7 @@ const GrievanceMain = () => {
       title: "Submit Complaint",
       description: "Raise your grievance with detailed information",
       icon: FileText,
-      link: "/login/student"
+      link: "/grievance/login/student"
     },
     {
       title: "Track Complaint",
@@ -301,31 +301,31 @@ const GrievanceMain = () => {
       title: "View Assigned Staff",
       description: "See staff details and contact information",
       icon: Users,
-      link: "/login/student"
+      link: "/grievance/login/student"
     },
     {
       title: "Escalate Complaint",
       description: "Escalate unresolved issues to higher authorities",
       icon: ArrowUp,
-      link: "/login/student"
+      link: "/grievance/login/student"
     },
     {
       title: "Complaint Timeline",
       description: "View detailed progress timeline",
       icon: Clock,
-      link: "/login/student"
+      link: "/grievance/login/student"
     },
     {
       title: "Feedback Submission",
       description: "Provide feedback on resolution quality",
       icon: Mail,
-      link: "/login/student"
+      link: "/grievance/login/student"
     },
     {
       title: "Email Updates Log",
       description: "Track all email notifications received",
       icon: Mail,
-      link: "/login/student"
+      link: "/grievance/login/student"
     },
     {
       title: "FAQ / Help",
@@ -682,9 +682,9 @@ const GrievanceMain = () => {
             <div>
               <h4 className="font-semibold mb-2">Portal Access</h4>
               <ul className="space-y-1 text-gray-400">
-                <li><a href="/login/student" className="hover:text-white">Student Login</a></li>
-                <li><a href="/login/staff" className="hover:text-white">Staff Login</a></li>
-                <li><a href="/login/admin" className="hover:text-white">Admin Login</a></li>
+                <li><a href="/grievance/login/student" className="hover:text-white">Student Login</a></li>
+                <li><a href="/grievance/login/staff" className="hover:text-white">Staff Login</a></li>
+                <li><a href="/grievance/login/admin" className="hover:text-white">Admin Login</a></li>
               </ul>
             </div>
             <div>
