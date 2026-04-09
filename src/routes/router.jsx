@@ -147,8 +147,6 @@ import SchoolsLayout from "../components/departments/SchoolsLayout.jsx";
 import Dean from "../components/departments/Dean.jsx";
 import Conferences from "../pages/departments/Usict_activities.jsx";
 import LaboratoryCards from "../pages/departments/laboratries.jsx";
-// import NewsLetter from "../pages/Announcements/NewsLetter.jsx";
-// import MediaCoverage from "../pages/Announcements/MediaCoverage.jsx";
 import Placement_home from "../pages/Placement/Placement_home.jsx";
 
 import RecruitMain from "../pages/recruitments/RecruitMain.jsx";
