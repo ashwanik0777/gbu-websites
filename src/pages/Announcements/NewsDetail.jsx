@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import Header from '../../components/announcement/Header';
 import SocialShare from '../../components/announcement/SocialShare';
 import { ArrowLeft, ArrowRight, Calendar, User } from 'lucide-react';
-
+import { useState, useMemo, useEffect } from "react";
 // Button component
 const Button = ({
   children,
@@ -57,143 +57,143 @@ const Badge = ({
 };
 
 // Mock news data
-export const mockNews = [
-  {
-    id: 1,
-    title: 'GBU Inaugurates Centre for Artificial Intelligence',
-    date: '2024-06-20',
-    author: 'Research Cell',
-    image: 'https://gburif.org/images/intro-carousel/gautam-buddha-university-3.jpg',
-    tags: ['AI', 'Research', 'Innovation'],
-    content: 'Gautam Buddha University has launched a state-of-the-art Centre for Artificial Intelligence to boost interdisciplinary research and smart technology development. The new centre aims to foster innovation through collaboration with academia and industry, encouraging students and researchers to work on cutting-edge AI solutions for societal challenges.',
-  },
-  {
-    id: 2,
-    title: 'Annual Convocation Ceremony Held at GBU',
-    date: '2024-05-30',
-    author: 'Admin',
-    image: 'https://tennews.in/wp-content/uploads/2016/04/14-3.jpg',
-    tags: ['Convocation', 'Graduation'],
-    content: 'Gautam Buddha University hosted its annual convocation ceremony, awarding degrees to graduating students in the presence of faculty members, proud parents, and esteemed guests. The event celebrated academic excellence and recognized the hard work and dedication of the students as they embark on their future journeys.',
-  },
-  {
-    id: 3,
-    title: 'GBU Students Shine at National Hackathon',
-    date: '2024-05-15',
-    author: 'Innovation Cell',
-    image: 'https://tennews.in/wp-content/uploads/2022/11/WhatsApp-Image-2022-11-22-at-8.24.01-PM-e1669129715871.jpeg',
-    tags: ['Hackathon', 'Technology'],
-    content: 'A team of engineering students from Gautam Buddha University won top honors at a prestigious national hackathon by developing a smart traffic management system. Their innovative project aims to reduce congestion and optimize urban traffic flow, showcasing the technical prowess and problem-solving skills of GBU students.',
-  },
-  {
-    id: 4,
-    title: 'Library Introduces Digital Resources Hub',
-    date: '2024-04-28',
-    author: 'Library Committee',
-    image: 'https://makesaral.com/wp-content/uploads/2025/06/Screenshot_2025-06-03-11-45-15-673_com.google.android.apps_.maps-edit.jpg',
-    tags: ['Library', 'Facilities'],
-    content: 'The GBU Library has expanded its services by launching a Digital Resources Hub, granting students access to thousands of e-books, scholarly journals, and digital archives. This initiative aims to promote a culture of research and self-learning while providing students with world-class academic resources at their fingertips.',
-  },
-  {
-    id: 5,
-    title: 'GBU Sports Meet: Champions of Tomorrow',
-    date: '2024-04-10',
-    author: 'Sports Department',
-    image: 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    tags: ['Sports', 'Achievements'],
-    content: 'Athletes from Gautam Buddha University showcased their talent and sportsmanship at the recent state-level sports meet, winning multiple medals across various disciplines. The event highlighted the university’s commitment to promoting physical fitness and nurturing future champions through dedicated training and excellent sports infrastructure.',
-  },
-  {
-    id: 6,
-    title: 'Environment Week Concludes with Plantation Drive',
-    date: '2024-04-05',
-    author: 'Eco Club',
-    image: 'https://scalemag.online/wp-content/uploads/2019/03/Gautam_Buddha_University.jpg',
-    tags: ['Environment', 'Campus Life'],
-    content: 'To mark the conclusion of Environment Week, students and staff of Gautam Buddha University participated in a massive plantation drive, planting over 500 saplings across the campus. The initiative promotes sustainability, raises environmental awareness, and strengthens the university’s green campus mission.',
-  },
-  {
-    id: 7,
-    title: 'Abhivyakti 2024: Cultural Fest Wraps Up',
-    date: '2024-03-20',
-    author: 'Cultural Committee',
-    image: 'https://images.openai.com/thumbnails/url/VUAonnicu1mUUVJSUGylr5-al1xUWVCSmqJbkpRnoJdeXJJYkpmsl5yfq5-Zm5ieWmxfaAuUsXL0S7F0Tw4pdXePdE1PTTRzDypwLPYzijAtjjAIzSpJLfbzKgur8o3y1E3XTdWNqNBNzwyvisoxzcgLcHNLSYtXKwYAxKYpTA',
-    tags: ['Cultural', 'Fest'],
-    content: 'Abhivyakti 2024, the annual cultural fest of GBU, concluded successfully after three vibrant days of music, dance performances, art exhibitions, and celebrity shows. The fest brought together students from various disciplines, celebrating diversity and talent on campus.',
-  },
-  {
-    id: 8,
-    title: 'Blood Donation Camp Organized by NSS',
-    date: '2024-03-15',
-    author: 'NSS Unit',
-    image: 'https://nss.gbu.ac.in/uploads/imagesfiles/666c5a020f5b4_WhatsApp%20Image%202024-03-09%20at%204.29.32%20PM.jpeg',
-    tags: ['Social Service', 'Health'],
-    content: 'The NSS unit of Gautam Buddha University organized a blood donation camp where volunteers donated over 300 units of blood to support local hospitals. The camp received an overwhelming response, demonstrating the university community’s commitment to social welfare and public health.',
-  },
-  {
-    id: 9,
-    title: 'Coding Club Conducts Competitive Programming Contest',
-    date: '2024-02-25',
-    author: 'Coding Club',
-    image: 'https://www.ic3ecsbhi.com/Events/20231006_133039.jpg',
-    tags: ['Coding', 'Competition'],
-    content: 'The Coding Club at GBU hosted a competitive programming contest that attracted top student coders from across the university. Participants competed for exciting prizes and internship opportunities, pushing their problem-solving and coding skills to the next level.',
-  },
-  {
-    id: 10,
-    title: 'GBU Signs MoU with German University',
-    date: '2024-02-10',
-    author: 'International Relations Office',
-    image: 'https://ik.imagekit.io/edtechdigit/usaii/content/images/usaii-and-gautam-buddha-university-sign-mou-to-elevate-ai-education-in-india.png',
-    tags: ['International', 'Collaboration'],
-    content: 'Gautam Buddha University has signed a Memorandum of Understanding (MoU) with a prestigious German university to facilitate student exchanges, collaborative research projects, and academic programs. This partnership aims to broaden the global exposure of GBU students and faculty.',
-  },
-  {
-    id: 11,
-    title: 'Yoga Day Celebration Promotes Wellness',
-    date: '2024-01-25',
-    author: 'Wellness Club',
-    image: 'https://images.openai.com/thumbnails/url/-F4ohXicu1mSUVJSUGylr5-al1xUWVCSmqJbkpRnoJdeXJJYkpmsl5yfq5-Zm5ieWmxfaAuUsXL0S7F0Tw6yNHIy1zUsTgtKys-qMC0v9g41dorK8M8qSM7KDixODy8NdfTNzi9OLK6IKvc0cjKuiM8pLjVwz_RMcVQrBgAhZyqH',
-    tags: ['Yoga', 'Wellness'],
-    content: 'In celebration of International Yoga Day, over 1000 students gathered on the main lawn of Gautam Buddha University for a mass yoga session promoting wellness and mindfulness. The event emphasized the importance of physical and mental well-being in students’ lives.',
-  },
-  {
-    id: 12,
-    title: 'Guest Lecture on Industry Trends by Tech Leader',
-    date: '2024-01-15',
-    author: 'Career Cell',
-    image: 'https://www.ux4g.gov.in/assets/img/awareness-workshop/gbu-19-11-24/900x16.webp',
-    tags: ['Lecture', 'Careers'],
-    content: 'The Career Cell at GBU organized a guest lecture featuring a renowned tech industry leader who shared valuable insights on current industry trends, emerging technologies, and career opportunities. Students gained practical knowledge and tips to excel in the tech world.',
-  },
-  {
-    id: 13,
-    title: 'Placement Season: Record Offers for 2024 Batch',
-    date: '2023-12-30',
-    author: 'Placement Cell',
-    image: 'https://images.openai.com/thumbnails/url/vLSln3icu1mUUVJSUGylr5-al1xUWVCSmqJbkpRnoJdeXJJYkpmsl5yfq5-Zm5ieWmxfaAuUsXL0S7F0Tw5MDgsycfcx94zMcrQ0dXS1SHP1Kg70twj0CneKL0gucS7MjChwjfcwCdaNLAv2LA9IMrMszA8yS65QKwYAl74oRw',
-    tags: ['Placements', 'Careers'],
-    content: 'The placement season at Gautam Buddha University concluded on a high note, with a record number of students from the 2024 graduating batch receiving lucrative offers from top MNCs in IT, finance, and consulting sectors. The success reflects the university’s strong industry connect and focus on employability.',
-  },
-  {
-    id: 14,
-    title: 'Arts Club Organizes Photography & Painting Workshop',
-    date: '2023-12-15',
-    author: 'Arts Club',
-    image: 'https://images.unsplash.com/photo-1495567720989-cebdbdd97913?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    tags: ['Workshop', 'Arts'],
-    content: 'The Arts Club of GBU conducted a photography and painting workshop for budding artists to learn new techniques and enhance their skills. Participants showcased their creative works in an on-campus exhibition, inspiring more students to explore the world of arts.',
-  },
-  {
-    id: 15,
-    title: 'Political Science Students Visit Parliament House',
-    date: '2023-12-05',
-    author: 'Political Science Dept',
-    image: 'https://niu.edu.in/wp-content/uploads/2025/06/image5-1.webp',
-    tags: ['Educational Tour', 'Politics'],
-    content: 'Political Science students from Gautam Buddha University visited the Parliament House in New Delhi as part of their educational tour. They attended live sessions, interacted with lawmakers, and gained practical insights into the functioning of the Indian democratic system.',
-  },
-];
+// export const mockNews = [
+//   {
+//     id: 1,
+//     title: 'GBU Inaugurates Centre for Artificial Intelligence',
+//     date: '2024-06-20',
+//     author: 'Research Cell',
+//     image: 'https://gburif.org/images/intro-carousel/gautam-buddha-university-3.jpg',
+//     tags: ['AI', 'Research', 'Innovation'],
+//     content: 'Gautam Buddha University has launched a state-of-the-art Centre for Artificial Intelligence to boost interdisciplinary research and smart technology development. The new centre aims to foster innovation through collaboration with academia and industry, encouraging students and researchers to work on cutting-edge AI solutions for societal challenges.',
+//   },
+//   {
+//     id: 2,
+//     title: 'Annual Convocation Ceremony Held at GBU',
+//     date: '2024-05-30',
+//     author: 'Admin',
+//     image: 'https://tennews.in/wp-content/uploads/2016/04/14-3.jpg',
+//     tags: ['Convocation', 'Graduation'],
+//     content: 'Gautam Buddha University hosted its annual convocation ceremony, awarding degrees to graduating students in the presence of faculty members, proud parents, and esteemed guests. The event celebrated academic excellence and recognized the hard work and dedication of the students as they embark on their future journeys.',
+//   },
+//   {
+//     id: 3,
+//     title: 'GBU Students Shine at National Hackathon',
+//     date: '2024-05-15',
+//     author: 'Innovation Cell',
+//     image: 'https://tennews.in/wp-content/uploads/2022/11/WhatsApp-Image-2022-11-22-at-8.24.01-PM-e1669129715871.jpeg',
+//     tags: ['Hackathon', 'Technology'],
+//     content: 'A team of engineering students from Gautam Buddha University won top honors at a prestigious national hackathon by developing a smart traffic management system. Their innovative project aims to reduce congestion and optimize urban traffic flow, showcasing the technical prowess and problem-solving skills of GBU students.',
+//   },
+//   {
+//     id: 4,
+//     title: 'Library Introduces Digital Resources Hub',
+//     date: '2024-04-28',
+//     author: 'Library Committee',
+//     image: 'https://makesaral.com/wp-content/uploads/2025/06/Screenshot_2025-06-03-11-45-15-673_com.google.android.apps_.maps-edit.jpg',
+//     tags: ['Library', 'Facilities'],
+//     content: 'The GBU Library has expanded its services by launching a Digital Resources Hub, granting students access to thousands of e-books, scholarly journals, and digital archives. This initiative aims to promote a culture of research and self-learning while providing students with world-class academic resources at their fingertips.',
+//   },
+//   {
+//     id: 5,
+//     title: 'GBU Sports Meet: Champions of Tomorrow',
+//     date: '2024-04-10',
+//     author: 'Sports Department',
+//     image: 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+//     tags: ['Sports', 'Achievements'],
+//     content: 'Athletes from Gautam Buddha University showcased their talent and sportsmanship at the recent state-level sports meet, winning multiple medals across various disciplines. The event highlighted the university’s commitment to promoting physical fitness and nurturing future champions through dedicated training and excellent sports infrastructure.',
+//   },
+//   {
+//     id: 6,
+//     title: 'Environment Week Concludes with Plantation Drive',
+//     date: '2024-04-05',
+//     author: 'Eco Club',
+//     image: 'https://scalemag.online/wp-content/uploads/2019/03/Gautam_Buddha_University.jpg',
+//     tags: ['Environment', 'Campus Life'],
+//     content: 'To mark the conclusion of Environment Week, students and staff of Gautam Buddha University participated in a massive plantation drive, planting over 500 saplings across the campus. The initiative promotes sustainability, raises environmental awareness, and strengthens the university’s green campus mission.',
+//   },
+//   {
+//     id: 7,
+//     title: 'Abhivyakti 2024: Cultural Fest Wraps Up',
+//     date: '2024-03-20',
+//     author: 'Cultural Committee',
+//     image: 'https://images.openai.com/thumbnails/url/VUAonnicu1mUUVJSUGylr5-al1xUWVCSmqJbkpRnoJdeXJJYkpmsl5yfq5-Zm5ieWmxfaAuUsXL0S7F0Tw4pdXePdE1PTTRzDypwLPYzijAtjjAIzSpJLfbzKgur8o3y1E3XTdWNqNBNzwyvisoxzcgLcHNLSYtXKwYAxKYpTA',
+//     tags: ['Cultural', 'Fest'],
+//     content: 'Abhivyakti 2024, the annual cultural fest of GBU, concluded successfully after three vibrant days of music, dance performances, art exhibitions, and celebrity shows. The fest brought together students from various disciplines, celebrating diversity and talent on campus.',
+//   },
+//   {
+//     id: 8,
+//     title: 'Blood Donation Camp Organized by NSS',
+//     date: '2024-03-15',
+//     author: 'NSS Unit',
+//     image: 'https://nss.gbu.ac.in/uploads/imagesfiles/666c5a020f5b4_WhatsApp%20Image%202024-03-09%20at%204.29.32%20PM.jpeg',
+//     tags: ['Social Service', 'Health'],
+//     content: 'The NSS unit of Gautam Buddha University organized a blood donation camp where volunteers donated over 300 units of blood to support local hospitals. The camp received an overwhelming response, demonstrating the university community’s commitment to social welfare and public health.',
+//   },
+//   {
+//     id: 9,
+//     title: 'Coding Club Conducts Competitive Programming Contest',
+//     date: '2024-02-25',
+//     author: 'Coding Club',
+//     image: 'https://www.ic3ecsbhi.com/Events/20231006_133039.jpg',
+//     tags: ['Coding', 'Competition'],
+//     content: 'The Coding Club at GBU hosted a competitive programming contest that attracted top student coders from across the university. Participants competed for exciting prizes and internship opportunities, pushing their problem-solving and coding skills to the next level.',
+//   },
+//   {
+//     id: 10,
+//     title: 'GBU Signs MoU with German University',
+//     date: '2024-02-10',
+//     author: 'International Relations Office',
+//     image: 'https://ik.imagekit.io/edtechdigit/usaii/content/images/usaii-and-gautam-buddha-university-sign-mou-to-elevate-ai-education-in-india.png',
+//     tags: ['International', 'Collaboration'],
+//     content: 'Gautam Buddha University has signed a Memorandum of Understanding (MoU) with a prestigious German university to facilitate student exchanges, collaborative research projects, and academic programs. This partnership aims to broaden the global exposure of GBU students and faculty.',
+//   },
+//   {
+//     id: 11,
+//     title: 'Yoga Day Celebration Promotes Wellness',
+//     date: '2024-01-25',
+//     author: 'Wellness Club',
+//     image: 'https://images.openai.com/thumbnails/url/-F4ohXicu1mSUVJSUGylr5-al1xUWVCSmqJbkpRnoJdeXJJYkpmsl5yfq5-Zm5ieWmxfaAuUsXL0S7F0Tw6yNHIy1zUsTgtKys-qMC0v9g41dorK8M8qSM7KDixODy8NdfTNzi9OLK6IKvc0cjKuiM8pLjVwz_RMcVQrBgAhZyqH',
+//     tags: ['Yoga', 'Wellness'],
+//     content: 'In celebration of International Yoga Day, over 1000 students gathered on the main lawn of Gautam Buddha University for a mass yoga session promoting wellness and mindfulness. The event emphasized the importance of physical and mental well-being in students’ lives.',
+//   },
+//   {
+//     id: 12,
+//     title: 'Guest Lecture on Industry Trends by Tech Leader',
+//     date: '2024-01-15',
+//     author: 'Career Cell',
+//     image: 'https://www.ux4g.gov.in/assets/img/awareness-workshop/gbu-19-11-24/900x16.webp',
+//     tags: ['Lecture', 'Careers'],
+//     content: 'The Career Cell at GBU organized a guest lecture featuring a renowned tech industry leader who shared valuable insights on current industry trends, emerging technologies, and career opportunities. Students gained practical knowledge and tips to excel in the tech world.',
+//   },
+//   {
+//     id: 13,
+//     title: 'Placement Season: Record Offers for 2024 Batch',
+//     date: '2023-12-30',
+//     author: 'Placement Cell',
+//     image: 'https://images.openai.com/thumbnails/url/vLSln3icu1mUUVJSUGylr5-al1xUWVCSmqJbkpRnoJdeXJJYkpmsl5yfq5-Zm5ieWmxfaAuUsXL0S7F0Tw5MDgsycfcx94zMcrQ0dXS1SHP1Kg70twj0CneKL0gucS7MjChwjfcwCdaNLAv2LA9IMrMszA8yS65QKwYAl74oRw',
+//     tags: ['Placements', 'Careers'],
+//     content: 'The placement season at Gautam Buddha University concluded on a high note, with a record number of students from the 2024 graduating batch receiving lucrative offers from top MNCs in IT, finance, and consulting sectors. The success reflects the university’s strong industry connect and focus on employability.',
+//   },
+//   {
+//     id: 14,
+//     title: 'Arts Club Organizes Photography & Painting Workshop',
+//     date: '2023-12-15',
+//     author: 'Arts Club',
+//     image: 'https://images.unsplash.com/photo-1495567720989-cebdbdd97913?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+//     tags: ['Workshop', 'Arts'],
+//     content: 'The Arts Club of GBU conducted a photography and painting workshop for budding artists to learn new techniques and enhance their skills. Participants showcased their creative works in an on-campus exhibition, inspiring more students to explore the world of arts.',
+//   },
+//   {
+//     id: 15,
+//     title: 'Political Science Students Visit Parliament House',
+//     date: '2023-12-05',
+//     author: 'Political Science Dept',
+//     image: 'https://niu.edu.in/wp-content/uploads/2025/06/image5-1.webp',
+//     tags: ['Educational Tour', 'Politics'],
+//     content: 'Political Science students from Gautam Buddha University visited the Parliament House in New Delhi as part of their educational tour. They attended live sessions, interacted with lawmakers, and gained practical insights into the functioning of the Indian democratic system.',
+//   },
+// ];
 
 
 
@@ -209,11 +209,38 @@ function format(date, formatStr) {
 }
 
 const NewsDetail = () => {
-  const { id } = useParams();
-const news = mockNews.find(item => item.id === Number(id));
+   const { id } = useParams();
+
+   const [mockNews, setMockNews] = useState([]);
+
+   const news = mockNews.find(item => item.id === Number(id));
 
 
+useEffect(() => {
+  // DHYAN DEIN: Double quotes (") hata kar backticks (`) use kiye hain
+  fetch(`http://localhost:3000/api/v1/news/${id}`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        const item = data.data; // Ye array nahi, single Object hai!
+        
+        // Isliye map() nahi lagayenge, seedha object banayenge
+        const formattedSingleNews = {
+          ...item,
+          date: item.published_date,
+          image: item.image_url,
+          featured: item.is_featured,
+          tags: Array.isArray(item.tags) ? item.tags : []
+        };
 
+        // Yahan function aapke single news detail state ko set karega (e.g. setNewsDetail)
+        setMockNews([formattedSingleNews]); 
+      }
+    })
+    .catch((err) => {
+      console.error("Error fetching single news:", err);
+    });
+}, [id]); // id dependency me daalna zaruri hai
 
   if (!news) {
     return (
