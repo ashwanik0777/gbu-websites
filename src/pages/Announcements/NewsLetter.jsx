@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 import { Download, FileText, Calendar, Eye, Share2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
@@ -73,153 +73,188 @@ const Badge = ({ children, variant = "default", className = "" }) => {
   );
 };
 
-// === Mock Newsletters Data ===
-const mockNewsletters = [
-  {
-    id: 1,
-    title: "GBU Spring Fest 2025",
-    issueNumber: "Vol. 15, Issue 1",
-    date: "2025-03-15",
-    coverImage: "https://cdn.thedecorjournalindia.com/wp-content/uploads/2022/11/9_Modern-day-marvel-Gautam-Buddha-University-by-CP-Kukreja-architects-transpires-fresh-vibe-and-ancient-wisdom.jpg?lossy=1&resize=1920%2C1357&ssl=1&strip=all",
-    excerpt: "Highlights of GBU's Spring Fest — cultural nights, competitions, and student showcases.",
-    pdfLink: "/newsletters/spring-fest-2025.pdf",
-    views: 1245,
-    category: "Events"
-  },
-  {
-    id: 2,
-    title: "Annual Convocation 2024",
-    issueNumber: "Vol. 14, Issue 4",
-    date: "2024-12-10",
-    coverImage: "https://www.ic3ecsbhi.com/Events/IMG-20231224-WA0082.jpg",
-    excerpt: "GBU's 14th Convocation ceremony highlights and graduate stories.",
-    pdfLink: "/newsletters/convocation-2024.pdf",
-    views: 892,
-    category: "Academic"
-  },
-  {
-    id: 3,
-    title: "Research & Innovation Summit",
-    issueNumber: "Vol. 14, Issue 3",
-    date: "2024-09-20",
-    coverImage: "https://gburif.org/images/intro-carousel/gautam-buddha-university-3.jpg",
-    excerpt: "Breakthrough research, industry tie-ups, and student-led innovations at GBU.",
-    pdfLink: "/newsletters/research-summit-2024.pdf",
-    views: 1567,
-    category: "Research"
-  },
-  {
-    id: 4,
-    title: "Sports Meet Highlights",
-    issueNumber: "Vol. 14, Issue 2",
-    date: "2024-06-15",
-    coverImage: "https://www.gbu.ac.in/Content/img/sports/banner1.jpg",
-    excerpt: "National Sports Meet 2024 hosted by GBU: winners, records, and sportsmanship.",
-    pdfLink: "/newsletters/sports-meet-2024.pdf",
-    views: 743,
-    category: "Sports"
-  },
-  {
-    id: 5,
-    title: "Student Entrepreneurship Week",
-    issueNumber: "Vol. 14, Issue 1",
-    date: "2024-04-10",
-    coverImage: "https://www.ux4g.gov.in/assets/img/awareness-workshop/gbu-19-11-24/900x1.webp",
-    excerpt: "GBU students transform ideas into startups during Entrepreneurship Week.",
-    pdfLink: "/newsletters/entrepreneurship-week-2024.pdf",
-    views: 1123,
-    category: "Business"
-  },
-  {
-    id: 6,
-    title: "Tech Symposium & Hackathon",
-    issueNumber: "Vol. 13, Issue 4",
-    date: "2024-02-25",
-    coverImage: "https://tennews.in/wp-content/uploads/2022/11/WhatsApp-Image-2022-11-22-at-8.24.01-PM-e1669129715871.jpeg",
-    excerpt: "GBU's biggest hackathon yet — innovation, collaboration, and solutions.",
-    pdfLink: "/newsletters/tech-symposium-2024.pdf",
-    views: 2156,
-    category: "Technology"
-  },
-  {
-    id: 7,
-    title: "Cultural Night Highlights",
-    issueNumber: "Vol. 13, Issue 3",
-    date: "2023-11-10",
-    coverImage: "https://images.unsplash.com/photo-1599491126263-3db86d7c3626?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    excerpt: "Vibrant cultural diversity with music, dance, and art performances.",
-    pdfLink: "/newsletters/cultural-night-2023.pdf",
-    views: 891,
-    category: "Culture"
-  },
-  {
-    id: 8,
-    title: "Green Campus Initiative",
-    issueNumber: "Vol. 13, Issue 2",
-    date: "2023-09-05",
-    coverImage: "https://images.unsplash.com/photo-1581090700224-81b1b0b59f6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    excerpt: "GBU's sustainability drive: plantation, waste management, and green tech.",
-    pdfLink: "/newsletters/green-campus-2023.pdf",
-    views: 654,
-    category: "Environment"
-  },
-  {
-    id: 9,
-    title: "Alumni Meet 2023",
-    issueNumber: "Vol. 13, Issue 1",
-    date: "2023-07-20",
-    coverImage: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    excerpt: "GBU alumni reconnect, share stories, and inspire students at the meet.",
-    pdfLink: "/newsletters/alumni-meet-2023.pdf",
-    views: 1432,
-    category: "Alumni"
-  },
-  {
-    id: 10,
-    title: "Placement Drive Report",
-    issueNumber: "Vol. 12, Issue 4",
-    date: "2023-05-10",
-    coverImage: "https://images.unsplash.com/photo-1584697964192-8d161b891f74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    excerpt: "Record-breaking placements with top companies and success stories.",
-    pdfLink: "/newsletters/placement-drive-2023.pdf",
-    views: 1876,
-    category: "Career"
-  },
-  {
-    id: 11,
-    title: "Art & Photography Fest",
-    issueNumber: "Vol. 12, Issue 3",
-    date: "2023-03-18",
-    coverImage: "https://images.unsplash.com/photo-1583321573717-7c1b746f0cb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    excerpt: "Students showcase creativity through art and photography exhibitions.",
-    pdfLink: "/newsletters/art-photography-2023.pdf",
-    views: 567,
-    category: "Arts"
-  },
-  {
-    id: 12,
-    title: "Student Clubs Orientation",
-    issueNumber: "Vol. 12, Issue 2",
-    date: "2023-01-25",
-    coverImage: "https://images.unsplash.com/photo-1588195533091-c89fa1b4e3b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    excerpt: "New students explore GBU's clubs and societies to join and grow.",
-    pdfLink: "/newsletters/clubs-orientation-2023.pdf",
-    views: 923,
-    category: "Student Life"
-  },
-];
+// const mockNewsletters = [
+//   {
+//     id: 1,
+//     title: "GBU Spring Fest 2025",
+//     issueNumber: "Vol. 15, Issue 1",
+//     date: "2025-03-15",
+//     coverImage: "https://cdn.thedecorjournalindia.com/wp-content/uploads/2022/11/9_Modern-day-marvel-Gautam-Buddha-University-by-CP-Kukreja-architects-transpires-fresh-vibe-and-ancient-wisdom.jpg?lossy=1&resize=1920%2C1357&ssl=1&strip=all",
+//     excerpt: "Highlights of GBU's Spring Fest — cultural nights, competitions, and student showcases.",
+//     pdfLink: "/newsletters/spring-fest-2025.pdf",
+//     views: 1245,
+//     category: "Events"
+//   },
+//   {
+//     id: 2,
+//     title: "Annual Convocation 2024",
+//     issueNumber: "Vol. 14, Issue 4",
+//     date: "2024-12-10",
+//     coverImage: "https://www.ic3ecsbhi.com/Events/IMG-20231224-WA0082.jpg",
+//     excerpt: "GBU's 14th Convocation ceremony highlights and graduate stories.",
+//     pdfLink: "/newsletters/convocation-2024.pdf",
+//     views: 892,
+//     category: "Academic"
+//   },
+//   {
+//     id: 3,
+//     title: "Research & Innovation Summit",
+//     issueNumber: "Vol. 14, Issue 3",
+//     date: "2024-09-20",
+//     coverImage: "https://gburif.org/images/intro-carousel/gautam-buddha-university-3.jpg",
+//     excerpt: "Breakthrough research, industry tie-ups, and student-led innovations at GBU.",
+//     pdfLink: "/newsletters/research-summit-2024.pdf",
+//     views: 1567,
+//     category: "Research"
+//   },
+//   {
+//     id: 4,
+//     title: "Sports Meet Highlights",
+//     issueNumber: "Vol. 14, Issue 2",
+//     date: "2024-06-15",
+//     coverImage: "https://www.gbu.ac.in/Content/img/sports/banner1.jpg",
+//     excerpt: "National Sports Meet 2024 hosted by GBU: winners, records, and sportsmanship.",
+//     pdfLink: "/newsletters/sports-meet-2024.pdf",
+//     views: 743,
+//     category: "Sports"
+//   },
+//   {
+//     id: 5,
+//     title: "Student Entrepreneurship Week",
+//     issueNumber: "Vol. 14, Issue 1",
+//     date: "2024-04-10",
+//     coverImage: "https://www.ux4g.gov.in/assets/img/awareness-workshop/gbu-19-11-24/900x1.webp",
+//     excerpt: "GBU students transform ideas into startups during Entrepreneurship Week.",
+//     pdfLink: "/newsletters/entrepreneurship-week-2024.pdf",
+//     views: 1123,
+//     category: "Business"
+//   },
+//   {
+//     id: 6,
+//     title: "Tech Symposium & Hackathon",
+//     issueNumber: "Vol. 13, Issue 4",
+//     date: "2024-02-25",
+//     coverImage: "https://tennews.in/wp-content/uploads/2022/11/WhatsApp-Image-2022-11-22-at-8.24.01-PM-e1669129715871.jpeg",
+//     excerpt: "GBU's biggest hackathon yet — innovation, collaboration, and solutions.",
+//     pdfLink: "/newsletters/tech-symposium-2024.pdf",
+//     views: 2156,
+//     category: "Technology"
+//   },
+//   {
+//     id: 7,
+//     title: "Cultural Night Highlights",
+//     issueNumber: "Vol. 13, Issue 3",
+//     date: "2023-11-10",
+//     coverImage: "https://images.unsplash.com/photo-1599491126263-3db86d7c3626?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+//     excerpt: "Vibrant cultural diversity with music, dance, and art performances.",
+//     pdfLink: "/newsletters/cultural-night-2023.pdf",
+//     views: 891,
+//     category: "Culture"
+//   },
+//   {
+//     id: 8,
+//     title: "Green Campus Initiative",
+//     issueNumber: "Vol. 13, Issue 2",
+//     date: "2023-09-05",
+//     coverImage: "https://images.unsplash.com/photo-1581090700224-81b1b0b59f6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+//     excerpt: "GBU's sustainability drive: plantation, waste management, and green tech.",
+//     pdfLink: "/newsletters/green-campus-2023.pdf",
+//     views: 654,
+//     category: "Environment"
+//   },
+//   {
+//     id: 9,
+//     title: "Alumni Meet 2023",
+//     issueNumber: "Vol. 13, Issue 1",
+//     date: "2023-07-20",
+//     coverImage: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+//     excerpt: "GBU alumni reconnect, share stories, and inspire students at the meet.",
+//     pdfLink: "/newsletters/alumni-meet-2023.pdf",
+//     views: 1432,
+//     category: "Alumni"
+//   },
+//   {
+//     id: 10,
+//     title: "Placement Drive Report",
+//     issueNumber: "Vol. 12, Issue 4",
+//     date: "2023-05-10",
+//     coverImage: "https://images.unsplash.com/photo-1584697964192-8d161b891f74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+//     excerpt: "Record-breaking placements with top companies and success stories.",
+//     pdfLink: "/newsletters/placement-drive-2023.pdf",
+//     views: 1876,
+//     category: "Career"
+//   },
+//   {
+//     id: 11,
+//     title: "Art & Photography Fest",
+//     issueNumber: "Vol. 12, Issue 3",
+//     date: "2023-03-18",
+//     coverImage: "https://images.unsplash.com/photo-1583321573717-7c1b746f0cb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+//     excerpt: "Students showcase creativity through art and photography exhibitions.",
+//     pdfLink: "/newsletters/art-photography-2023.pdf",
+//     views: 567,
+//     category: "Arts"
+//   },
+//   {
+//     id: 12,
+//     title: "Student Clubs Orientation",
+//     issueNumber: "Vol. 12, Issue 2",
+//     date: "2023-01-25",
+//     coverImage: "https://images.unsplash.com/photo-1588195533091-c89fa1b4e3b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+//     excerpt: "New students explore GBU's clubs and societies to join and grow.",
+//     pdfLink: "/newsletters/clubs-orientation-2023.pdf",
+//     views: 923,
+//     category: "Student Life"
+//   },
+// ];
 
 // === Main Component ===
 const NewsLetter = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [mockNewsletters, setMockNewsletters] = useState([]);
+  const [loading, setLoading] = useState(true); // Added loading state
+
   const [email, setEmail] = useState('');
   const { toast } = useToast();
   const itemsPerPage = 6;
 
-  const totalPages = Math.ceil(mockNewsletters.length / itemsPerPage);
-  const currentNewsletters = mockNewsletters.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  useEffect(() => {
+    // Backend API call for newsletters
+    fetch("http://localhost:3000/api/v1/newsletters")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          // Backend keys ko frontend structure me map kar rahe hain
+          const formattedNewsletters = data.data.map((item) => ({
+            id: item.id,
+            title: item.title,
+            issueNumber: item.issueNumber || item.issue_number, 
+            date: item.publishedDate || item.published_date,    
+            coverImage: item.coverImageUrl || item.cover_image_url, 
+            excerpt: item.excerpt,
+            pdfLink: item.pdfUrl || item.pdf_url,               
+            views: item.views,
+            category: item.category
+          }));
 
-  const latestId = mockNewsletters[0].id;
+          setMockNewsletters(formattedNewsletters);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching newsletters:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  // Safe calculations (prevents crashes when array is empty)
+  const totalPages = Math.ceil(mockNewsletters.length / itemsPerPage) || 1;
+  const currentNewsletters = mockNewsletters.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const latestId = mockNewsletters.length > 0 ? mockNewsletters[0].id : null;
+
+  // Dynamic values for StatsCard
+  const uniqueCategoriesCount = new Set(mockNewsletters.map(n => n.category)).size || 0;
+  const latestYear = mockNewsletters.length > 0 ? new Date(mockNewsletters[0].date).getFullYear() : new Date().getFullYear();
 
   const getCategoryColor = (category) => {
     const colors = {
@@ -252,9 +287,9 @@ const NewsLetter = () => {
         <StatsCard
           stats={[
             { number: mockNewsletters.length, title: "Total Issues", icon: FileText, iconColor: "#4F46E5" },
-            { number: 12, title: "Categories", icon: Calendar, iconColor: "#10B981" },
+            { number: uniqueCategoriesCount, title: "Categories", icon: Calendar, iconColor: "#10B981" },
             { numberText: "15K+", title: "Total Views", icon: Eye, iconColor: "#465797" },
-            { number: 2025, title: "Latest Year", icon: Calendar, iconColor: "#EF4444" }
+            { number: latestYear, title: "Latest Year", icon: Calendar, iconColor: "#EF4444" }
           ]}
         />
 
@@ -262,120 +297,135 @@ const NewsLetter = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Newsletter Archive</h2>
-
           </div>
         </div>
 
-        {/* Newsletter Grid */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.1 } },
-          }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12"
-        >
-          {currentNewsletters.map((newsletter) => (
+        {/* Loading State or Newsletter Grid */}
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        ) : mockNewsletters.length === 0 ? (
+          <div className="text-center py-20 text-gray-500">
+            <FileText size={48} className="mx-auto mb-4 opacity-50" />
+            <p className="text-lg">No newsletters found.</p>
+          </div>
+        ) : (
+          <>
+            {/* Newsletter Grid */}
             <motion.div
-              key={newsletter.id}
+              initial="hidden"
+              animate="visible"
               variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 },
+                hidden: {},
+                visible: { transition: { staggerChildren: 0.1 } },
               }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12"
             >
-              <Card className="h-full flex flex-col relative group">
-                {/* New Badge */}
-                {newsletter.id === latestId && (
-                  <Badge variant="new" className="absolute top-3 right-3 z-10">
-                    NEW
-                  </Badge>
-                )}
+              {currentNewsletters.map((newsletter) => (
+                <motion.div
+                  key={newsletter.id}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                >
+                  <Card className="h-full flex flex-col relative group">
+                    {/* New Badge */}
+                    {newsletter.id === latestId && (
+                      <Badge variant="new" className="absolute top-3 right-3 z-10">
+                        NEW
+                      </Badge>
+                    )}
 
-                {/* Cover Image */}
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={newsletter.coverImage}
-                    alt={newsletter.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.target.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=600&q=80';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-                </div>
-
-                {/* Card Header */}
-                <CardHeader>
-                  <div className="flex items-center justify-between mb-3">
-                    <Badge className={getCategoryColor(newsletter.category)}>
-                      {newsletter.category}
-                    </Badge>
-                    <span className="text-xs text-gray-500 font-medium">
-                      {newsletter.issueNumber}
-                    </span>
-                  </div>
-
-                  <CardTitle className="group-hover:text-blue-600 transition-colors">
-                    {newsletter.title}
-                  </CardTitle>
-
-                  {/* Meta Information */}
-                  <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
-                    <div className="flex items-center gap-1">
-                      <Calendar size={12} />
-                      <span>{format(new Date(newsletter.date), 'MMM dd, yyyy')}</span>
+                    {/* Cover Image */}
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={newsletter.coverImage}
+                        alt={newsletter.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          e.target.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=600&q=80';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Eye size={12} />
-                      <span>{newsletter.views}</span>
-                    </div>
-                  </div>
 
-                  <CardDescription>
-                    {newsletter.excerpt}
-                  </CardDescription>
-                </CardHeader>
+                    {/* Card Header */}
+                    <CardHeader>
+                      <div className="flex items-center justify-between mb-3">
+                        <Badge className={getCategoryColor(newsletter.category)}>
+                          {newsletter.category}
+                        </Badge>
+                        <span className="text-xs text-gray-500 font-medium">
+                          {newsletter.issueNumber}
+                        </span>
+                      </div>
 
-                {/* Card Content - Actions */}
-                <CardContent className="mt-auto">
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => window.open(newsletter.pdfLink, "_blank")}
-                      className="flex-1"
-                    >
-                      <FileText size={14} className="mr-1.5" />
-                      Read
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => window.open(newsletter.pdfLink, "_blank")}
-                    >
-                      <Download size={14} className="mr-1.5" />
-                      PDF
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="px-3"
-                    >
-                      <Share2 size={14} />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                      <CardTitle className="group-hover:text-blue-600 transition-colors">
+                        {newsletter.title}
+                      </CardTitle>
+
+                      {/* Meta Information */}
+                      <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                        <div className="flex items-center gap-1">
+                          <Calendar size={12} />
+                          <span>{newsletter.date ? format(new Date(newsletter.date), 'MMM dd, yyyy') : 'Unknown'}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Eye size={12} />
+                          <span>{newsletter.views}</span>
+                        </div>
+                      </div>
+
+                      <CardDescription>
+                        {newsletter.excerpt}
+                      </CardDescription>
+                    </CardHeader>
+
+                    {/* Card Content - Actions */}
+                    <CardContent className="mt-auto">
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => window.open(newsletter.pdfLink, "_blank")}
+                          className="flex-1"
+                        >
+                          <FileText size={14} className="mr-1.5" />
+                          Read
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => window.open(newsletter.pdfLink, "_blank")}
+                        >
+                          <Download size={14} className="mr-1.5" />
+                          PDF
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="px-3"
+                        >
+                          <Share2 size={14} />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
             </motion.div>
-          ))}
-        </motion.div>
 
-        {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
+          </>
+        )}
       </div>
     </div>
   );

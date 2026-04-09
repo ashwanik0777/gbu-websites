@@ -424,11 +424,30 @@ const EventDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/v1/eventss/${id}`)
+    fetch(`http://localhost:3000/api/v1/events/${id}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-        setEvent(data.data);
+        console.log("Single Event Data:", data);
+        
+        const apiData = data.data;
+        
+        // Backend ke data ko Frontend ke variables me map kar rahe hain
+        const formattedEvent = {
+          ...apiData,
+          coverImageUrl: apiData.cover_image,         // cover_image -> coverImageUrl
+          location: apiData.venue,                    // venue -> location
+          date: apiData.starts_at,                    // Calendar function ke liye
+          startsAt: apiData.starts_at,                // starts_at -> startsAt
+          endDate: apiData.ends_at,                   // ends_at -> endDate
+          endsAt: apiData.ends_at,
+          images: apiData.gallery || [],              // gallery -> images (Array)
+          registrationUrl: apiData.registration_url,  
+          isUpcoming: apiData.status === 'upcoming',  // status ke basis pe true/false
+          agenda: apiData.agenda || [],               // API se agenda nikalna
+          speakers: apiData.speakers || []            // API se speakers nikalna
+        };
+
+        setEvent(formattedEvent);
         setLoading(false);
       })
       .catch((err) => {

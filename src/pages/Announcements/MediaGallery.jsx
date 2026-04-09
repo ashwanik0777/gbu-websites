@@ -1,4 +1,4 @@
-import React, { useState, useMemo, cloneElement } from 'react';
+import React, { useState, useMemo, cloneElement, useEffect } from 'react';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -412,268 +412,268 @@ function format(date, formatStr) {
 }
 
 // === Mock Data ===
-const mockMedia = [
-  {
-    id: 1,
-    title: '15th Annual Convocation Ceremony',
-    category: 'Convocation',
-    year: '2025',
-    date: '2025-05-12',
-    images: [
-      'https://www.ic3ecsbhi.com/Gallery/20231224_134240.jpg',
-      'https://www.ic3ecsbhi.com/Events/IMG-20231224-WA0082.jpg',
-      'https://hostels.gbu.ac.in/uploads/eventsfiles/photos/65a98a5384fb0_GBU-Convocation.jpeg',
-    ],
-  },
-  {
-    id: 2,
-    title: 'National Sports Meet 2025',
-    category: 'Sports',
-    year: '2025',
-    date: '2025-02-18',
-    images: [
-      'https://www.gbu.ac.in/Content/img/sports/banner2.jpg',
-      'https://www.gbu.ac.in/Content/img/sports/banner1.jpg',
-    ],
-  },
-  {
-    id: 3,
-    title: 'Annual Cultural Fest - Rhythms 2025',
-    category: 'Cultural',
-    year: '2025',
-    date: '2025-03-10',
-    images: [
-      'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&q=80',
-      'https://www.gbu.ac.in/Content/img/cc/Artboard%201abhivyanjana7.jpg',
-    ],
-  },
-  {
-    id: 4,
-    title: 'International Research Symposium',
-    category: 'Academic',
-    year: '2025',
-    date: '2025-04-08',
-    images: [
-      'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=600&q=80',
-    ],
-  },
-  {
-    id: 5,
-    title: 'Campus Life - Spring Moments',
-    category: 'Campus Life',
-    year: '2025',
-    date: '2025-03-25',
-    images: [
-      'https://cdn.thedecorjournalindia.com/wp-content/uploads/2022/11/9_Modern-day-marvel-Gautam-Buddha-University-by-CP-Kukreja-architects-transpires-fresh-vibe-and-ancient-wisdom.jpg?lossy=1&resize=1920%2C1357&ssl=1&strip=all',
-      'https://images.lifestyleasia.com/wp-content/uploads/sites/7/2022/11/03131617/1-inside-image-816-x-576-horizontal.jpeg',
-      'https://hawmagazine.com/wp-content/uploads/2023/11/DSF8939-croped-1.jpg',
-    ],
-  },
-  {
-    id: 6,
-    title: 'Tech Symposium 2025',
-    category: 'Events',
-    year: '2025',
-    date: '2025-01-22',
-    images: [
-      'https://www.gbu.ac.in/Content/gbudata/incubation/Incubation_Pic9.jpg',
-      'https://www.ic3ecsbhi.com/dsf8951%20copy.jpeg',
-    ],
-  },
-  {
-    id: 7,
-    title: 'Robotics Workshop & Expo',
-    category: 'Academic',
-    year: '2024',
-    date: '2024-08-10',
-    images: [
-      'https://www.ux4g.gov.in/assets/img/awareness-workshop/gbu-19-11-24/900x1.webp',
-      'https://static.toiimg.com/thumb/msid-104795413%2Cwidth-1280%2Cheight-720%2Cresizemode-72/104795413.jpg',
-    ],
-  },
-  {
-    id: 8,
-    title: 'Faculty Development Program 2024',
-    category: 'Academic',
-    year: '2024',
-    date: '2024-12-12',
-    images: [
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80',
-    ],
-  },
-  {
-    id: 9,
-    title: 'Science & Innovation Fair',
-    category: 'Academic',
-    year: '2024',
-    date: '2024-10-18',
-    images: [
-      'https://gburif.org/images/intro-carousel/gautam-buddha-university-3.jpg',
-      'https://www.hindustantimes.com/ht-img/img/2024/09/05/1600x900/The-12-hour-Hackathon-was-held-at-the-Central-Comp_1725563537794.jpg',
-    ],
-  },
-  {
-    id: 10,
-    title: 'Inter-College Football League',
-    category: 'Sports',
-    year: '2024',
-    date: '2024-09-20',
-    images: [
-      'https://www.gbu.ac.in/Content/img/sports/banner1.jpg',
-    ],
-  },
-  {
-    id: 11,
-    title: 'Winter Cultural Gala',
-    category: 'Cultural',
-    year: '2024',
-    date: '2024-12-22',
-    images: [
-      'https://i.ytimg.com/vi/Aicd7XpY9eI/sd2.jpg?rs=AOn4CLCprID9Bk-ruT1eZpLbeLjahWmBSg&sqp=-oaymwEoCIAFEOAD8quKqQMcGADwAQH4AYwCgALgA4oCDAgAEAEYVCAgKH8wDw%3D%3D',
-    ],
-  },
-  {
-    id: 12,
-    title: 'Open Stage Night',
-    category: 'Cultural',
-    year: '2024',
-    date: '2024-11-15',
-    images: [
-      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80',
-    ],
-  },
-  {
-    id: 13,
-    title: 'Yoga & Wellness Retreat',
-    category: 'Campus Life',
-    year: '2024',
-    date: '2024-07-05',
-    images: [
-      'https://www.gbu.ac.in/Content/gbudata/meditation/img/buddha28.jpg',
-      'https://www.gbu.ac.in/Content/gbudata/meditation/img/buddha31.jpg',
-    ],
-  },
-  {
-    id: 14,
-    title: 'GBU Literary Festival',
-    category: 'Cultural',
-    year: '2024',
-    date: '2024-09-15',
-    images: [
-      'https://sameer.mygbu.in/home/uploads/4.jpg',
-    ],
-  },
-  {
-    id: 15,
-    title: 'GBU Half Marathon 2025',
-    category: 'Sports',
-    year: '2025',
-    date: '2025-01-28',
-    images: [
-      'https://www.gbu.ac.in/Content/img/sports/banner1.jpg',
-    ],
-  },
-  {
-    id: 16,
-    title: 'Inter-University Debate Championship',
-    category: 'Academic',
-    year: '2025',
-    date: '2025-02-20',
-    images: [
-      'https://d8it4huxumps7.cloudfront.net/lambda-pdfs/opportunity-bannerImages/1743929131.png',
-    ],
-  },
-  {
-    id: 17,
-    title: 'Startup Expo & Innovation Fair',
-    category: 'Events',
-    year: '2025',
-    date: '2025-03-18',
-    images: [
-      'https://images.unsplash.com/photo-1564866657310-2630c1f1df9f?auto=format&fit=crop&w=600&q=80',
-    ],
-  },
-  {
-    id: 18,
-    title: 'Women Empowerment Seminar',
-    category: 'Academic',
-    year: '2025',
-    date: '2025-03-25',
-    images: [
-      'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80',
-    ],
-  },
-  {
-    id: 19,
-    title: 'Spring Tree Plantation Drive',
-    category: 'Campus Life',
-    year: '2025',
-    date: '2025-04-05',
-    images: [
-      'https://images.unsplash.com/photo-1559634684-e3eab5be0985?auto=format&fit=crop&w=600&q=80',
-    ],
-  },
-  {
-    id: 20,
-    title: 'GBU Alumni Meet & Reunion',
-    category: 'Events',
-    year: '2025',
-    date: '2025-04-20',
-    images: [
-      'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80',
-    ],
-  },
-  {
-    id: 21,
-    title: 'Environmental Awareness Drive',
-    category: 'Campus Life',
-    year: '2025',
-    date: '2025-05-02',
-    images: [
-      'https://images.unsplash.com/photo-1575202335306-5c8c54b6db1c?auto=format&fit=crop&w=600&q=80',
-    ],
-  },
-  {
-    id: 22,
-    title: 'Inter-College Hackathon',
-    category: 'Academic',
-    year: '2025',
-    date: '2025-05-15',
-    images: [
-      'https://images.unsplash.com/photo-1537432376769-00aabc1ca45c?auto=format&fit=crop&w=600&q=80',
-    ],
-  },
-  {
-    id: 23,
-    title: 'Cultural Evening - Folk Fusion',
-    category: 'Cultural',
-    year: '2025',
-    date: '2025-06-10',
-    images: [
-      'https://images.unsplash.com/photo-1587049352849-35263f2e96f5?auto=format&fit=crop&w=600&q=80',
-    ],
-  },
-  {
-    id: 24,
-    title: 'Photography Exhibition',
-    category: 'Cultural',
-    year: '2025',
-    date: '2025-06-20',
-    images: [
-      'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=600&q=80',
-    ],
-  },
-  {
-    id: 25,
-    title: 'Summer Internship Orientation',
-    category: 'Academic',
-    year: '2025',
-    date: '2025-07-01',
-    images: [
-      'https://biotechworldindia.in/wp-content/uploads/2023/11/IMG-20200620-WA0002-1024x705.jpg',
-    ],
-  },
-];
+// const mockMedia = [
+//   {
+//     id: 1,
+//     title: '15th Annual Convocation Ceremony',
+//     category: 'Convocation',
+//     year: '2025',
+//     date: '2025-05-12',
+//     images: [
+//       'https://www.ic3ecsbhi.com/Gallery/20231224_134240.jpg',
+//       'https://www.ic3ecsbhi.com/Events/IMG-20231224-WA0082.jpg',
+//       'https://hostels.gbu.ac.in/uploads/eventsfiles/photos/65a98a5384fb0_GBU-Convocation.jpeg',
+//     ],
+//   },
+//   {
+//     id: 2,
+//     title: 'National Sports Meet 2025',
+//     category: 'Sports',
+//     year: '2025',
+//     date: '2025-02-18',
+//     images: [
+//       'https://www.gbu.ac.in/Content/img/sports/banner2.jpg',
+//       'https://www.gbu.ac.in/Content/img/sports/banner1.jpg',
+//     ],
+//   },
+//   {
+//     id: 3,
+//     title: 'Annual Cultural Fest - Rhythms 2025',
+//     category: 'Cultural',
+//     year: '2025',
+//     date: '2025-03-10',
+//     images: [
+//       'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&q=80',
+//       'https://www.gbu.ac.in/Content/img/cc/Artboard%201abhivyanjana7.jpg',
+//     ],
+//   },
+//   {
+//     id: 4,
+//     title: 'International Research Symposium',
+//     category: 'Academic',
+//     year: '2025',
+//     date: '2025-04-08',
+//     images: [
+//       'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=600&q=80',
+//     ],
+//   },
+//   {
+//     id: 5,
+//     title: 'Campus Life - Spring Moments',
+//     category: 'Campus Life',
+//     year: '2025',
+//     date: '2025-03-25',
+//     images: [
+//       'https://cdn.thedecorjournalindia.com/wp-content/uploads/2022/11/9_Modern-day-marvel-Gautam-Buddha-University-by-CP-Kukreja-architects-transpires-fresh-vibe-and-ancient-wisdom.jpg?lossy=1&resize=1920%2C1357&ssl=1&strip=all',
+//       'https://images.lifestyleasia.com/wp-content/uploads/sites/7/2022/11/03131617/1-inside-image-816-x-576-horizontal.jpeg',
+//       'https://hawmagazine.com/wp-content/uploads/2023/11/DSF8939-croped-1.jpg',
+//     ],
+//   },
+//   {
+//     id: 6,
+//     title: 'Tech Symposium 2025',
+//     category: 'Events',
+//     year: '2025',
+//     date: '2025-01-22',
+//     images: [
+//       'https://www.gbu.ac.in/Content/gbudata/incubation/Incubation_Pic9.jpg',
+//       'https://www.ic3ecsbhi.com/dsf8951%20copy.jpeg',
+//     ],
+//   },
+//   {
+//     id: 7,
+//     title: 'Robotics Workshop & Expo',
+//     category: 'Academic',
+//     year: '2024',
+//     date: '2024-08-10',
+//     images: [
+//       'https://www.ux4g.gov.in/assets/img/awareness-workshop/gbu-19-11-24/900x1.webp',
+//       'https://static.toiimg.com/thumb/msid-104795413%2Cwidth-1280%2Cheight-720%2Cresizemode-72/104795413.jpg',
+//     ],
+//   },
+//   {
+//     id: 8,
+//     title: 'Faculty Development Program 2024',
+//     category: 'Academic',
+//     year: '2024',
+//     date: '2024-12-12',
+//     images: [
+//       'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80',
+//     ],
+//   },
+//   {
+//     id: 9,
+//     title: 'Science & Innovation Fair',
+//     category: 'Academic',
+//     year: '2024',
+//     date: '2024-10-18',
+//     images: [
+//       'https://gburif.org/images/intro-carousel/gautam-buddha-university-3.jpg',
+//       'https://www.hindustantimes.com/ht-img/img/2024/09/05/1600x900/The-12-hour-Hackathon-was-held-at-the-Central-Comp_1725563537794.jpg',
+//     ],
+//   },
+//   {
+//     id: 10,
+//     title: 'Inter-College Football League',
+//     category: 'Sports',
+//     year: '2024',
+//     date: '2024-09-20',
+//     images: [
+//       'https://www.gbu.ac.in/Content/img/sports/banner1.jpg',
+//     ],
+//   },
+//   {
+//     id: 11,
+//     title: 'Winter Cultural Gala',
+//     category: 'Cultural',
+//     year: '2024',
+//     date: '2024-12-22',
+//     images: [
+//       'https://i.ytimg.com/vi/Aicd7XpY9eI/sd2.jpg?rs=AOn4CLCprID9Bk-ruT1eZpLbeLjahWmBSg&sqp=-oaymwEoCIAFEOAD8quKqQMcGADwAQH4AYwCgALgA4oCDAgAEAEYVCAgKH8wDw%3D%3D',
+//     ],
+//   },
+//   {
+//     id: 12,
+//     title: 'Open Stage Night',
+//     category: 'Cultural',
+//     year: '2024',
+//     date: '2024-11-15',
+//     images: [
+//       'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80',
+//     ],
+//   },
+//   {
+//     id: 13,
+//     title: 'Yoga & Wellness Retreat',
+//     category: 'Campus Life',
+//     year: '2024',
+//     date: '2024-07-05',
+//     images: [
+//       'https://www.gbu.ac.in/Content/gbudata/meditation/img/buddha28.jpg',
+//       'https://www.gbu.ac.in/Content/gbudata/meditation/img/buddha31.jpg',
+//     ],
+//   },
+//   {
+//     id: 14,
+//     title: 'GBU Literary Festival',
+//     category: 'Cultural',
+//     year: '2024',
+//     date: '2024-09-15',
+//     images: [
+//       'https://sameer.mygbu.in/home/uploads/4.jpg',
+//     ],
+//   },
+//   {
+//     id: 15,
+//     title: 'GBU Half Marathon 2025',
+//     category: 'Sports',
+//     year: '2025',
+//     date: '2025-01-28',
+//     images: [
+//       'https://www.gbu.ac.in/Content/img/sports/banner1.jpg',
+//     ],
+//   },
+//   {
+//     id: 16,
+//     title: 'Inter-University Debate Championship',
+//     category: 'Academic',
+//     year: '2025',
+//     date: '2025-02-20',
+//     images: [
+//       'https://d8it4huxumps7.cloudfront.net/lambda-pdfs/opportunity-bannerImages/1743929131.png',
+//     ],
+//   },
+//   {
+//     id: 17,
+//     title: 'Startup Expo & Innovation Fair',
+//     category: 'Events',
+//     year: '2025',
+//     date: '2025-03-18',
+//     images: [
+//       'https://images.unsplash.com/photo-1564866657310-2630c1f1df9f?auto=format&fit=crop&w=600&q=80',
+//     ],
+//   },
+//   {
+//     id: 18,
+//     title: 'Women Empowerment Seminar',
+//     category: 'Academic',
+//     year: '2025',
+//     date: '2025-03-25',
+//     images: [
+//       'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80',
+//     ],
+//   },
+//   {
+//     id: 19,
+//     title: 'Spring Tree Plantation Drive',
+//     category: 'Campus Life',
+//     year: '2025',
+//     date: '2025-04-05',
+//     images: [
+//       'https://images.unsplash.com/photo-1559634684-e3eab5be0985?auto=format&fit=crop&w=600&q=80',
+//     ],
+//   },
+//   {
+//     id: 20,
+//     title: 'GBU Alumni Meet & Reunion',
+//     category: 'Events',
+//     year: '2025',
+//     date: '2025-04-20',
+//     images: [
+//       'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80',
+//     ],
+//   },
+//   {
+//     id: 21,
+//     title: 'Environmental Awareness Drive',
+//     category: 'Campus Life',
+//     year: '2025',
+//     date: '2025-05-02',
+//     images: [
+//       'https://images.unsplash.com/photo-1575202335306-5c8c54b6db1c?auto=format&fit=crop&w=600&q=80',
+//     ],
+//   },
+//   {
+//     id: 22,
+//     title: 'Inter-College Hackathon',
+//     category: 'Academic',
+//     year: '2025',
+//     date: '2025-05-15',
+//     images: [
+//       'https://images.unsplash.com/photo-1537432376769-00aabc1ca45c?auto=format&fit=crop&w=600&q=80',
+//     ],
+//   },
+//   {
+//     id: 23,
+//     title: 'Cultural Evening - Folk Fusion',
+//     category: 'Cultural',
+//     year: '2025',
+//     date: '2025-06-10',
+//     images: [
+//       'https://images.unsplash.com/photo-1587049352849-35263f2e96f5?auto=format&fit=crop&w=600&q=80',
+//     ],
+//   },
+//   {
+//     id: 24,
+//     title: 'Photography Exhibition',
+//     category: 'Cultural',
+//     year: '2025',
+//     date: '2025-06-20',
+//     images: [
+//       'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=600&q=80',
+//     ],
+//   },
+//   {
+//     id: 25,
+//     title: 'Summer Internship Orientation',
+//     category: 'Academic',
+//     year: '2025',
+//     date: '2025-07-01',
+//     images: [
+//       'https://biotechworldindia.in/wp-content/uploads/2023/11/IMG-20200620-WA0002-1024x705.jpg',
+//     ],
+//   },
+// ];
 
 // === Main Component ===
 const MediaGallery = () => {
@@ -685,7 +685,35 @@ const MediaGallery = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [selectedMediaItem, setSelectedMediaItem] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
+   const [mockMedia, setMockMedia] = useState([]);
+   const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    // Backend API ko call karna (Aap limit aur page parameter bhi pass kar sakte hain)
+    fetch("http://localhost:3000/api/v1/media-gallery")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          // Backend keys ko frontend expected keys me map karna
+          const formattedMedia = data.data.map((item) => ({
+            id: item.id,
+            title: item.title,
+            category: item.category,
+            year: item.year,
+            date: item.publishedAt,         // 'publishedAt' ko 'date' banaya
+            images: item.images || [],      // Images ka array (Lightbox/Slider ke liye)
+            coverImage: item.coverImageUrl  // Card ke thumbnail ke liye
+          }));
 
+          setMockMedia(formattedMedia);
+         
+        
+          }
+      })
+      .catch((err) => {
+        console.error("Error fetching media gallery:", err);
+        setLoading(false);
+      });
+  }, []);
   const allCategories = Array.from(new Set(mockMedia.map(item => item.category)));
   const allYears = Array.from(new Set(mockMedia.map(item => item.year)));
 

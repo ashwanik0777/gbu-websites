@@ -678,26 +678,37 @@ const Notice = () => {
 
   //   return () => controller.abort();
   // }, []);
-  useEffect(() => {
-    fetch("http://localhost:3000/api/v1/announcements?limit=50")
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log(data);
-        const arr = data.data || data.announcements || data;
-        setMockNotices(Array.isArray(arr) ? arr : []);
-      })
-      .catch((err) => console.log(err));
-  }, []);
-  const allTypes = Array.from(
-    new Set(mockNotices.map((notice) => notice.type)),
-  );
-  const allYears = Array.from(
-    new Set(
-      mockNotices.map((notice) =>
-        new Date(notice.date).getFullYear().toString(),
-      ),
-    ),
-  );
+useEffect(() => {
+  // /notice ki jagah /notices aayega
+  fetch("http://localhost:3000/api/v1/notices")
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        // Backend keys ko frontend keys me map karna
+        const formattedNotices = data.data.map((notice) => ({
+          ...notice,
+          date: notice.published_date,
+          isNew: notice.is_new,
+          pdfUrl: notice.pdf_url
+        }));
+
+        setMockNotices(formattedNotices);
+      }
+    })
+    .catch((err) => console.log("Error fetching notices:", err));
+}, []);
+
+// Type aur Year nikalne ka logic ab state set hone ke baad map hoga
+const allTypes = Array.from(
+  new Set(mockNotices.map((notice) => notice.type))
+);
+const allYears = Array.from(
+  new Set(
+    mockNotices.map((notice) =>
+      new Date(notice.date).getFullYear().toString()
+    )
+  )
+);
 
   // Filtered and sorted data
   const filteredAndSortedNews = useMemo(() => {

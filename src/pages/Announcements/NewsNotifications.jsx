@@ -1014,58 +1014,29 @@ const NewsNotifications = () => {
   const [selectedPriorities, setSelectedPriorities] = useState([]);
   const [viewMode, setViewMode] = useState("grid");
   const [mockNews, setMockNews] = useState([]);
-  // useEffect(() => {
-  //   fetch("http://localhost:3000/api/v1/news")
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       const formattedNews = data.data.map((item) => ({
-  //         id: item.id,
-  //         title: item.title,
-  //         excerpt: item.summary,
-  //         content: item.summary,
-  //         date: new Date().toISOString(),
-  //         author: "GBU",
-  //         department: "University",
-  //         tags: ["News"],
-  //         category: "General",
-  //         priority: "medium",
-  //         views: 0,
-  //         likes: 0,
-  //         image:
-  //           "https://gburif.org/images/intro-carousel/gautam-buddha-university-3.jpg",
-  //         featured: false,
-  //       }));
 
-  //       setMockNews(formattedNews);
-  //     });
-  // }, []);
-  // useEffect(() => {
-  //   fetch("http://localhost:3000/api/v1/news")
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       const formattedNews = data.data.map((item) => ({
-  //         id: item.id,
-  //         title: item.title,
-  //         excerpt: item.excerpt,
-  //         content: item.content,
-  //         date: item.date,
-  //         author: item.author,
-  //         department: item.department,
-  //         tags: item.tags ? item.tags.split(",") : [],
-  //         category: item.category,
-  //         priority: item.priority,
-  //         views: item.views,
-  //         likes: item.likes,
-  //         image: item.image_url, // 🔥 IMPORTANT
-  //         featured: item.featured,
-  //       }));
+  useEffect(() => {
+  fetch("http://localhost:3000/api/v1/news")
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        // data.data ek Array hai, isliye hum map use kar rahe hain
+        const formattedNews = data.data.map((item) => ({
+          ...item,
+          date: item.published_date, // DB ke 'published_date' ko 'date' banaya
+          image: item.image_url,     // DB ke 'image_url' ko 'image' banaya
+          featured: item.is_featured, // DB ke 'is_featured' ko 'featured' banaya
+          // JSONB DB me directly array return karta hai, to split ki zarurat nahi padegi
+          tags: Array.isArray(item.tags) ? item.tags : [] 
+        }));
 
-  //       setMockNews(formattedNews);
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error fetching news:", err);
-  //     });
-  // }, []);
+        setMockNews(formattedNews);
+      }
+    })
+    .catch((err) => {
+      console.error("Error fetching news:", err);
+    });
+}, []);
   // Extract unique values
   const allTags = Array.from(new Set(mockNews.flatMap((news) => news.tags)));
   const allCategories = Array.from(

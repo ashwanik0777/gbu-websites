@@ -1002,15 +1002,24 @@ const EventsPage = () => {
   };
 
   const currentEvents = getCurrentEvents();
-  useEffect(() => {
-    fetch("http://localhost:3000/api/v1/events?limit=50")
+ useEffect(() => {
+    fetch("http://localhost:3000/api/v1/events")
       .then((res) => res.json())
       .then((data) => {
         console.log("Full API Response:", data);
-        console.log("Events Array:", data.data);
-        console.log("First Event:", data.data[0]); // IMPORTANT
+        
+        // Data aane ke baad usko React ke purane format mein convert kar rahe hain
+        const formattedEvents = data.data.map((event) => {
+          return {
+            ...event,
+            date: event.starts_at,           // 'starts_at' ko 'date' bana diya
+            coverImageUrl: event.cover_image,// 'cover_image' ko 'coverImageUrl' bana diya
+            location: event.venue            // 'venue' ko 'location' bana diya
+          };
+        });
 
-        seteventsData(data.data);
+        console.log("Formatted Events:", formattedEvents);
+        seteventsData(formattedEvents); // Ab formatted data set hoga
       })
       .catch((err) => console.log(err));
   }, []);
