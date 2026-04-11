@@ -723,7 +723,7 @@ const SchoolDashboard = () => {
               })}
 
               <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-2">
-                <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Other Tabs (Inactive)</p>
+                <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Upcoming Tabs</p>
                 <div className="space-y-1">
                   {INACTIVE_TABS.map((label) => (
                     <button
