@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Card, CardHeader, CardTitle, CardContent, and Badge components defined here for best UI/UX
 
 // Card container with subtle shadow and rounded corners
@@ -34,62 +35,10 @@ const Badge = ({ className = '', children }) => (
 );
 import { Calendar, MapPin, GraduationCap } from 'lucide-react';
 
-export const QualificationsTab = () => {
-  const qualifications = [
-    {
-      degree: "Ph.D. in Computer Science",
-      institution: "Indian Institute of Technology",
-      year: "2021",
-      location: "Delhi, India",
-      specialization: "Machine Learning and Data Mining",
-      type: "doctorate"
-    },
-    {
-      degree: "M.Tech in Computer Science & Engineering",
-      institution: "Gautam Buddha University",
-      year: "2018",
-      location: "Greater Noida, India",
-      specialization: "Software Engineering",
-      type: "masters"
-    },
-    {
-      degree: "B.Tech in Computer Science & Engineering",
-      institution: "Gautam Buddha University",
-      year: "2016",
-      location: "Greater Noida, India",
-      specialization: "Computer Science",
-      type: "bachelors"
-    }
-  ];
-
-  const experience = [
-    {
-      position: "Professor",
-      department: "School of Information and Communication Technology",
-      institution: "Gautam Buddha University",
-      duration: "2022 - Present",
-      type: "academic",
-      responsibilities: [
-        "Leading research in Machine Learning and AI",
-        "Teaching graduate and undergraduate courses",
-        "Supervising PhD and Master's students",
-        "Contributing to curriculum development"
-      ]
-    },
-    {
-      position: "Assistant Professor",
-      department: "Department of Computer Science",
-      institution: "Gautam Buddha University",
-      duration: "2021 - 2022",
-      type: "academic",
-      responsibilities: [
-        "Conducted research in recommendation systems",
-        "Taught courses in data structures and algorithms",
-        "Mentored undergraduate students",
-        "Published research papers in peer-reviewed journals"
-      ]
-    }
-  ];
+export const QualificationsTab = ({ profile }) => {
+  const tabData = profile?.tabData?.qualifications || DUMMY_FACULTY_TAB_DATA.qualifications;
+  const qualifications = tabData.qualifications || [];
+  const experience = tabData.experience || [];
 
   const getTypeColor = (type) => {
     switch (type) {

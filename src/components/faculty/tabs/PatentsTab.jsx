@@ -1,4 +1,5 @@
 import React from 'react';
+import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Minimal custom Card, CardHeader, CardTitle, CardContent, Badge, and Button components with Tailwind CSS
 
 export const Card = ({ className = '', children, ...props }) => (
@@ -69,45 +70,9 @@ export const Button = ({
 };
 import { Award, Calendar, MapPin, FileText, ExternalLink } from 'lucide-react';
 
-export const PatentsTab = () => {
-  const patents = [
-    {
-      title: "AI-Based Intrusion Detection System for IoT Networks",
-      applicationNo: "202341012345",
-      status: "Filed",
-      filedYear: 2024,
-      country: "India",
-      patentOffice: "Indian Patent Office",
-      inventors: ["Dr. Gaurav Kumar", "Priya Sharma", "Rajesh Singh"],
-      description: "A novel machine learning framework for real-time detection and prevention of cyber attacks in Internet of Things networks using deep neural networks and ensemble methods.",
-      technicalField: "Cybersecurity, Machine Learning, IoT",
-      applicationDate: "15th March 2024"
-    },
-    {
-      title: "Context-Aware Recommendation Engine for Educational Platforms",
-      applicationNo: "202341023456",
-      status: "Under Examination",
-      filedYear: 2023,
-      country: "India",
-      patentOffice: "Indian Patent Office",
-      inventors: ["Dr. Gaurav Kumar", "Neha Gupta", "Anita Verma"],
-      description: "An intelligent recommendation system that adapts to learner's context, preferences, and learning patterns to provide personalized educational content and learning paths.",
-      technicalField: "Machine Learning, Education Technology",
-      applicationDate: "8th September 2023"
-    },
-    {
-      title: "Federated Learning System for Privacy-Preserving Data Analytics",
-      applicationNo: "202241034567",
-      status: "Published",
-      filedYear: 2022,
-      country: "India",
-      patentOffice: "Indian Patent Office",
-      inventors: ["Dr. Gaurav Kumar", "Suresh Patel"],
-      description: "A distributed machine learning framework that enables collaborative model training across multiple parties while preserving data privacy and security.",
-      technicalField: "Privacy-Preserving ML, Distributed Systems",
-      applicationDate: "22nd November 2022"
-    }
-  ];
+export const PatentsTab = ({ profile }) => {
+  const tabData = profile?.tabData?.patents || DUMMY_FACULTY_TAB_DATA.patents;
+  const patents = tabData.patents || [];
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {

@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Minimal custom UI components styled with Tailwind CSS
  
 export const Card = ({ className = "", children, ...props }) => (
@@ -68,82 +69,10 @@ export const Button = ({
 };
 import { BookOpen, Clock, Users, Filter, Upload, FileText, Download, Eye } from 'lucide-react';
 
-export const TeachingTab = () => {
+export const TeachingTab = ({ profile }) => {
   const [selectedLevel, setSelectedLevel] = useState('all');
-
-  const courses = [
-    {
-      code: "CS301",
-      name: "Machine Learning Fundamentals",
-      semester: "Fall 2024",
-      level: "UG",
-      batch: "2022-2026",
-      credits: 4,
-      students: 45,
-      description: "Introduction to machine learning algorithms and applications",
-      slides: [
-        { id: 1, title: "Introduction to ML", filename: "ML_Intro.pdf", uploadDate: "2024-01-15" },
-        { id: 2, title: "Supervised Learning", filename: "Supervised_Learning.pdf", uploadDate: "2024-01-22" },
-        { id: 3, title: "Neural Networks", filename: "Neural_Networks.pdf", uploadDate: "2024-02-05" }
-      ]
-    },
-    {
-      code: "CS501",
-      name: "Advanced Data Mining",
-      semester: "Spring 2024",
-      level: "PG",
-      batch: "2023-2025",
-      credits: 3,
-      students: 28,
-      description: "Deep dive into data mining techniques and big data analytics",
-      slides: [
-        { id: 4, title: "Data Mining Overview", filename: "DataMining_Overview.pdf", uploadDate: "2024-01-10" },
-        { id: 5, title: "Classification Algorithms", filename: "Classification.pdf", uploadDate: "2024-01-18" }
-      ]
-    },
-    {
-      code: "CS401",
-      name: "Artificial Intelligence",
-      semester: "Fall 2024",
-      level: "UG",
-      batch: "2021-2025",
-      credits: 4,
-      students: 52,
-      description: "Comprehensive study of AI algorithms and intelligent systems",
-      slides: [
-        { id: 6, title: "AI Fundamentals", filename: "AI_Fundamentals.pdf", uploadDate: "2024-01-12" },
-        { id: 7, title: "Search Algorithms", filename: "Search_Algorithms.pdf", uploadDate: "2024-01-20" },
-        { id: 8, title: "Knowledge Representation", filename: "Knowledge_Rep.pdf", uploadDate: "2024-01-28" }
-      ]
-    },
-    {
-      code: "CS601",
-      name: "Research Methodology",
-      semester: "Spring 2024",
-      level: "PhD",
-      batch: "2023-2026",
-      credits: 2,
-      students: 12,
-      description: "Research methods and academic writing for doctoral students",
-      slides: [
-        { id: 9, title: "Research Design", filename: "Research_Design.pdf", uploadDate: "2024-01-08" }
-      ]
-    },
-    {
-      code: "CS201",
-      name: "Data Structures & Algorithms",
-      semester: "Fall 2023",
-      level: "UG",
-      batch: "2023-2027",
-      credits: 4,
-      students: 68,
-      description: "Fundamental data structures and algorithmic problem solving",
-      slides: [
-        { id: 10, title: "Arrays and Linked Lists", filename: "Arrays_LinkedLists.pdf", uploadDate: "2023-08-15" },
-        { id: 11, title: "Trees and Graphs", filename: "Trees_Graphs.pdf", uploadDate: "2023-09-10" }
-      ]
-    }
-  ];
+  const tabData = profile?.tabData?.teaching || DUMMY_FACULTY_TAB_DATA.teaching;
+  const courses = tabData.courses || [];
 
   const filteredCourses = selectedLevel === 'all' 
     ? courses 
@@ -158,7 +87,7 @@ export const TeachingTab = () => {
     }
   };
 
-  const teachingPhilosophy = `Dr. Kumar believes in creating an interactive and engaging learning environment where students are encouraged to think critically and apply theoretical concepts to real-world problems. His teaching methodology emphasizes hands-on learning, collaborative projects, and industry-relevant case studies.`;
+  const teachingPhilosophy = tabData.philosophy || "";
 
   return (
     <div className="space-y-6 bg-gray-50">

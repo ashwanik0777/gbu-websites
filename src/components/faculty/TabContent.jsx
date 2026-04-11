@@ -19,29 +19,29 @@ const TabContent = ({ activeTab , profile}) => {
       case 'overview':
         return <OverviewTab profile={profile}/>;
       case 'qualifications':
-        return <QualificationsTab />;
+        return <QualificationsTab profile={profile} />;
       case 'teaching':
-        return <TeachingTab />;
+        return <TeachingTab profile={profile} />;
       case 'administration':
-        return <AdministrationTab />;
+        return <AdministrationTab profile={profile} />;
       case 'research-projects':
-        return <ResearchProjectsAndGroup />;
+        return <ResearchProjectsAndGroup profile={profile} />;
       case 'research-group':
-        return <ResearchGroupTab />;
+        return <ResearchGroupTab profile={profile} />;
       case 'publications':
-        return <PublicationsTab />;
+        return <PublicationsTab profile={profile} />;
       case 'patents':
-        return <PatentsTab />;
+        return <PatentsTab profile={profile} />;
       case 'certifications':
-        return <CertificationsTab />;
+        return <CertificationsTab profile={profile} />;
       case 'talks':
-        return <TalksTab />;
+        return <TalksTab profile={profile} />;
       case 'awards':
-        return <AwardsAndSocialImpactPage/>;
+        return <AwardsAndSocialImpactPage profile={profile} />;
       case 'social-impact':
-        return <SocialImpactTab />;
+        return <SocialImpactTab profile={profile} />;
       case 'other':
-        return <OtherTab />;
+        return <OtherTab profile={profile} />;
       default:
         return <OverviewTab />;
     }
