@@ -94,7 +94,7 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
     {
       id: "evt-2",
       title: "AI and Data Science Research Colloquium",
-      date: "2025-07-12",
+      date: "2026-07-12",
       venue: "Seminar Hall - ICT",
       type: "Academic",
       time: "10:30",
@@ -108,7 +108,7 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
     {
       id: "evt-3",
       title: "Inter-School Sports Meet",
-      date: "2025-08-08",
+      date: "2026-08-08",
       venue: "University Sports Complex",
       type: "Sports",
       time: "09:00",

@@ -792,35 +792,36 @@ const allYears = Array.from(
       className={viewMode === "list" ? "w-full" : ""}
     >
       <Card className="h-full group overflow-hidden relative">
-        {/* Priority & New Badge */}
-        <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
-          {notice.isNew && (
-            <Badge variant="event" className="animate-pulse">
-              <Star size={10} className="mr-1" />
-              NEW
-            </Badge>
-          )}
-          {notice.priority === "high" && (
-            <Badge variant="exam">
-              <AlertCircle size={10} className="mr-1" />
-              HIGH
-            </Badge>
-          )}
-        </div>
-
         <CardHeader
           className={`${viewMode === "list" ? "flex flex-row items-center gap-6" : ""}`}
         >
           <div className={`${viewMode === "list" ? "flex-1" : ""}`}>
-            <div className="flex items-center gap-3 mb-3">
-              <Badge variant={getTypeColor(notice.type)}>{notice.type}</Badge>
-              <div className="flex items-center text-sm text-gray-500 gap-2">
-                <Calendar size={14} />
-                {format(new Date(notice.date), "MMMM dd, yyyy")}
+            <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge variant={getTypeColor(notice.type)}>{notice.type}</Badge>
+                <div className="flex items-center text-sm text-gray-500 gap-2">
+                  <Calendar size={14} />
+                  {format(new Date(notice.date), "MMMM dd, yyyy")}
+                </div>
+                <div className="flex items-center text-sm text-gray-500 gap-2">
+                  <Eye size={14} />
+                  {notice.views}
+                </div>
               </div>
-              <div className="flex items-center text-sm text-gray-500 gap-2">
-                <Eye size={14} />
-                {notice.views}
+
+              <div className="flex flex-wrap items-center gap-2">
+                {notice.isNew && (
+                  <Badge variant="event" className="animate-pulse">
+                    <Star size={10} className="mr-1" />
+                    NEW
+                  </Badge>
+                )}
+                {notice.priority === "high" && (
+                  <Badge variant="exam">
+                    <AlertCircle size={10} className="mr-1" />
+                    HIGH
+                  </Badge>
+                )}
               </div>
             </div>
 

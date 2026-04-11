@@ -59,23 +59,36 @@ export const getSchoolAnnouncements = () => {
   const events = safeArray(data.events).map((item, index) => {
     const fallbackImage = galleryItems[index]?.imageUrl || galleryFallback;
     const eventDate = item.date || new Date().toISOString().slice(0, 10);
+    const eventStart = new Date(eventDate);
+    eventStart.setHours(0, 0, 0, 0);
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const isUpcoming = eventStart >= todayStart;
 
     return {
       id: item.id || `event-${index + 1}`,
       title: item.title || `Event ${index + 1}`,
       date: eventDate,
-      starts_at: eventDate,
+      startsAt: item.startsAt || eventDate,
+      starts_at: item.starts_at || eventDate,
+      endDate: item.endDate || item.endsAt || item.ends_at || eventDate,
+      endsAt: item.endsAt || item.ends_at || item.endDate || eventDate,
+      ends_at: item.ends_at || item.endsAt || item.endDate || eventDate,
       time: item.time || "10:00",
       location: item.venue || item.location || "Campus",
       venue: item.venue || item.location || "Campus",
       type: item.type || "Academic",
+      mode: item.mode || "Offline",
       description:
         item.description || `${item.title || "Event"} organized by ${schoolName}.`,
       coverImageUrl: item.coverImageUrl || item.image || fallbackImage,
       image: item.image || item.coverImageUrl || fallbackImage,
+      images: item.images || [item.image || item.coverImageUrl || fallbackImage],
       attendees: Number(item.attendees || 100),
       price: item.price || "Free",
       organizer: item.organizer || schoolName,
+      registrationUrl: item.registrationUrl || item.registration_url || "",
+      isUpcoming,
       tags: normalizeList(item.tags, [item.type || "Event"]),
       year: new Date(eventDate).getFullYear().toString(),
       schoolName,

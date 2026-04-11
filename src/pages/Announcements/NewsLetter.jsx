@@ -143,10 +143,6 @@ const NewsLetter = () => {
           ]}
         />
 
-        {/* Results Summary */}
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 to-white px-4 py-3 shadow-sm">
-          <p className="text-sm font-medium text-slate-600">School-driven newsletter data. Updates are synced from School Dashboard.</p>
-        </div>
 
         <div className="flex items-center justify-between mb-6">
           <div>

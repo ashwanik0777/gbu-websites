@@ -349,6 +349,12 @@ import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
 
 // Your Existing Event Card Component - Keeping the same UI
 const EventCard = ({ event }) => {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const eventStart = new Date(event.date);
+  eventStart.setHours(0, 0, 0, 0);
+  const isUpcoming = eventStart >= todayStart;
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return {
@@ -458,8 +464,12 @@ const EventCard = ({ event }) => {
         </button> */}
 
         <Link to={`/announcements/event-calendar/${event.id}`}>
-          <button className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-colors duration-300 ease-in-out shadow hover:shadow-md">
-            Register Now
+          <button className={`w-full mt-4 py-3 rounded-xl font-medium transition-colors duration-300 ease-in-out shadow hover:shadow-md ${
+            isUpcoming
+              ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
+              : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+          }`}>
+            {isUpcoming ? "Register Now" : "View Details"}
           </button>
         </Link>
       </div>
@@ -989,16 +999,19 @@ const EventsPage = () => {
   // Get current events based on active tab (only upcoming and past)
   const getCurrentEvents = () => {
     const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
 
     switch (activeTab) {
       case "upcoming":
         return eventsData.filter((event) => {
           const eventDate = new Date(event.date);
+          eventDate.setHours(0, 0, 0, 0);
           return eventDate >= currentDate;
         });
       case "past":
         return eventsData.filter((event) => {
           const eventDate = new Date(event.date);
+          eventDate.setHours(0, 0, 0, 0);
           return eventDate < currentDate;
         });
       default:
@@ -1055,15 +1068,26 @@ const EventsPage = () => {
       id: "upcoming",
       label: "Upcoming Events",
       count: eventsData.filter(
-        (e) => new Date(e.date) >= new Date(),
+        (e) => {
+          const eventDate = new Date(e.date);
+          eventDate.setHours(0, 0, 0, 0);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return eventDate >= today;
+        },
       ).length,
       icon: Calendar,
     },
     {
       id: "past",
       label: "Past Events",
-      count: eventsData.filter((e) => new Date(e.date) < new Date())
-        .length,
+      count: eventsData.filter((e) => {
+        const eventDate = new Date(e.date);
+        eventDate.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return eventDate < today;
+      }).length,
       icon: Clock,
     },
   ];
@@ -1079,18 +1103,18 @@ const EventsPage = () => {
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Navigation Tabs - Only 2 tabs */}
         <div className="mb-12">
-          <div className="rounded-2xl shadow-lg p mb-6">
-            <div className="flex gap-2">
+          <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex-1 flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 ${
+                    className={`flex items-center justify-center gap-3 rounded-xl px-8 py-4 font-semibold transition-all duration-300 ${
                       activeTab === tab.id
-                        ? "bg-gray-100 text-blue-600 shadow-lg transform scale-105"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-white/80"
+                        ? "bg-blue-50 text-blue-700 shadow-sm"
+                        : "text-gray-600 hover:bg-slate-50 hover:text-gray-900"
                     }`}
                   >
                     <IconComponent className="w-5 h-5" />
