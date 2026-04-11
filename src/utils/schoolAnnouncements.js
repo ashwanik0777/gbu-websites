@@ -83,7 +83,7 @@ export const getSchoolAnnouncements = () => {
         item.description || `${item.title || "Event"} organized by ${schoolName}.`,
       coverImageUrl: item.coverImageUrl || item.image || fallbackImage,
       image: item.image || item.coverImageUrl || fallbackImage,
-      images: item.images || [item.image || item.coverImageUrl || fallbackImage],
+      images: normalizeList(item.images, [item.image || item.coverImageUrl || fallbackImage]),
       attendees: Number(item.attendees || 100),
       price: item.price || "Free",
       organizer: item.organizer || schoolName,
@@ -134,13 +134,29 @@ export const getSchoolAnnouncements = () => {
     schoolName: item.schoolName,
   }));
 
+  const explicitNewsletters = safeArray(data.newsletters).map((item, index) => ({
+    id: item.id || `newsletter-${index + 1}`,
+    title: item.title || `Newsletter ${index + 1}`,
+    issueNumber:
+      item.issueNumber || `Vol. ${new Date(item.date || new Date().toISOString()).getFullYear()}, Issue ${index + 1}`,
+    date: item.date || new Date().toISOString().slice(0, 10),
+    coverImage: item.coverImage || item.image || galleryFallback,
+    excerpt: item.excerpt || `${item.title || "Newsletter"} from ${schoolName}.`,
+    pdfLink: item.pdfLink || item.pdfUrl || item.link || "",
+    views: Number(item.views || 0),
+    category: item.category || "School Update",
+    content: item.content || "",
+    isPublished: normalizeBool(item.isPublished, true),
+    schoolName,
+  }));
+
   const mediaGallery = galleryItems.map((item, index) => ({
     id: item.id || `gallery-${index + 1}`,
     title: item.title || `Gallery ${index + 1}`,
     category: item.category || "Events",
     year: String(new Date(item.eventDate || new Date().toISOString()).getFullYear()),
     date: item.eventDate || new Date().toISOString().slice(0, 10),
-    images: item.images || [item.imageUrl || galleryFallback],
+    images: normalizeList(item.images, [item.imageUrl || galleryFallback]),
     coverImage: item.imageUrl || galleryFallback,
     schoolName,
   }));
@@ -150,7 +166,7 @@ export const getSchoolAnnouncements = () => {
     notices,
     events,
     news,
-    newsletters,
+    newsletters: explicitNewsletters.length ? explicitNewsletters : newsletters,
     mediaGallery,
     eventGallery: galleryItems,
   };

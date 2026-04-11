@@ -241,6 +241,34 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       image: "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=1200"
     }
   ],
+  newsletters: [
+    {
+      id: "nl-1",
+      title: "SOICT Monthly Digest - April 2026",
+      date: "2026-04-05",
+      category: "School Update",
+      issueNumber: "Vol. 2026, Issue 1",
+      excerpt: "Highlights from placements, research, and student activities.",
+      content: "This issue covers recent school updates, student achievements, and key announcements.",
+      coverImage: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200",
+      pdfLink: "",
+      views: 320,
+      isPublished: true
+    },
+    {
+      id: "nl-2",
+      title: "Innovation Special Edition",
+      date: "2026-03-18",
+      category: "Innovation",
+      issueNumber: "Vol. 2026, Issue 2",
+      excerpt: "Special issue focused on innovation projects and labs.",
+      content: "A special edition featuring startup ideas, innovation day, and student-led product demos.",
+      coverImage: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200",
+      pdfLink: "",
+      views: 280,
+      isPublished: true
+    }
+  ],
   notices: [
     {
       id: "notice-1",

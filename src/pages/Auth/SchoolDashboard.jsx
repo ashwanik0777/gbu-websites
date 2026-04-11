@@ -13,6 +13,7 @@ import {
   Lock,
   Plus,
   Trash2,
+  Pencil,
 } from "lucide-react";
 import {
   DEFAULT_SCHOOL_DASHBOARD_DATA,
@@ -30,6 +31,7 @@ const ACTIVE_TABS = [
   { id: "faculty-management", label: "Faculty Management", icon: Users },
   { id: "events", label: "Events", icon: CalendarDays },
   { id: "news", label: "News", icon: Newspaper },
+  { id: "newsletters", label: "Newsletters", icon: Newspaper },
   { id: "notices", label: "Notices", icon: Bell },
   { id: "event-gallery", label: "Event Gallery", icon: Images },
 ];
@@ -71,6 +73,7 @@ const getInitialSchoolData = () => {
       events: ensureArray(parsed.events, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.events || [])),
       news: ensureArray(parsed.news, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.news || [])),
       notices: ensureArray(parsed.notices, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.notices || [])),
+      newsletters: ensureArray(parsed.newsletters, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.newsletters || [])),
       eventGallery: ensureArray(parsed.eventGallery, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.eventGallery || [])),
       tabContent: {
         ...deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.tabContent),
@@ -118,10 +121,13 @@ const SchoolDashboard = () => {
   const [data, setData] = useState(getInitialSchoolData);
   const [activeTab, setActiveTab] = useState("home");
   const [message, setMessage] = useState("");
+  const [facultyRefreshKey, setFacultyRefreshKey] = useState(0);
+  const [collectionEditors, setCollectionEditors] = useState({});
+  const [facultyEditor, setFacultyEditor] = useState({ index: null, form: null });
 
   const facultyProfiles = useMemo(
     () => getFacultyProfilesBySchool(data.schoolName),
-    [data.schoolName, data]
+    [data.schoolName, facultyRefreshKey]
   );
 
   const summary = useMemo(
@@ -129,9 +135,10 @@ const SchoolDashboard = () => {
       { label: "Faculty", value: facultyProfiles.length },
       { label: "Events", value: data.events?.length || 0 },
       { label: "News", value: data.news?.length || 0 },
+      { label: "Newsletters", value: data.newsletters?.length || 0 },
       { label: "Notices", value: data.notices?.length || 0 },
     ],
-    [facultyProfiles.length, data.events, data.news, data.notices]
+    [facultyProfiles.length, data.events, data.news, data.newsletters, data.notices]
   );
 
   const updateField = (key, value) => {
@@ -153,31 +160,6 @@ const SchoolDashboard = () => {
     setMessage("");
   };
 
-  const updateArrayItem = (listKey, index, field, value) => {
-    setData((prev) => {
-      const next = [...(prev[listKey] || [])];
-      next[index] = { ...next[index], [field]: value };
-      return { ...prev, [listKey]: next };
-    });
-    setMessage("");
-  };
-
-  const removeArrayItem = (listKey, index) => {
-    setData((prev) => ({
-      ...prev,
-      [listKey]: (prev[listKey] || []).filter((_, i) => i !== index),
-    }));
-    setMessage("");
-  };
-
-  const addArrayItem = (listKey, item) => {
-    setData((prev) => ({
-      ...prev,
-      [listKey]: [...(prev[listKey] || []), item],
-    }));
-    setMessage("");
-  };
-
   const saveAll = () => {
     localStorage.setItem(SCHOOL_DASHBOARD_STORAGE_KEY, JSON.stringify(data));
     setMessage("School dashboard updated successfully.");
@@ -192,7 +174,107 @@ const SchoolDashboard = () => {
   const saveFacultyProfile = (faculty) => {
     if (!faculty?.id) return;
     localStorage.setItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${faculty.id}`, JSON.stringify(faculty));
+    setFacultyRefreshKey((prev) => prev + 1);
     setMessage(`Faculty profile updated: ${faculty.name}`);
+  };
+
+  const deleteFacultyProfile = (facultyId) => {
+    if (!facultyId) return;
+    localStorage.removeItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${facultyId}`);
+    setFacultyRefreshKey((prev) => prev + 1);
+    setFacultyEditor({ index: null, form: null });
+    setMessage("Faculty profile deleted.");
+  };
+
+  const addFacultyProfile = () => {
+    setFacultyEditor({
+      index: null,
+      form: {
+        id: `faculty-${Date.now()}`,
+        name: "",
+        designation: "",
+        department: "",
+        school: data.schoolName || "",
+        email: "",
+        phone: "",
+      },
+    });
+  };
+
+  const normalizeFieldInput = (field, value) => {
+    if (field.type === "number") return Number(value || 0);
+    if (field.type === "boolean") return value === true || value === "true";
+    return value;
+  };
+
+  const openCollectionAdd = (listKey, template) => {
+    setCollectionEditors((prev) => ({
+      ...prev,
+      [listKey]: { index: null, form: { ...template, id: `${listKey}-${Date.now()}` } },
+    }));
+  };
+
+  const openCollectionEdit = (listKey, index, item) => {
+    setCollectionEditors((prev) => ({
+      ...prev,
+      [listKey]: { index, form: { ...item } },
+    }));
+  };
+
+  const updateCollectionFormField = (listKey, field, value) => {
+    setCollectionEditors((prev) => ({
+      ...prev,
+      [listKey]: {
+        ...(prev[listKey] || { index: null, form: {} }),
+        form: {
+          ...((prev[listKey] && prev[listKey].form) || {}),
+          [field.key]: normalizeFieldInput(field, value),
+        },
+      },
+    }));
+  };
+
+  const cancelCollectionEdit = (listKey) => {
+    setCollectionEditors((prev) => ({
+      ...prev,
+      [listKey]: { index: null, form: null },
+    }));
+  };
+
+  const saveCollectionForm = (listKey) => {
+    const editor = collectionEditors[listKey];
+    if (!editor?.form) return;
+
+    setData((prev) => {
+      const next = [...(prev[listKey] || [])];
+      if (editor.index === null || editor.index === undefined) {
+        next.push(editor.form);
+      } else {
+        next[editor.index] = editor.form;
+      }
+      return { ...prev, [listKey]: next };
+    });
+
+    setCollectionEditors((prev) => ({
+      ...prev,
+      [listKey]: { index: null, form: null },
+    }));
+    setMessage(`${listKey} item saved.`);
+  };
+
+  const deleteCollectionItem = (listKey, index) => {
+    setData((prev) => ({
+      ...prev,
+      [listKey]: (prev[listKey] || []).filter((_, i) => i !== index),
+    }));
+
+    setCollectionEditors((prev) => {
+      const current = prev[listKey] || { index: null, form: null };
+      if (current.index === index) return { ...prev, [listKey]: { index: null, form: null } };
+      return prev;
+    });
+
+    setMessage(`${listKey} item deleted.`);
   };
 
   const renderCollectionEditor = (listKey, title, fields, newItemTemplate) => (
@@ -201,49 +283,212 @@ const SchoolDashboard = () => {
         <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
         <button
           type="button"
-          onClick={() => addArrayItem(listKey, { ...newItemTemplate, id: `${listKey}-${Date.now()}` })}
+          onClick={() => openCollectionAdd(listKey, newItemTemplate)}
           className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
         >
           <Plus className="h-3.5 w-3.5" /> Add New
         </button>
       </div>
 
-      <div className="space-y-3">
-        {(data[listKey] || []).map((item, index) => (
-          <div key={`${listKey}-${item.id || index}`} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Item {index + 1}</p>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
+          {(data[listKey] || []).map((item, index) => {
+            const primaryValue = item.title || item.name || item.id || `Item ${index + 1}`;
+            return (
+              <div key={`${listKey}-${item.id || index}`} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900">{primaryValue}</p>
+                    <p className="text-xs text-slate-500">Item {index + 1}</p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => openCollectionEdit(listKey, index, item)}
+                      className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                    >
+                      <Pencil className="h-3.5 w-3.5" /> Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteCollectionItem(listKey, index)}
+                      className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+          {(data[listKey] || []).length === 0 && (
+            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+              No items yet. Click Add New to create one.
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          {collectionEditors[listKey]?.form ? (
+            <>
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-800">
+                  {collectionEditors[listKey].index === null ? "Add New Item" : "Edit Item"}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => cancelCollectionEdit(listKey)}
+                  className="text-xs font-medium text-slate-500 hover:text-slate-700"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div className="max-h-[440px] space-y-3 overflow-y-auto pr-1">
+                {fields.map((field) => (
+                  <Field key={`${listKey}-${field.key}`} label={field.label}>
+                    {field.type === "textarea" ? (
+                      <textarea
+                        className={`${inputClass} min-h-20`}
+                        value={collectionEditors[listKey].form[field.key] || ""}
+                        onChange={(e) => updateCollectionFormField(listKey, field, e.target.value)}
+                      />
+                    ) : field.type === "boolean" ? (
+                      <select
+                        className={inputClass}
+                        value={String(collectionEditors[listKey].form[field.key] ?? false)}
+                        onChange={(e) => updateCollectionFormField(listKey, field, e.target.value)}
+                      >
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                      </select>
+                    ) : (
+                      <input
+                        className={inputClass}
+                        type={field.type || "text"}
+                        value={collectionEditors[listKey].form[field.key] || ""}
+                        onChange={(e) => updateCollectionFormField(listKey, field, e.target.value)}
+                      />
+                    )}
+                  </Field>
+                ))}
+              </div>
+
               <button
                 type="button"
-                onClick={() => removeArrayItem(listKey, index)}
-                className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                onClick={() => saveCollectionForm(listKey)}
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
               >
-                <Trash2 className="h-3.5 w-3.5" /> Remove
+                Save Item
               </button>
+            </>
+          ) : (
+            <div className="flex h-full min-h-[180px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
+              Select an item to edit, or click Add New.
             </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
-            <div className="grid gap-3 md:grid-cols-2">
-              {fields.map((field) => (
-                <Field key={`${listKey}-${index}-${field.key}`} label={field.label}>
-                  {field.type === "textarea" ? (
-                    <textarea
-                      className={`${inputClass} min-h-20`}
-                      value={item[field.key] || ""}
-                      onChange={(e) => updateArrayItem(listKey, index, field.key, e.target.value)}
-                    />
-                  ) : (
-                    <input
-                      className={inputClass}
-                      type={field.type || "text"}
-                      value={item[field.key] || ""}
-                      onChange={(e) => updateArrayItem(listKey, index, field.key, e.target.value)}
-                    />
-                  )}
-                </Field>
-              ))}
+  const renderFacultyEditor = () => (
+    <div className={cardClass}>
+      <div className="mb-3 flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">Faculty Management</h2>
+          <p className="text-sm text-slate-600">Compact single form with add, edit and delete actions.</p>
+        </div>
+        <button
+          type="button"
+          onClick={addFacultyProfile}
+          className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+        >
+          <Plus className="h-3.5 w-3.5" /> Add New
+        </button>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
+          {facultyProfiles.map((faculty, index) => (
+            <div key={faculty.id || index} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-slate-900">{faculty.name || "Untitled Faculty"}</p>
+                  <p className="text-xs text-slate-500">{faculty.designation || "No designation"}</p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setFacultyEditor({ index, form: { ...faculty } })}
+                    className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                  >
+                    <Pencil className="h-3.5 w-3.5" /> Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteFacultyProfile(faculty.id)}
+                    className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" /> Delete
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+
+          {facultyProfiles.length === 0 && (
+            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+              No faculty found. Click Add New to create one.
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          {facultyEditor.form ? (
+            <>
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-800">
+                  {facultyEditor.index === null ? "Add Faculty" : "Edit Faculty"}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setFacultyEditor({ index: null, form: null })}
+                  className="text-xs font-medium text-slate-500 hover:text-slate-700"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <Field label="Name"><input className={inputClass} value={facultyEditor.form.name || ""} onChange={(e) => setFacultyEditor((prev) => ({ ...prev, form: { ...prev.form, name: e.target.value } }))} /></Field>
+                <Field label="Designation"><input className={inputClass} value={facultyEditor.form.designation || ""} onChange={(e) => setFacultyEditor((prev) => ({ ...prev, form: { ...prev.form, designation: e.target.value } }))} /></Field>
+                <Field label="Department"><input className={inputClass} value={facultyEditor.form.department || ""} onChange={(e) => setFacultyEditor((prev) => ({ ...prev, form: { ...prev.form, department: e.target.value } }))} /></Field>
+                <Field label="School"><input className={inputClass} value={facultyEditor.form.school || ""} onChange={(e) => setFacultyEditor((prev) => ({ ...prev, form: { ...prev.form, school: e.target.value } }))} /></Field>
+                <Field label="Email"><input className={inputClass} value={facultyEditor.form.email || ""} onChange={(e) => setFacultyEditor((prev) => ({ ...prev, form: { ...prev.form, email: e.target.value } }))} /></Field>
+                <Field label="Phone"><input className={inputClass} value={facultyEditor.form.phone || ""} onChange={(e) => setFacultyEditor((prev) => ({ ...prev, form: { ...prev.form, phone: e.target.value } }))} /></Field>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  saveFacultyProfile(facultyEditor.form);
+                  setFacultyEditor({ index: null, form: null });
+                }}
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              >
+                Save Faculty
+              </button>
+            </>
+          ) : (
+            <div className="flex h-full min-h-[180px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
+              Select a faculty to edit, or click Add New.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -283,34 +528,7 @@ const SchoolDashboard = () => {
       );
     }
 
-    if (activeTab === "faculty-management") {
-      return (
-        <div className={cardClass}>
-          <h2 className="mb-3 text-lg font-semibold text-slate-900">Faculty Management</h2>
-          <p className="mb-4 text-sm text-slate-600">
-            Faculty list auto-sync hoti hai jo profiles same school name ke saath saved hain.
-          </p>
-
-          <div className="space-y-4">
-            {facultyProfiles.map((faculty, index) => (
-              <div key={faculty.id || index} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <div className="grid gap-3 md:grid-cols-2">
-                  <Field label="Name"><input className={inputClass} value={faculty.name || ""} onChange={(e) => {
-                    const next = { ...faculty, name: e.target.value };
-                    saveFacultyProfile(next);
-                  }} /></Field>
-                  <Field label="Designation"><input className={inputClass} value={faculty.designation || ""} onChange={(e) => saveFacultyProfile({ ...faculty, designation: e.target.value })} /></Field>
-                  <Field label="Department"><input className={inputClass} value={faculty.department || ""} onChange={(e) => saveFacultyProfile({ ...faculty, department: e.target.value })} /></Field>
-                  <Field label="School"><input className={inputClass} value={faculty.school || ""} onChange={(e) => saveFacultyProfile({ ...faculty, school: e.target.value })} /></Field>
-                  <Field label="Email"><input className={inputClass} value={faculty.email || ""} onChange={(e) => saveFacultyProfile({ ...faculty, email: e.target.value })} /></Field>
-                  <Field label="Phone"><input className={inputClass} value={faculty.phone || ""} onChange={(e) => saveFacultyProfile({ ...faculty, phone: e.target.value })} /></Field>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
+    if (activeTab === "faculty-management") return renderFacultyEditor();
 
     if (activeTab === "events") {
       return renderCollectionEditor(
@@ -319,27 +537,43 @@ const SchoolDashboard = () => {
         [
           { key: "title", label: "Event Title" },
           { key: "date", label: "Date", type: "date" },
+          { key: "startsAt", label: "Starts At (ISO or date/time text)" },
+          { key: "endDate", label: "End Date", type: "date" },
+          { key: "endsAt", label: "Ends At (ISO or date/time text)" },
           { key: "time", label: "Time" },
           { key: "venue", label: "Venue" },
+          { key: "location", label: "Location" },
           { key: "organizer", label: "Organizer" },
           { key: "type", label: "Type" },
+          { key: "mode", label: "Mode (Offline/Online/Hybrid)" },
           { key: "attendees", label: "Attendees", type: "number" },
           { key: "price", label: "Price" },
           { key: "tags", label: "Tags (comma separated)" },
           { key: "image", label: "Image URL" },
+          { key: "coverImageUrl", label: "Cover Image URL" },
+          { key: "images", label: "Gallery Images (comma separated URLs)" },
+          { key: "registrationUrl", label: "Registration URL" },
           { key: "description", label: "Description", type: "textarea" },
         ],
         {
           title: "",
           date: "",
+          startsAt: "",
+          endDate: "",
+          endsAt: "",
           time: "",
           venue: "",
+          location: "",
           organizer: "",
           type: "",
+          mode: "Offline",
           attendees: 0,
           price: "Free",
           tags: "",
           image: "",
+          coverImageUrl: "",
+          images: "",
+          registrationUrl: "",
           description: "",
         }
       );
@@ -357,10 +591,13 @@ const SchoolDashboard = () => {
           { key: "department", label: "Department" },
           { key: "tags", label: "Tags (comma separated)" },
           { key: "priority", label: "Priority" },
-          { key: "featured", label: "Featured (true/false)" },
+          { key: "featured", label: "Featured", type: "boolean" },
           { key: "views", label: "Views", type: "number" },
           { key: "likes", label: "Likes", type: "number" },
           { key: "image", label: "Image URL" },
+          { key: "coverImageUrl", label: "Cover Image URL" },
+          { key: "pdfUrl", label: "PDF URL" },
+          { key: "link", label: "External Link" },
           { key: "excerpt", label: "Excerpt", type: "textarea" },
           { key: "content", label: "Content", type: "textarea" },
           { key: "status", label: "Status" },
@@ -377,9 +614,43 @@ const SchoolDashboard = () => {
           views: 0,
           likes: 0,
           image: "",
+          coverImageUrl: "",
+          pdfUrl: "",
+          link: "",
           excerpt: "",
           content: "",
           status: "draft",
+        }
+      );
+    }
+
+    if (activeTab === "newsletters") {
+      return renderCollectionEditor(
+        "newsletters",
+        "Newsletter Management",
+        [
+          { key: "title", label: "Title" },
+          { key: "date", label: "Date", type: "date" },
+          { key: "category", label: "Category" },
+          { key: "issueNumber", label: "Issue Number" },
+          { key: "views", label: "Views", type: "number" },
+          { key: "coverImage", label: "Cover Image URL" },
+          { key: "pdfLink", label: "PDF Link" },
+          { key: "excerpt", label: "Excerpt", type: "textarea" },
+          { key: "content", label: "Content", type: "textarea" },
+          { key: "isPublished", label: "Published", type: "boolean" },
+        ],
+        {
+          title: "",
+          date: "",
+          category: "School Update",
+          issueNumber: "",
+          views: 0,
+          coverImage: "",
+          pdfLink: "",
+          excerpt: "",
+          content: "",
+          isPublished: true,
         }
       );
     }
@@ -393,7 +664,7 @@ const SchoolDashboard = () => {
           { key: "date", label: "Date", type: "date" },
           { key: "type", label: "Type" },
           { key: "priority", label: "Priority" },
-          { key: "isNew", label: "New Badge (true/false)" },
+          { key: "isNew", label: "New Badge", type: "boolean" },
           { key: "views", label: "Views", type: "number" },
           { key: "pdfUrl", label: "PDF URL" },
           { key: "content", label: "Content", type: "textarea" },
@@ -419,8 +690,9 @@ const SchoolDashboard = () => {
         { key: "eventDate", label: "Event Date", type: "date" },
         { key: "category", label: "Category" },
         { key: "imageUrl", label: "Image URL" },
+        { key: "images", label: "Additional Images (comma separated URLs)" },
       ],
-      { title: "", eventDate: "", category: "Events", imageUrl: "" }
+      { title: "", eventDate: "", category: "Events", imageUrl: "", images: "" }
     );
   };
 
@@ -491,7 +763,7 @@ const SchoolDashboard = () => {
             {message ? <p className="mt-3 text-sm font-medium text-emerald-700">{message}</p> : null}
           </section>
 
-          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {summary.map((item) => (
               <div key={item.label} className={cardClass}>
                 <p className="text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
