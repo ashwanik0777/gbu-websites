@@ -1,17 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Download,
   FileText,
   Calendar,
   Clock,
-  Filter,
-  Search,
-  X,
   ChevronDown,
-  Grid,
-  List,
   Eye,
   Share2,
   BookOpen,
@@ -24,6 +19,7 @@ import {
 } from "lucide-react";
 import BannerSection from "../../components/HeroBanner";
 import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
+import UnifiedAnnouncementFilter from "../../components/announcement/UnifiedAnnouncementFilter";
 
 // Enhanced Card components with modern styling
 const Card = ({ children, className = "", hover = true }) => (
@@ -296,137 +292,26 @@ const EnhancedSearchFilter = ({
   viewMode,
   onViewModeChange,
 }) => {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-
   return (
-    <div className="container bg-white/90 backdrop-blur-md shadow-2xl rounded-3xl mx-auto mt-5 relative z-10 p-4 border border-gray-200/50">
-      <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
-        {/* Search Bar */}
-        <div className="relative flex-1 max-w-2xl">
-          <Search
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={20}
-          />
-          <input
-            type="text"
-            placeholder="Search notices, announcements, circulars..."
-            className="w-full pl-12 pr-4 py-2 bg-gray-50/80 border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              onSearch(e.target.value);
-            }}
-          />
-          {searchTerm && (
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                onSearch("");
-              }}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <X size={20} />
-            </button>
-          )}
-        </div>
-
-        {/* Filter Controls */}
-        <div className="flex items-center gap-4">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="flex items-center gap-2 px-6 py-2 bg-indigo-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            <Filter size={18} />
-            Filters
-            <ChevronDown
-              className={`transform transition-transform duration-300 ${isFilterOpen ? "rotate-180" : ""}`}
-              size={16}
-            />
-          </motion.button>
-
-          {/* View Mode Toggle */}
-          <div className="flex items-center bg-gray-100 rounded-xl p-1">
-            <button
-              onClick={() => onViewModeChange("grid")}
-              className={`p-2 rounded-lg transition-all duration-300 ${viewMode === "grid" ? "bg-white shadow-md text-blue-600" : "text-gray-500"}`}
-            >
-              <Grid size={18} />
-            </button>
-            <button
-              onClick={() => onViewModeChange("list")}
-              className={`p-2 rounded-lg transition-all duration-300 ${viewMode === "list" ? "bg-white shadow-md text-blue-600" : "text-gray-500"}`}
-            >
-              <List size={18} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Filter Panel */}
-      <AnimatePresence>
-        {isFilterOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-6 pt-6 border-t border-gray-200"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Type Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Category
-                </label>
-                <select
-                  value={selectedType}
-                  onChange={(e) => onTypeFilter(e.target.value)}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400"
-                >
-                  <option value="all">All Categories</option>
-                  {types.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Year Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Year
-                </label>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => onYearFilter(e.target.value)}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400"
-                >
-                  <option value="all">All Years</option>
-                  {years.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Date Range Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Date Range
-                </label>
-                <input
-                  type="date"
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400"
-                  onChange={(e) => onDateFilter(new Date(e.target.value), null)}
-                />
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="container mx-auto mt-5 px-4">
+      <UnifiedAnnouncementFilter
+        onSearch={onSearch}
+        onDateFilter={onDateFilter}
+        categories={types}
+        selectedCategories={selectedType !== "all" ? [selectedType] : []}
+        onCategoryToggle={(category) =>
+          onTypeFilter(selectedType === category ? "all" : category)
+        }
+        onTypeChange={onTypeFilter}
+        selectedType={selectedType}
+        years={years}
+        selectedYear={selectedYear}
+        onYearChange={onYearFilter}
+        viewMode={viewMode}
+        onViewModeChange={onViewModeChange}
+        totalResults={undefined}
+        searchPlaceholder="Search notices, announcements, circulars..."
+      />
     </div>
   );
 };
@@ -929,21 +814,6 @@ const allYears = Array.from(
                 {filteredAndSortedNews.length} Notice
                 {filteredAndSortedNews.length !== 1 ? "s" : ""} Found
               </h2>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  setSelectedType("all");
-                  setSelectedYear("all");
-                  setSearchQuery("");
-                  setStartDate(null);
-                  setEndDate(null);
-                  setCurrentPage(1);
-                }}
-                icon={<X size={16} />}
-              >
-                Clear Filters
-              </Button>
             </div>
 
             <div className="text-sm text-gray-500">

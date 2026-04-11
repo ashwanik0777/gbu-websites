@@ -3,10 +3,6 @@ import {
   ChevronLeft, 
   ChevronRight, 
   X, 
-  Search, 
-  Filter, 
-  Grid, 
-  List,
   Calendar,
   Eye,
   MoreHorizontal,
@@ -15,6 +11,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import BannerSection from '../../components/HeroBanner';
 import { getSchoolAnnouncements } from '../../utils/schoolAnnouncements';
+import UnifiedAnnouncementFilter from '../../components/announcement/UnifiedAnnouncementFilter';
 
 // === Professional Card Components ===
 const Card = ({ children, className = '', onClick }) => (
@@ -270,137 +267,24 @@ const ProfessionalSearchFilter = ({
   viewMode = 'grid',
   onViewModeChange 
 }) => {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm mb-8">
-      {/* Main Search and View Toggle Row */}
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between mb-4">
-        {/* Search Bar */}
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-          <input
-            type="text"
-            placeholder="Search media gallery..."
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              onSearch(e.target.value);
-            }}
-          />
-          {searchTerm && (
-            <button
-              type="button"
-              onClick={() => {
-                setSearchTerm('');
-                onSearch('');
-              }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <X size={20} />
-            </button>
-          )}
-        </div>
-
-        {/* Filter and View Controls */}
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="flex items-center gap-2"
-          >
-            <Filter size={16} />
-            Filters
-            <ChevronDown className={`transform transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} size={14} />
-          </Button>
-
-          {/* View Mode Toggle */}
-          <div className="flex items-center border border-gray-300 rounded-lg p-1">
-            <button
-              type="button"
-              onClick={() => onViewModeChange && onViewModeChange('grid')}
-              className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              <Grid size={16} />
-            </button>
-            <button
-              type="button"
-              onClick={() => onViewModeChange && onViewModeChange('list')}
-              className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              <List size={16} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Filter Panel */}
-      <AnimatePresence>
-  {isFilterOpen && (
-    <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 'auto' }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{
-        opacity: { duration: 0.2, ease: 'easeOut' },
-        height: { duration: 0.3, ease: 'easeOut' },
-      }}
-      className="border-t border-gray-200 pt-4 overflow-hidden"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Category Filter */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-          <select
-            value={selectedType}
-            onChange={(e) => onTypeFilter(e.target.value)}
-            className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Categories</option>
-            {types.map(type => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Year Filter */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
-          <select
-            value={selectedYear}
-            onChange={(e) => onYearFilter(e.target.value)}
-            className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Years</option>
-            {years.map(year => (
-              <option key={year} value={year}>{year}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Reset Filters */}
-        <div className="flex items-end">
-          <Button
-            variant="ghost"
-            onClick={() => {
-              onTypeFilter('all');
-              onYearFilter('all');
-              setSearchTerm('');
-              onSearch('');
-            }}
-            className="w-full"
-          >
-            Reset Filters
-          </Button>
-        </div>
-      </div>
-    </motion.div>
-  )}
-</AnimatePresence>
-
-    </div>
+    <UnifiedAnnouncementFilter
+      onSearch={onSearch}
+      categories={types}
+      selectedCategories={selectedType !== 'all' ? [selectedType] : []}
+      onCategoryToggle={(category) =>
+        onTypeFilter(selectedType === category ? 'all' : category)
+      }
+      onTypeChange={onTypeFilter}
+      selectedType={selectedType}
+      years={years}
+      selectedYear={selectedYear}
+      onYearChange={onYearFilter}
+      viewMode={viewMode}
+      onViewModeChange={onViewModeChange}
+      showDate={false}
+      searchPlaceholder="Search media gallery..."
+    />
   );
 };
 
@@ -784,20 +668,6 @@ const MediaGallery = () => {
                 Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, filteredMedia.length)} of {filteredMedia.length} results
               </p>
             </div>
-            
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSelectedCategory('all');
-                setSelectedYear('all');
-                setSearchQuery('');
-                setCurrentPage(1);
-              }}
-              className="flex items-center gap-2"
-            >
-              <X size={16} />
-              Clear All Filters
-            </Button>
           </div>
         )}
 

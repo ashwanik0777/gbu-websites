@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Download, FileText, Calendar, Eye, Share2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
@@ -6,6 +6,7 @@ import Pagination from '../../components/announcement/Pagination';
 import BannerSection from '../../components/HeroBanner';
 import StatsCard from '../../components/StatsCard';
 import { getSchoolAnnouncements } from '../../utils/schoolAnnouncements';
+import UnifiedAnnouncementFilter from '../../components/announcement/UnifiedAnnouncementFilter';
 
 // === Modern Card Components ===
 const Card = ({ children, className = "" }) => (
@@ -77,6 +78,9 @@ const Badge = ({ children, variant = "default", className = "" }) => {
 const NewsLetter = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [mockNewsletters, setMockNewsletters] = useState(() => getSchoolAnnouncements().newsletters);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedYear, setSelectedYear] = useState("all");
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 6;
 
@@ -96,9 +100,41 @@ const NewsLetter = () => {
     };
   }, []);
 
+  const allCategories = useMemo(
+    () => Array.from(new Set(mockNewsletters.map((n) => n.category))).filter(Boolean),
+    [mockNewsletters],
+  );
+  const allYears = useMemo(
+    () => Array.from(new Set(mockNewsletters.map((n) => new Date(n.date).getFullYear().toString()))),
+    [mockNewsletters],
+  );
+
+  const filteredNewsletters = useMemo(() => {
+    return mockNewsletters.filter((newsletter) => {
+      const query = searchQuery.toLowerCase();
+      const matchesSearch =
+        !searchQuery ||
+        newsletter.title.toLowerCase().includes(query) ||
+        newsletter.excerpt.toLowerCase().includes(query) ||
+        newsletter.category.toLowerCase().includes(query);
+
+      const matchesCategory =
+        selectedCategory === "all" || newsletter.category === selectedCategory;
+      const matchesYear =
+        selectedYear === "all" ||
+        new Date(newsletter.date).getFullYear().toString() === selectedYear;
+
+      return matchesSearch && matchesCategory && matchesYear;
+    });
+  }, [mockNewsletters, searchQuery, selectedCategory, selectedYear]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, selectedYear]);
+
   // Safe calculations (prevents crashes when array is empty)
-  const totalPages = Math.ceil(mockNewsletters.length / itemsPerPage) || 1;
-  const currentNewsletters = mockNewsletters.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(filteredNewsletters.length / itemsPerPage) || 1;
+  const currentNewsletters = filteredNewsletters.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const latestId = mockNewsletters.length > 0 ? mockNewsletters[0].id : null;
 
   // Dynamic values for StatsCard
@@ -150,6 +186,24 @@ const NewsLetter = () => {
           </div>
         </div>
 
+        <UnifiedAnnouncementFilter
+          onSearch={setSearchQuery}
+          categories={allCategories}
+          selectedCategories={selectedCategory !== "all" ? [selectedCategory] : []}
+          onCategoryToggle={(category) =>
+            setSelectedCategory(selectedCategory === category ? "all" : category)
+          }
+          onTypeChange={setSelectedCategory}
+          selectedType={selectedCategory}
+          years={allYears}
+          selectedYear={selectedYear}
+          onYearChange={setSelectedYear}
+          showDate={false}
+          showViewMode={false}
+          totalResults={filteredNewsletters.length}
+          searchPlaceholder="Search newsletters by title, excerpt, or category..."
+        />
+
         {/* Loading State or Newsletter Grid */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
@@ -159,6 +213,11 @@ const NewsLetter = () => {
           <div className="text-center py-20 text-gray-500">
             <FileText size={48} className="mx-auto mb-4 opacity-50" />
             <p className="text-lg">No newsletters found.</p>
+          </div>
+        ) : filteredNewsletters.length === 0 ? (
+          <div className="text-center py-20 text-gray-500">
+            <FileText size={48} className="mx-auto mb-4 opacity-50" />
+            <p className="text-lg">No newsletters match current filters.</p>
           </div>
         ) : (
           <>

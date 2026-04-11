@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   Calendar,
@@ -12,11 +11,10 @@ import {
   Star,
   ChevronLeft,
   ChevronRight,
-  X,
-  SlidersHorizontal,
 } from "lucide-react";
 import BannerSection from "../../components/HeroBanner";
 import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
+import UnifiedAnnouncementFilter from "../../components/announcement/UnifiedAnnouncementFilter";
 
 // Complete Events Data
 // const eventsData = [
@@ -485,16 +483,12 @@ const ModernSearchFilters = ({
   onYearFilter,
   types,
   years,
-  activeFilters = [],
-  onClearFilter,
-  onClearAllFilters,
 }) => {
   const [search, setSearch] = useState("");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [selectedType, setSelectedType] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const handleSearch = (value) => {
     setSearch(value);
@@ -517,221 +511,27 @@ const ModernSearchFilters = ({
     onYearFilter(year);
   };
 
-  const quickDatePresets = [
-    { label: "Today", days: 0 },
-    { label: "This Week", days: 7 },
-    { label: "This Month", days: 30 },
-    { label: "Next 3 Months", days: 90 },
-  ];
-
-  const clearAllFilters = () => {
-    setSearch("");
-    setStartDate(null);
-    setEndDate(null);
-    setSelectedType("");
-    setSelectedYear("");
-    onClearAllFilters();
-  };
-
   return (
-    <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl  overflow-hidden">
-      {/* Modern Search Header */}
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-              <Search className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">
-                Search & Filter Events
-              </h3>
-              <p className="text-sm text-gray-600">Find your perfect event</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 bg-white/80 hover:bg-white rounded-xl 
-                     shadow-sm border border-gray-200 transition-all duration-200"
-          >
-            <SlidersHorizontal className="w-4 h-4 text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">
-              {showFilters ? "Hide Filters" : "Show Filters"}
-            </span>
-          </button>
-        </div>
-
-        {/* Modern Search Bar */}
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search events, organizers, locations, or topics..."
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white/90 border border-gray-100 rounded-2xl 
-                     focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none
-                     text-gray-900 placeholder-gray-500 text-lg font-medium
-                     backdrop-blur-sm transition-all duration-300
-                     shadow-lg hover:shadow-xl"
-          />
-        </div>
-      </div>
-
-      {/* Advanced Filters Panel */}
-      {showFilters && (
-        <div className="p-6 space-y-6">
-          {/* Date Range Filter */}
-          <div className=" rounded-2xl p-5 border border-blue-200/30">
-            <div className="flex items-center gap-2 mb-4">
-              <Calendar className="w-5 h-5 text-blue-600" />
-              <h4 className="text-lg font-semibold text-gray-900">
-                Date Range Filter
-              </h4>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  From Date
-                </label>
-                <DatePicker
-                  selected={startDate}
-                  onChange={(date) => handleDateRange(date, endDate)}
-                  selectsStart
-                  startDate={startDate}
-                  endDate={endDate}
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 
-                           focus:ring-2 focus:ring-blue-500/20 outline-none bg-white/90"
-                  placeholderText="Select start date"
-                  dateFormat="dd/MM/yyyy"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  To Date
-                </label>
-                <DatePicker
-                  selected={endDate}
-                  onChange={(date) => handleDateRange(startDate, date)}
-                  selectsEnd
-                  startDate={startDate}
-                  endDate={endDate}
-                  minDate={startDate}
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 
-                           focus:ring-2 focus:ring-blue-500/20 outline-none bg-white/90"
-                  placeholderText="Select end date"
-                  dateFormat="dd/MM/yyyy"
-                />
-              </div>
-            </div>
-
-            {/* Quick Date Presets */}
-            <div className="flex flex-wrap gap-2">
-              {quickDatePresets.map((preset) => (
-                <button
-                  key={preset.label}
-                  onClick={() => {
-                    const today = new Date();
-                    const futureDate = new Date(
-                      today.getTime() + preset.days * 24 * 60 * 60 * 1000,
-                    );
-                    handleDateRange(today, futureDate);
-                  }}
-                  className="px-4 py-2 bg-white/80 hover:bg-blue-100 text-blue-700 text-sm font-medium 
-                           rounded-full border border-blue-200 transition-all duration-200 
-                           hover:shadow-md hover:scale-105"
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Category & Year Filters */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className=" rounded-xl p-4 border border-purple-200/30">
-              <label className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <Filter className="w-4 h-4 text-purple-600" />
-                Event Type
-              </label>
-              <select
-                value={selectedType}
-                onChange={(e) => handleTypeChange(e.target.value)}
-                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 
-                         focus:ring-2 focus:ring-purple-500/20 outline-none bg-white/90"
-              >
-                <option value="">All Types</option>
-                {types.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className=" rounded-xl p-4 border border-indigo-200/30">
-              <label className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-indigo-600" />
-                Year
-              </label>
-              <select
-                value={selectedYear}
-                onChange={(e) => handleYearChange(e.target.value)}
-                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 
-                         focus:ring-2 focus:ring-indigo-500/20 outline-none bg-white/90"
-              >
-                <option value="">All Years</option>
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Active Filters Display */}
-      {activeFilters.length > 0 && (
-        <div className="bg-gray-50/80 px-6 py-4 border-t border-gray-100">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-              <Filter className="w-4 h-4" />
-              Active Filters ({activeFilters.length})
-            </span>
-            <button
-              onClick={clearAllFilters}
-              className="text-red-600 hover:text-red-700 text-sm font-medium 
-                       hover:bg-red-50 px-3 py-1 rounded-lg transition-all duration-200"
-            >
-              Clear All
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {activeFilters.map((filter) => (
-              <span
-                key={filter.key}
-                className="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-800 text-sm 
-                         font-medium rounded-xl border border-blue-200 shadow-sm
-                         hover:bg-blue-200 transition-all duration-200"
-              >
-                {filter.label}
-                <button
-                  onClick={() => onClearFilter(filter.key)}
-                  className="ml-2 text-blue-600 hover:text-blue-800 hover:bg-blue-200 
-                           rounded-full p-1 transition-all duration-200"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+    <UnifiedAnnouncementFilter
+      onSearch={handleSearch}
+      onDateFilter={handleDateRange}
+      categories={types}
+      selectedCategories={selectedType ? [selectedType] : []}
+      onCategoryToggle={(category) =>
+        handleTypeChange(selectedType === category ? "" : category)
+      }
+      onTypeChange={handleTypeChange}
+      selectedType={selectedType}
+      years={years}
+      selectedYear={selectedYear}
+      onYearChange={handleYearChange}
+      allTypeValue=""
+      allYearValue=""
+      showViewMode={false}
+      totalResults={undefined}
+      searchPlaceholder="Search events, organizers, locations, or topics..."
+      showDate
+    />
   );
 };
 
@@ -949,24 +749,6 @@ const useEventFiltering = ({ events, itemsPerPage }) => {
   const handleTypeFilter = (type) => setSelectedType(type);
   const handleYearFilter = (year) => setSelectedYear(year);
 
-  const handleClearFilter = (filterKey) => {
-    switch (filterKey) {
-      case "search":
-        setSearchTerm("");
-        break;
-      case "dateRange":
-        setStartDate(null);
-        setEndDate(null);
-        break;
-      case "type":
-        setSelectedType("");
-        break;
-      case "year":
-        setSelectedYear("");
-        break;
-    }
-  };
-
   const handleClearAllFilters = () => {
     setSearchTerm("");
     setStartDate(null);
@@ -986,7 +768,6 @@ const useEventFiltering = ({ events, itemsPerPage }) => {
     handleDateRangeFilter,
     handleTypeFilter,
     handleYearFilter,
-    handleClearFilter,
     handleClearAllFilters,
   };
 };
@@ -1048,7 +829,6 @@ const EventsPage = () => {
     handleDateRangeFilter,
     handleTypeFilter,
     handleYearFilter,
-    handleClearFilter,
     handleClearAllFilters,
   } = useEventFiltering({ events: currentEvents, itemsPerPage });
 
@@ -1144,9 +924,6 @@ const EventsPage = () => {
             onYearFilter={handleYearFilter}
             types={allTypes}
             years={allYears}
-            activeFilters={activeFilters}
-            onClearFilter={handleClearFilter}
-            onClearAllFilters={handleClearAllFilters}
           />
         </div>
 
