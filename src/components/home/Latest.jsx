@@ -1,21 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import homeData from '../../Data/home.json';
+import { getSchoolAnnouncements } from '../../utils/schoolAnnouncements';
 
 export default function LatestUpdates() {
   const [isVisible, setIsVisible] = useState(false);
   const [data, setData] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  const mockData = [
-    { id: 1, content_text: 'Orientation Program for First-Year Students will commence from 10th July.', category: 'Latest News', priority: 'high', date: '2025-06-25', url: '#' },
-    { id: 2, content_text: 'Notice: University will remain closed on account of Diwali on 29th October.', category: 'Notice/Circulars', priority: 'medium', date: '2025-06-20', url: '#' },
-    { id: 3, content_text: 'Annual Tech Fest “TechZenith 2025” registrations are now open for all branches.', category: 'Upcoming Events', priority: 'high', date: '2025-06-22', url: '#' },
-    { id: 4, content_text: 'Guest Lecture on Artificial Intelligence by Dr. Rajeev Kumar, IIT Delhi.', category: 'Latest News', priority: 'medium', date: '2025-06-24', url: '#' },
-    { id: 5, content_text: 'Blood Donation Camp organized by NSS Unit at University Auditorium.', category: 'Upcoming Events', priority: 'high', date: '2025-06-21', url: '#' },
-    { id: 6, content_text: 'Library timing extended till 10 PM during the examination period.', category: 'Notice/Circulars', priority: 'low', date: '2025-06-18', url: '#' },
-    { id: 7, content_text: 'Annual Sports Meet 2025 – Registration for track events and games open till 5th July.', category: 'Upcoming Events', priority: 'medium', date: '2025-06-27', url: '#' },
-    { id: 8, content_text: 'MoU signed with IIT Delhi for collaborative research in Data Science.', category: 'Latest News', priority: 'high', date: '2025-06-26', url: '#' }
-  ];
+  const buildSchoolUpdates = () => {
+    const announcements = getSchoolAnnouncements();
+
+    const latestNews = (announcements.news || [])
+      .slice(0, 8)
+      .map((item) => ({
+        id: `news-${item.id}`,
+        content_text: item.title || 'News update',
+        category: 'Latest News',
+        priority: item.priority || 'medium',
+        date: item.date,
+        url: `/announcements/news-notifications/${item.id}`,
+      }));
+
+    const noticeItems = (announcements.notices || [])
+      .slice(0, 8)
+      .map((item) => ({
+        id: `notice-${item.id}`,
+        content_text: item.title || 'Notice update',
+        category: 'Notice/Circulars',
+        priority: item.priority || 'medium',
+        date: item.date,
+        url: `/announcements/notices/${item.id}`,
+      }));
+
+    const upcomingEvents = (announcements.events || [])
+      .filter((item) => item.isUpcoming)
+      .slice(0, 8)
+      .map((item) => ({
+        id: `event-${item.id}`,
+        content_text: item.title || 'Upcoming event',
+        category: 'Upcoming Events',
+        priority: item.priority || 'high',
+        date: item.date,
+        url: `/announcements/event-calendar/${item.id}`,
+      }));
+
+    return [...latestNews, ...noticeItems, ...upcomingEvents];
+  };
 
   const viewMoreUrls = {
     'Latest News': '/announcements/news-notifications',
@@ -25,11 +54,22 @@ export default function LatestUpdates() {
 
   useEffect(() => {
     setIsVisible(true);
-    const noticesFromJson = homeData?.sections?.news_and_events;
-    const notices = Array.isArray(noticesFromJson) && noticesFromJson.length ? noticesFromJson : mockData;
-    setData(notices);
-    const uniqueCategories = [...new Map(notices.map(item => [item.category.trim(), item])).values()];
-    setCategories(uniqueCategories);
+
+    const loadUpdates = () => {
+      const notices = buildSchoolUpdates();
+      setData(notices);
+      const uniqueCategories = [...new Map(notices.map(item => [item.category.trim(), item])).values()];
+      setCategories(uniqueCategories);
+    };
+
+    loadUpdates();
+    window.addEventListener('storage', loadUpdates);
+    window.addEventListener('focus', loadUpdates);
+
+    return () => {
+      window.removeEventListener('storage', loadUpdates);
+      window.removeEventListener('focus', loadUpdates);
+    };
   }, []);
 
   const getPriorityIndicator = (priority = 'low') => {
@@ -50,8 +90,6 @@ export default function LatestUpdates() {
   const NoticeCard = ({ item, index, category }) => (
     <a
       href={item.url}
-      target="_blank"
-      rel="noopener noreferrer"
       className={`group relative flex items-start gap-3 p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg border border-transparent hover:border-blue-100 ${isVisible ? 'animate-slide-in' : 'opacity-0 translate-y-4'}`}
       style={{ animationDelay: `${index * 150}ms` }}
     >
