@@ -1,5 +1,6 @@
 import { Calendar } from "lucide-react";
 import { useRef, useEffect } from "react";
+import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
 
 // Card Components
 const Card = ({ children, className = "", ...props }) => {
@@ -77,117 +78,7 @@ const NoticeEvents = () => {
 
     return () => clearInterval(intervalId);
   }, []);
-
-  const notices = [
-    {
-      title: "Back Paper Examination Date Sheet – Even Semester 2024–25",
-      date: "2025-05-16",
-      type: "Important",
-    },
-    {
-      title: "Notice for Aadhaar e‑kyc through UPDESCO",
-      date: "2025-06-03",
-      type: "Administrative",
-    },
-    {
-      title: "Tablet Distribution Program Scheduled",
-      date: "2025-05-24",
-      type: "General",
-    },
-    {
-      title: "Office Order for Hostel & Mess Exemption",
-      date: "2025-05-13",
-      type: "Administrative",
-    },
-    {
-      title: "Office Order for Hostel & Mess2 Exemption",
-      date: "2025-05-13",
-      type: "Administrative",
-    },
-    {
-      title: "PhD Thesis Submission Guidelines Update",
-      date: "2025-05-12",
-      type: "Academic",
-    },
-    {
-      title: "Summer Internship Opportunities 2025",
-      date: "2025-05-10",
-      type: "Placement",
-    },
-    {
-      title: "Library Working Hours Extended",
-      date: "2025-05-09",
-      type: "General",
-    },
-    {
-      title: "Research Grant Applications Open",
-      date: "2025-05-08",
-      type: "Research",
-    },
-    {
-      title: "Campus Recruitment Drive - TCS",
-      date: "2025-05-07",
-      type: "Placement",
-    },
-    {
-      title: "Student Council Elections Schedule",
-      date: "2025-05-06",
-      type: "Important",
-    },
-    {
-      title: "Student Council Elections Schedule",
-      date: "2025-05-06",
-      type: "Important",
-    },
-  ];
-
-  const events = [
-    {
-      title: "Online National Article Writing Competition (GST)",
-      date: "2025-06-30",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTK2NnCSPRdgMAEkEafMhZojs0fdgEv6hFY0A&s",
-      description: "Organized by School of Law, extended submission date.",
-    },
-    {
-      title: "Six‑Day Residential Vipassana Program",
-      date: "2025-06-09",
-      image:
-        "https://data.gbu.ac.in/Events/1714148988_FIVE%20DAY%20VIPASSANA%20COURSE%20FEB2024_page-0001.jpg",
-      description: "Well‑being retreat by School of Buddhist Studies.",
-    },
-    {
-      title: "World Environment Day Report",
-      date: "2025-06-05",
-      image:
-        "https://images.timesnownews.com/thumb/msid-151788925,thumbsize-1151391,width-1280,height-720,resizemode-75/151788925.jpg",
-      description:
-        "Activities report by Department of Environmental Science.",
-    },
-    {
-      title: "SOBSC Vesak Day Celebrations",
-      date: "2025-05-03",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCwXCDOopXvx7WxXSEcJJJ86SzCi_HjeITTQ&s",
-      description:
-        "Celebration at School of Buddhist Studies & Civilization.",
-    },
-    {
-      title: "ICSSR‑Sponsored AI Research Methodology Course",
-      date: "2024-12-03",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvQud5sjoe92WQkeO2ddUOccbSRysoFo6K5GvgRZzSeMy1a2DsromFso3Hp7ctE8W-e94&usqp=CAU",
-      description:
-        "10‑day course on integrating AI in research, sponsored by ICSSR.",
-    },
-    {
-      title: "Digital India Talk Show",
-      date: "2024-11-20",
-      image: "https://negd.gov.in/wp-content/uploads/2025/01/gatishakti.jpeg",
-      description:
-        "Awareness session on e‑governance chaired by VC Prof. R.K. Sinha.",
-    },
-  ];
+  const { notices, events } = getSchoolAnnouncements();
 
   return (
     <section className="py-20 bg-gray-100">

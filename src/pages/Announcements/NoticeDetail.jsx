@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Download } from 'lucide-react';
 import SocialShare from '../../components/announcement/SocialShare';
 import { useState, useMemo, useEffect } from "react";
+import { getSchoolAnnouncements } from '../../utils/schoolAnnouncements';
 // Button component
 const Button = ({ children, variant = "default", size = "md", className = "", ...props }) => {
   const base =
@@ -131,30 +132,21 @@ function format(date, formatStr) {
 
 const NoticeDetail = () => {
   const { id } = useParams();
-  const [mockNotices, setMockNotices] = useState([]);
-  const notice = mockNotices.find(item => item.id === Number(id));
+  const [mockNotices, setMockNotices] = useState(() => getSchoolAnnouncements().notices);
+  const notice = mockNotices.find((item) => String(item.id) === String(id));
   
   useEffect(() => {
-  // Backticks (`) ka use for ID
-  fetch(`http://localhost:3000/api/v1/notices/${id}`)
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.success) {
-        const notice = data.data; // Single object
-        
-        const formattedSingleNotice = {
-          ...notice,
-          date: notice.published_date,
-          isNew: notice.is_new,
-          pdfUrl: notice.pdf_url
-        };
+    const loadNotices = () => setMockNotices(getSchoolAnnouncements().notices);
 
-        // Ye aapki detail page ki state hogi
-        setMockNotices([formattedSingleNotice]); 
-      }
-    })
-    .catch((err) => console.log("Error fetching single notice:", err));
-}, [id]);
+    loadNotices();
+    window.addEventListener("storage", loadNotices);
+    window.addEventListener("focus", loadNotices);
+
+    return () => {
+      window.removeEventListener("storage", loadNotices);
+      window.removeEventListener("focus", loadNotices);
+    };
+  }, []);
 
   if (!notice) {
     return (
@@ -197,6 +189,7 @@ const NoticeDetail = () => {
         </Badge>
 
         <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-800">{notice.title}</h1>
+        <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600 mb-2">{notice.schoolName}</p>
         <p className="text-gray-500 mb-6">Published on {format(notice.date, 'MMMM dd, yyyy')}</p>
 
         <div className="prose max-w-none mb-6">

@@ -3,6 +3,7 @@ import Header from '../../components/announcement/Header';
 import SocialShare from '../../components/announcement/SocialShare';
 import { ArrowLeft, ArrowRight, Calendar, User } from 'lucide-react';
 import { useState, useMemo, useEffect } from "react";
+import { getSchoolAnnouncements } from '../../utils/schoolAnnouncements';
 // Button component
 const Button = ({
   children,
@@ -211,36 +212,23 @@ function format(date, formatStr) {
 const NewsDetail = () => {
    const { id } = useParams();
 
-   const [mockNews, setMockNews] = useState([]);
+  const [mockNews, setMockNews] = useState(() => getSchoolAnnouncements().news);
 
-   const news = mockNews.find(item => item.id === Number(id));
+  const news = mockNews.find((item) => String(item.id) === String(id));
 
 
 useEffect(() => {
-  // DHYAN DEIN: Double quotes (") hata kar backticks (`) use kiye hain
-  fetch(`http://localhost:3000/api/v1/news/${id}`)
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.success) {
-        const item = data.data; // Ye array nahi, single Object hai!
-        
-        // Isliye map() nahi lagayenge, seedha object banayenge
-        const formattedSingleNews = {
-          ...item,
-          date: item.published_date,
-          image: item.image_url,
-          featured: item.is_featured,
-          tags: Array.isArray(item.tags) ? item.tags : []
-        };
+  const loadNews = () => setMockNews(getSchoolAnnouncements().news);
 
-        // Yahan function aapke single news detail state ko set karega (e.g. setNewsDetail)
-        setMockNews([formattedSingleNews]); 
-      }
-    })
-    .catch((err) => {
-      console.error("Error fetching single news:", err);
-    });
-}, [id]); // id dependency me daalna zaruri hai
+  loadNews();
+  window.addEventListener("storage", loadNews);
+  window.addEventListener("focus", loadNews);
+
+  return () => {
+    window.removeEventListener("storage", loadNews);
+    window.removeEventListener("focus", loadNews);
+  };
+}, []);
 
   if (!news) {
     return (
@@ -260,7 +248,7 @@ useEffect(() => {
   }
 
  
-const currentIndex = mockNews.findIndex(item => item.id === Number(id));
+const currentIndex = mockNews.findIndex((item) => String(item.id) === String(id));
 const previousNews = currentIndex > 0 ? mockNews[currentIndex - 1] : null;
 const nextNews = currentIndex < mockNews.length - 1 ? mockNews[currentIndex + 1] : null;
 
@@ -303,6 +291,10 @@ const nextNews = currentIndex < mockNews.length - 1 ? mockNews[currentIndex + 1]
             <h1 className="text-4xl font-extrabold text-blue-900 mb-4 leading-tight drop-shadow">
               {news.title}
             </h1>
+
+            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+              {news.schoolName}
+            </p>
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 text-blue-700/80 gap-2">
               <div className="flex items-center gap-4 text-sm">

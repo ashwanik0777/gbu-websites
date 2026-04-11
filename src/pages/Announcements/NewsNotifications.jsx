@@ -5,6 +5,7 @@ import EnhancedPagination from "../../components/announcement/EnhancedPagination
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import BannerSection from "../../components/HeroBanner";
+import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
 
 // Enhanced Card Components with Professional Design
 const Card = ({ children, className = "", featured = false, ...props }) => (
@@ -770,6 +771,10 @@ const NewsGridCard = ({ news }) => {
 
         <CardTitle className="mb-3 line-clamp-2">{news.title}</CardTitle>
 
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+          {news.schoolName}
+        </p>
+
         <CardDescription className="space-y-2">
           <div className="flex items-center text-xs text-gray-500">
             <svg
@@ -783,7 +788,7 @@ const NewsGridCard = ({ news }) => {
                 clipRule="evenodd"
               />
             </svg>
-            {format(new Date(news.publishedAt), "MMM dd, yyyy")}
+            {format(new Date(news.date), "MMM dd, yyyy")}
           </div>
           <div className="flex items-center text-xs text-gray-500">
             <svg
@@ -931,6 +936,10 @@ const NewsListCard = ({ news }) => {
               {news.title}
             </h3>
 
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+              {news.schoolName}
+            </p>
+
             <p className="text-gray-600 text-sm mb-3 line-clamp-2">
               {news.excerpt}
             </p>
@@ -1013,30 +1022,20 @@ const NewsNotifications = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedPriorities, setSelectedPriorities] = useState([]);
   const [viewMode, setViewMode] = useState("grid");
-  const [mockNews, setMockNews] = useState([]);
+  const [mockNews, setMockNews] = useState(() => getSchoolAnnouncements().news);
 
   useEffect(() => {
-  fetch("http://localhost:3000/api/v1/news")
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.success) {
-        // data.data ek Array hai, isliye hum map use kar rahe hain
-        const formattedNews = data.data.map((item) => ({
-          ...item,
-          date: item.published_date, // DB ke 'published_date' ko 'date' banaya
-          image: item.image_url,     // DB ke 'image_url' ko 'image' banaya
-          featured: item.is_featured, // DB ke 'is_featured' ko 'featured' banaya
-          // JSONB DB me directly array return karta hai, to split ki zarurat nahi padegi
-          tags: Array.isArray(item.tags) ? item.tags : [] 
-        }));
+    const loadNews = () => setMockNews(getSchoolAnnouncements().news);
 
-        setMockNews(formattedNews);
-      }
-    })
-    .catch((err) => {
-      console.error("Error fetching news:", err);
-    });
-}, []);
+    loadNews();
+    window.addEventListener("storage", loadNews);
+    window.addEventListener("focus", loadNews);
+
+    return () => {
+      window.removeEventListener("storage", loadNews);
+      window.removeEventListener("focus", loadNews);
+    };
+  }, []);
   // Extract unique values
   const allTags = Array.from(new Set(mockNews.flatMap((news) => news.tags)));
   const allCategories = Array.from(
@@ -1123,18 +1122,6 @@ const NewsNotifications = () => {
   //
 
   //
-  useEffect(() => {
-    fetch("http://localhost:3000/api/v1/news?limit=50")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Full API Response:", data);
-        console.log("News Array:", data.data);
-        console.log("First News Item  :", data.data[0]); // IMPORTANT
-
-        setMockNews(data.data);
-      })
-      .catch((err) => console.log(err));
-  }, []);
   const currentNews = filteredAndSortedNews.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,

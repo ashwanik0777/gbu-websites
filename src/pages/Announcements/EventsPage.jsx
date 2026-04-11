@@ -16,6 +16,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import BannerSection from "../../components/HeroBanner";
+import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
 
 // Complete Events Data
 // const eventsData = [
@@ -404,6 +405,10 @@ const EventCard = ({ event }) => {
         <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
           {event.title}
         </h3>
+
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+          {event.schoolName}
+        </p>
 
         <p className="text-gray-600 text-sm mb-4 line-clamp-3">
           {event.description}
@@ -980,10 +985,10 @@ const useEventFiltering = ({ events, itemsPerPage }) => {
 const EventsPage = () => {
   const [activeTab, setActiveTab] = useState("upcoming");
   const [itemsPerPage, setItemsPerPage] = useState(6); // Default 6 events per page
-  const [eventsData, seteventsData] = useState([]);
+  const [eventsData, seteventsData] = useState(() => getSchoolAnnouncements().events);
   // Get current events based on active tab (only upcoming and past)
   const getCurrentEvents = () => {
-    const currentDate = new Date("2025-07-19"); // Current date from context
+    const currentDate = new Date();
 
     switch (activeTab) {
       case "upcoming":
@@ -1002,26 +1007,17 @@ const EventsPage = () => {
   };
 
   const currentEvents = getCurrentEvents();
- useEffect(() => {
-    fetch("http://localhost:3000/api/v1/events")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Full API Response:", data);
-        
-        // Data aane ke baad usko React ke purane format mein convert kar rahe hain
-        const formattedEvents = data.data.map((event) => {
-          return {
-            ...event,
-            date: event.starts_at,           // 'starts_at' ko 'date' bana diya
-            coverImageUrl: event.cover_image,// 'cover_image' ko 'coverImageUrl' bana diya
-            location: event.venue            // 'venue' ko 'location' bana diya
-          };
-        });
+  useEffect(() => {
+    const loadEvents = () => seteventsData(getSchoolAnnouncements().events);
 
-        console.log("Formatted Events:", formattedEvents);
-        seteventsData(formattedEvents); // Ab formatted data set hoga
-      })
-      .catch((err) => console.log(err));
+    loadEvents();
+    window.addEventListener("storage", loadEvents);
+    window.addEventListener("focus", loadEvents);
+
+    return () => {
+      window.removeEventListener("storage", loadEvents);
+      window.removeEventListener("focus", loadEvents);
+    };
   }, []);
   // Get unique types and years for filters
   const allTypes = [...new Set(eventsData.map((event) => event.type))];
@@ -1053,28 +1049,20 @@ const EventsPage = () => {
     setItemsPerPage(newItemsPerPage);
     setCurrentPage(1); // Reset to first page
   };
-  function mapEvent(row) {
-    return {
-      id: row.id,
-      title: row.title,
-      image: row.image,
-      tags: row.tags ? row.tags.split(",") : [],
-    };
-  }
   // Only two tabs: Upcoming and Past
   const tabs = [
     {
       id: "upcoming",
       label: "Upcoming Events",
       count: eventsData.filter(
-        (e) => new Date(e.date) >= new Date("2025-07-19"),
+        (e) => new Date(e.date) >= new Date(),
       ).length,
       icon: Calendar,
     },
     {
       id: "past",
       label: "Past Events",
-      count: eventsData.filter((e) => new Date(e.date) < new Date("2025-07-19"))
+      count: eventsData.filter((e) => new Date(e.date) < new Date())
         .length,
       icon: Clock,
     },

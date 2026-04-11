@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BannerSection from '../../components/HeroBanner';
+import { getSchoolAnnouncements } from '../../utils/schoolAnnouncements';
 
 // === Professional Card Components ===
 const Card = ({ children, className = '', onClick }) => (
@@ -685,34 +686,22 @@ const MediaGallery = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [selectedMediaItem, setSelectedMediaItem] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
-   const [mockMedia, setMockMedia] = useState([]);
-   const [loading, setLoading] = useState(true);
+   const [mockMedia, setMockMedia] = useState(() => getSchoolAnnouncements().mediaGallery);
+   const [loading, setLoading] = useState(false);
   useEffect(() => {
-    // Backend API ko call karna (Aap limit aur page parameter bhi pass kar sakte hain)
-    fetch("http://localhost:3000/api/v1/media-gallery")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          // Backend keys ko frontend expected keys me map karna
-          const formattedMedia = data.data.map((item) => ({
-            id: item.id,
-            title: item.title,
-            category: item.category,
-            year: item.year,
-            date: item.publishedAt,         // 'publishedAt' ko 'date' banaya
-            images: item.images || [],      // Images ka array (Lightbox/Slider ke liye)
-            coverImage: item.coverImageUrl  // Card ke thumbnail ke liye
-          }));
+    const loadMedia = () => {
+      setMockMedia(getSchoolAnnouncements().mediaGallery);
+      setLoading(false);
+    };
 
-          setMockMedia(formattedMedia);
-         
-        
-          }
-      })
-      .catch((err) => {
-        console.error("Error fetching media gallery:", err);
-        setLoading(false);
-      });
+    loadMedia();
+    window.addEventListener("storage", loadMedia);
+    window.addEventListener("focus", loadMedia);
+
+    return () => {
+      window.removeEventListener("storage", loadMedia);
+      window.removeEventListener("focus", loadMedia);
+    };
   }, []);
   const allCategories = Array.from(new Set(mockMedia.map(item => item.category)));
   const allYears = Array.from(new Set(mockMedia.map(item => item.year)));
@@ -868,6 +857,10 @@ const MediaGallery = () => {
                     <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                       {item.title}
                     </h3>
+
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+                      {item.schoolName}
+                    </p>
                     
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                       <Calendar size={14} />

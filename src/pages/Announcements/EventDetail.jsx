@@ -15,6 +15,7 @@ import {
 import Header from "../../components/announcement/Header";
 import SocialShare from "../../components/announcement/SocialShare";
 import RelatedEvents from "../../components/announcement/RelatedEvents";
+import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
 
 // --- Solid Color Button ---
 const Button = ({
@@ -421,39 +422,24 @@ const EventDetail = () => {
   const { id } = useParams();
   const [showQR, setShowQR] = useState(false);
   const [event, setEvent] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/v1/events/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Single Event Data:", data);
-        
-        const apiData = data.data;
-        
-        // Backend ke data ko Frontend ke variables me map kar rahe hain
-        const formattedEvent = {
-          ...apiData,
-          coverImageUrl: apiData.cover_image,         // cover_image -> coverImageUrl
-          location: apiData.venue,                    // venue -> location
-          date: apiData.starts_at,                    // Calendar function ke liye
-          startsAt: apiData.starts_at,                // starts_at -> startsAt
-          endDate: apiData.ends_at,                   // ends_at -> endDate
-          endsAt: apiData.ends_at,
-          images: apiData.gallery || [],              // gallery -> images (Array)
-          registrationUrl: apiData.registration_url,  
-          isUpcoming: apiData.status === 'upcoming',  // status ke basis pe true/false
-          agenda: apiData.agenda || [],               // API se agenda nikalna
-          speakers: apiData.speakers || []            // API se speakers nikalna
-        };
+    const loadEvent = () => {
+      const eventList = getSchoolAnnouncements().events;
+      const selected = eventList.find((item) => String(item.id) === String(id));
+      setEvent(selected || null);
+      setLoading(false);
+    };
 
-        setEvent(formattedEvent);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
+    loadEvent();
+    window.addEventListener("storage", loadEvent);
+    window.addEventListener("focus", loadEvent);
+
+    return () => {
+      window.removeEventListener("storage", loadEvent);
+      window.removeEventListener("focus", loadEvent);
+    };
   }, [id]);
   // const event = mockEvents.find((item) => String(item.id) === String(id));
   if (!event) {
@@ -564,6 +550,9 @@ const EventDetail = () => {
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-lg">
                   {event.title}
                 </h1>
+                <p className="mb-5 text-xs font-semibold uppercase tracking-wider text-blue-100">
+                  {event.schoolName}
+                </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-base">
                   <div className="flex items-center">
                     <Calendar size={20} className="mr-3" />

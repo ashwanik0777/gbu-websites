@@ -23,6 +23,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import BannerSection from "../../components/HeroBanner";
+import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
 
 // Enhanced Card components with modern styling
 const Card = ({ children, className = "", hover = true }) => (
@@ -638,9 +639,8 @@ const Notice = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(9);
   const [viewMode, setViewMode] = useState("grid");
-  const [mockNotices, setMockNotices] = useState([]);
-  const [apiError, setApiError] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [mockNotices, setMockNotices] = useState(() => getSchoolAnnouncements().notices);
+  const [isLoading, setIsLoading] = useState(false);
 
   // useEffect(() => {
   //   const controller = new AbortController();
@@ -678,25 +678,21 @@ const Notice = () => {
 
   //   return () => controller.abort();
   // }, []);
-useEffect(() => {
-  // /notice ki jagah /notices aayega
-  fetch("http://localhost:3000/api/v1/notices")
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.success) {
-        // Backend keys ko frontend keys me map karna
-        const formattedNotices = data.data.map((notice) => ({
-          ...notice,
-          date: notice.published_date,
-          isNew: notice.is_new,
-          pdfUrl: notice.pdf_url
-        }));
+  useEffect(() => {
+    const loadNotices = () => {
+      setMockNotices(getSchoolAnnouncements().notices);
+      setIsLoading(false);
+    };
 
-        setMockNotices(formattedNotices);
-      }
-    })
-    .catch((err) => console.log("Error fetching notices:", err));
-}, []);
+    loadNotices();
+    window.addEventListener("storage", loadNotices);
+    window.addEventListener("focus", loadNotices);
+
+    return () => {
+      window.removeEventListener("storage", loadNotices);
+      window.removeEventListener("focus", loadNotices);
+    };
+  }, []);
 
 // Type aur Year nikalne ka logic ab state set hone ke baad map hoga
 const allTypes = Array.from(
@@ -832,6 +828,10 @@ const allYears = Array.from(
               {notice.title}
             </CardTitle>
 
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+              {notice.schoolName}
+            </p>
+
             <CardDescription className="text-gray-600 leading-relaxed mb-4">
               {viewMode === "list"
                 ? notice.content.substring(0, 200) + "..."
@@ -880,7 +880,7 @@ const allYears = Array.from(
       {/* Hero Section */}
       <BannerSection
         title="Notices & Circulars"
-        subtitle="Stay updated with the latest notices, announcements, and circulars from GBU."
+        subtitle="School dashboard se synced notices aur circulars."
         bgTheme={5}
       />
       {/* Enhanced Search Filter */}
@@ -906,18 +906,6 @@ const allYears = Array.from(
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
-
-      {apiError && (
-        <div className="container mx-auto px-4 mt-8">
-          <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-            <AlertCircle size={18} className="mt-0.5" />
-            <div>
-              <p className="font-semibold">Unable to load notices</p>
-              <p className="text-sm">{apiError}</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {isLoading && (
         <div className="container mx-auto px-4 mt-8">

@@ -4,23 +4,57 @@ import {
   Save,
   RotateCcw,
   LogOut,
-  ExternalLink,
   Home,
   Users,
-  Info,
-  GraduationCap,
-  FlaskConical,
-  Briefcase,
-  Phone,
-  ChevronRight,
-  ChevronDown,
+  CalendarDays,
+  Newspaper,
+  Bell,
+  Images,
+  Lock,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import {
   DEFAULT_SCHOOL_DASHBOARD_DATA,
   SCHOOL_DASHBOARD_STORAGE_KEY,
 } from "../../Data/schoolDashboardData";
+import {
+  DUMMY_FACULTY_DETAIL,
+  FACULTY_PROFILE_STORAGE_PREFIX,
+} from "../../Data/facultyDummyData";
 
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
+
+const ACTIVE_TABS = [
+  { id: "home", label: "Home", icon: Home },
+  { id: "faculty-management", label: "Faculty Management", icon: Users },
+  { id: "events", label: "Events", icon: CalendarDays },
+  { id: "news", label: "News", icon: Newspaper },
+  { id: "notices", label: "Notices", icon: Bell },
+  { id: "event-gallery", label: "Event Gallery", icon: Images },
+];
+
+const INACTIVE_TABS = [
+  "About Us",
+  "Departments & Academic Programs",
+  "Research",
+  "Placement",
+  "Contact Us",
+];
+
+const inputClass =
+  "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-700";
+
+const cardClass = "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
+
+const Field = ({ label, children }) => (
+  <div>
+    <label className="mb-1 block text-sm font-medium text-slate-700">{label}</label>
+    {children}
+  </div>
+);
+
+const ensureArray = (value, fallback) => (Array.isArray(value) ? value : fallback);
 
 const getInitialSchoolData = () => {
   try {
@@ -30,25 +64,14 @@ const getInitialSchoolData = () => {
     return {
       ...deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA),
       ...parsed,
-      highlights: Array.isArray(parsed.highlights)
-        ? parsed.highlights
-        : deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.highlights),
-      departments: Array.isArray(parsed.departments)
-        ? parsed.departments
-        : deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.departments),
-      pages: Array.isArray(parsed.pages)
-        ? parsed.pages
-        : deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.pages),
-      announcements: Array.isArray(parsed.announcements)
-        ? parsed.announcements
-        : deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.announcements),
-      navigation: {
-        ...deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.navigation),
-        ...(parsed.navigation || {}),
-        tabs: Array.isArray(parsed.navigation?.tabs)
-          ? parsed.navigation.tabs
-          : deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.navigation.tabs),
-      },
+      highlights: ensureArray(parsed.highlights, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.highlights)),
+      departments: ensureArray(parsed.departments, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.departments)),
+      pages: ensureArray(parsed.pages, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.pages)),
+      announcements: ensureArray(parsed.announcements, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.announcements)),
+      events: ensureArray(parsed.events, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.events || [])),
+      news: ensureArray(parsed.news, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.news || [])),
+      notices: ensureArray(parsed.notices, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.notices || [])),
+      eventGallery: ensureArray(parsed.eventGallery, deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.eventGallery || [])),
       tabContent: {
         ...deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA.tabContent),
         ...(parsed.tabContent || {}),
@@ -59,106 +82,57 @@ const getInitialSchoolData = () => {
   }
 };
 
-const inputClass =
-  "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-700";
+const getFacultyProfilesBySchool = (schoolName) => {
+  const normalizedSchool = (schoolName || "").trim().toLowerCase();
+  const list = [];
 
-const cardClass = "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
+  try {
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (!key || !key.startsWith(FACULTY_PROFILE_STORAGE_PREFIX)) continue;
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const profile = JSON.parse(raw);
+      if (!profile || typeof profile !== "object") continue;
 
-const MAIN_TAB_META = [
-  { id: "home", icon: Home, hasSubTabs: false },
-  { id: "faculty", icon: Users, hasSubTabs: false },
-  { id: "about", icon: Info, hasSubTabs: true },
-  { id: "departments", icon: GraduationCap, hasSubTabs: true },
-  { id: "research", icon: FlaskConical, hasSubTabs: true },
-  { id: "placement", icon: Briefcase, hasSubTabs: false },
-  { id: "contact", icon: Phone, hasSubTabs: false },
-];
+      const profileSchool = (profile.school || "").trim().toLowerCase();
+      if (!normalizedSchool || profileSchool === normalizedSchool) {
+        list.push(profile);
+      }
+    }
 
-const Field = ({ label, children }) => (
-  <div>
-    <label className="mb-1 block text-sm font-medium text-slate-700">{label}</label>
-    {children}
-  </div>
-);
+    const dummySchool = (DUMMY_FACULTY_DETAIL.school || "").trim().toLowerCase();
+    const hasDummy = list.some((item) => item.id === DUMMY_FACULTY_DETAIL.id);
+    if ((!normalizedSchool || dummySchool === normalizedSchool) && !hasDummy) {
+      list.push(DUMMY_FACULTY_DETAIL);
+    }
+  } catch {
+    return [DUMMY_FACULTY_DETAIL];
+  }
+
+  return list;
+};
 
 const SchoolDashboard = () => {
   const navigate = useNavigate();
   const [data, setData] = useState(getInitialSchoolData);
+  const [activeTab, setActiveTab] = useState("home");
   const [message, setMessage] = useState("");
-  const [activeMainTab, setActiveMainTab] = useState("home");
-  const [activeSubTab, setActiveSubTab] = useState("");
-  const [expandedTabId, setExpandedTabId] = useState("");
+
+  const facultyProfiles = useMemo(
+    () => getFacultyProfilesBySchool(data.schoolName),
+    [data.schoolName, data]
+  );
 
   const summary = useMemo(
     () => [
-      { label: "Departments", value: data.departments.length },
-      { label: "Managed Pages", value: data.pages.length },
-      { label: "Highlights", value: data.highlights.length },
-      { label: "Announcements", value: data.announcements.length },
+      { label: "Faculty", value: facultyProfiles.length },
+      { label: "Events", value: data.events?.length || 0 },
+      { label: "News", value: data.news?.length || 0 },
+      { label: "Notices", value: data.notices?.length || 0 },
     ],
-    [data]
+    [facultyProfiles.length, data.events, data.news, data.notices]
   );
-
-  const normalizedTabs = useMemo(() => {
-    const savedTabs = data.navigation?.tabs || [];
-    return MAIN_TAB_META.map((meta) => {
-      const saved = savedTabs.find((item) => item.id === meta.id) || {};
-      return {
-        ...meta,
-        label: saved.label || meta.id,
-        subTabs: Array.isArray(saved.subTabs) ? saved.subTabs : [],
-      };
-    });
-  }, [data.navigation]);
-
-  const currentMainTab = normalizedTabs.find((tab) => tab.id === activeMainTab) || normalizedTabs[0];
-
-  const changeMainTab = (tabId) => {
-    const tab = normalizedTabs.find((item) => item.id === tabId) || normalizedTabs[0];
-    setActiveMainTab(tab.id);
-    if (tab.hasSubTabs) {
-      setExpandedTabId(tab.id);
-    }
-    if (tab.hasSubTabs && tab.subTabs.length > 0) {
-      setActiveSubTab(tab.subTabs[0]);
-      return;
-    }
-    setActiveSubTab("");
-  };
-
-  const updateTabLabel = (tabId, value) => {
-    setData((prev) => ({
-      ...prev,
-      navigation: {
-        ...prev.navigation,
-        tabs: (prev.navigation?.tabs || []).map((tab) =>
-          tab.id === tabId ? { ...tab, label: value } : tab
-        ),
-      },
-    }));
-    setMessage("");
-  };
-
-  const updateSubTabLabel = (tabId, index, value) => {
-    setData((prev) => ({
-      ...prev,
-      navigation: {
-        ...prev.navigation,
-        tabs: (prev.navigation?.tabs || []).map((tab) => {
-          if (tab.id !== tabId) return tab;
-          const nextSubTabs = [...(tab.subTabs || [])];
-          nextSubTabs[index] = value;
-          return { ...tab, subTabs: nextSubTabs };
-        }),
-      },
-    }));
-    setActiveSubTab((prevSubTab) => {
-      const oldSubTab = currentMainTab?.subTabs?.[index];
-      if (prevSubTab === oldSubTab) return value;
-      return prevSubTab;
-    });
-    setMessage("");
-  };
 
   const updateField = (key, value) => {
     setData((prev) => ({ ...prev, [key]: value }));
@@ -179,26 +153,34 @@ const SchoolDashboard = () => {
     setMessage("");
   };
 
-  const updateDepartment = (index, key, value) => {
+  const updateArrayItem = (listKey, index, field, value) => {
     setData((prev) => {
-      const departments = [...prev.departments];
-      departments[index] = { ...departments[index], [key]: value };
-      return { ...prev, departments };
+      const next = [...(prev[listKey] || [])];
+      next[index] = { ...next[index], [field]: value };
+      return { ...prev, [listKey]: next };
     });
     setMessage("");
   };
 
-  const updateDepartmentListField = (index, key, rawValue) => {
-    const parsed = rawValue
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean);
-    updateDepartment(index, key, parsed);
+  const removeArrayItem = (listKey, index) => {
+    setData((prev) => ({
+      ...prev,
+      [listKey]: (prev[listKey] || []).filter((_, i) => i !== index),
+    }));
+    setMessage("");
+  };
+
+  const addArrayItem = (listKey, item) => {
+    setData((prev) => ({
+      ...prev,
+      [listKey]: [...(prev[listKey] || []), item],
+    }));
+    setMessage("");
   };
 
   const saveAll = () => {
     localStorage.setItem(SCHOOL_DASHBOARD_STORAGE_KEY, JSON.stringify(data));
-    setMessage("School dashboard data saved successfully.");
+    setMessage("School dashboard updated successfully.");
   };
 
   const resetAll = () => {
@@ -207,126 +189,121 @@ const SchoolDashboard = () => {
     setMessage("School dashboard reset to default data.");
   };
 
-  const renderTabBody = () => {
-    if (activeMainTab === "home") {
-      return (
-        <div className={cardClass}>
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Home Tab Configuration</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Hero Title">
-              <input className={inputClass} value={data.tabContent.home.heroTitle} onChange={(e) => updateTabContent("home", "heroTitle", e.target.value)} />
-            </Field>
-            <Field label="Hero Subtitle">
-              <input className={inputClass} value={data.tabContent.home.heroSubtitle} onChange={(e) => updateTabContent("home", "heroSubtitle", e.target.value)} />
-            </Field>
-            <Field label="Banner Image URL">
-              <input className={inputClass} value={data.bannerImage} onChange={(e) => updateField("bannerImage", e.target.value)} />
-            </Field>
-            <Field label="School Name">
-              <input className={inputClass} value={data.schoolName} onChange={(e) => updateField("schoolName", e.target.value)} />
-            </Field>
-          </div>
-          <div className="mt-4">
-            <Field label="School Description">
-              <textarea className={`${inputClass} min-h-24`} value={data.schoolDescription} onChange={(e) => updateField("schoolDescription", e.target.value)} />
-            </Field>
-          </div>
-        </div>
-      );
-    }
+  const saveFacultyProfile = (faculty) => {
+    if (!faculty?.id) return;
+    localStorage.setItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${faculty.id}`, JSON.stringify(faculty));
+    setMessage(`Faculty profile updated: ${faculty.name}`);
+  };
 
-    if (activeMainTab === "faculty") {
+  const renderCollectionEditor = (listKey, title, fields, newItemTemplate) => (
+    <div className={cardClass}>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+        <button
+          type="button"
+          onClick={() => addArrayItem(listKey, { ...newItemTemplate, id: `${listKey}-${Date.now()}` })}
+          className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+        >
+          <Plus className="h-3.5 w-3.5" /> Add New
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        {(data[listKey] || []).map((item, index) => (
+          <div key={`${listKey}-${item.id || index}`} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Item {index + 1}</p>
+              <button
+                type="button"
+                onClick={() => removeArrayItem(listKey, index)}
+                className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Remove
+              </button>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              {fields.map((field) => (
+                <Field key={`${listKey}-${index}-${field.key}`} label={field.label}>
+                  {field.type === "textarea" ? (
+                    <textarea
+                      className={`${inputClass} min-h-20`}
+                      value={item[field.key] || ""}
+                      onChange={(e) => updateArrayItem(listKey, index, field.key, e.target.value)}
+                    />
+                  ) : (
+                    <input
+                      className={inputClass}
+                      type={field.type || "text"}
+                      value={item[field.key] || ""}
+                      onChange={(e) => updateArrayItem(listKey, index, field.key, e.target.value)}
+                    />
+                  )}
+                </Field>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderBody = () => {
+    if (activeTab === "home") {
       return (
         <div className={cardClass}>
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Faculty Tab Configuration</h2>
+          <h2 className="mb-4 text-lg font-semibold text-slate-900">Home Management</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Faculty Page Route">
-              <input className={inputClass} value={data.tabContent.faculty.facultyPagePath} onChange={(e) => updateTabContent("faculty", "facultyPagePath", e.target.value)} />
-            </Field>
-            <Field label="Faculty Intro Title">
-              <input className={inputClass} value={data.tabContent.faculty.title} onChange={(e) => updateTabContent("faculty", "title", e.target.value)} />
-            </Field>
-            <Field label="Total Faculty Count Text">
-              <input className={inputClass} value={data.tabContent.faculty.totalFacultyText} onChange={(e) => updateTabContent("faculty", "totalFacultyText", e.target.value)} />
+            <Field label="School Name">
+              <input className={inputClass} value={data.schoolName || ""} onChange={(e) => updateField("schoolName", e.target.value)} />
             </Field>
             <Field label="Dean Name">
-              <input className={inputClass} value={data.deanName} onChange={(e) => updateField("deanName", e.target.value)} />
+              <input className={inputClass} value={data.deanName || ""} onChange={(e) => updateField("deanName", e.target.value)} />
+            </Field>
+            <Field label="Hero Title">
+              <input className={inputClass} value={data.tabContent.home.heroTitle || ""} onChange={(e) => updateTabContent("home", "heroTitle", e.target.value)} />
+            </Field>
+            <Field label="Hero Subtitle">
+              <input className={inputClass} value={data.tabContent.home.heroSubtitle || ""} onChange={(e) => updateTabContent("home", "heroSubtitle", e.target.value)} />
+            </Field>
+            <Field label="Banner Image URL">
+              <input className={inputClass} value={data.bannerImage || ""} onChange={(e) => updateField("bannerImage", e.target.value)} />
+            </Field>
+            <Field label="School Email">
+              <input className={inputClass} value={data.email || ""} onChange={(e) => updateField("email", e.target.value)} />
             </Field>
           </div>
+
           <div className="mt-4">
-            <Field label="Faculty Intro Description">
-              <textarea className={`${inputClass} min-h-24`} value={data.tabContent.faculty.description} onChange={(e) => updateTabContent("faculty", "description", e.target.value)} />
+            <Field label="School Description">
+              <textarea className={`${inputClass} min-h-28`} value={data.schoolDescription || ""} onChange={(e) => updateField("schoolDescription", e.target.value)} />
             </Field>
           </div>
         </div>
       );
     }
 
-    if (activeMainTab === "about") {
+    if (activeTab === "faculty-management") {
       return (
         <div className={cardClass}>
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">About Us Tab Configuration</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field label="About Intro Title">
-              <input className={inputClass} value={data.tabContent.about.introTitle} onChange={(e) => updateTabContent("about", "introTitle", e.target.value)} />
-            </Field>
-            <Field label="Dean Message Route">
-              <input className={inputClass} value={data.tabContent.about.deanPath} onChange={(e) => updateTabContent("about", "deanPath", e.target.value)} />
-            </Field>
-            <Field label="Board Route">
-              <input className={inputClass} value={data.tabContent.about.boardPath} onChange={(e) => updateTabContent("about", "boardPath", e.target.value)} />
-            </Field>
-            <Field label="Staff Route">
-              <input className={inputClass} value={data.tabContent.about.staffPath} onChange={(e) => updateTabContent("about", "staffPath", e.target.value)} />
-            </Field>
-            <Field label="Labs Route">
-              <input className={inputClass} value={data.tabContent.about.labsPath} onChange={(e) => updateTabContent("about", "labsPath", e.target.value)} />
-            </Field>
-            <Field label="Activities Route">
-              <input className={inputClass} value={data.tabContent.about.activitiesPath} onChange={(e) => updateTabContent("about", "activitiesPath", e.target.value)} />
-            </Field>
-          </div>
-          <div className="mt-4 space-y-4">
-            <Field label="Overview Text">
-              <textarea className={`${inputClass} min-h-24`} value={data.tabContent.about.overviewText} onChange={(e) => updateTabContent("about", "overviewText", e.target.value)} />
-            </Field>
-            <Field label="Dean Message Text">
-              <textarea className={`${inputClass} min-h-24`} value={data.tabContent.about.deanMessage} onChange={(e) => updateTabContent("about", "deanMessage", e.target.value)} />
-            </Field>
-          </div>
-        </div>
-      );
-    }
+          <h2 className="mb-3 text-lg font-semibold text-slate-900">Faculty Management</h2>
+          <p className="mb-4 text-sm text-slate-600">
+            Faculty list auto-sync hoti hai jo profiles same school name ke saath saved hain.
+          </p>
 
-    if (activeMainTab === "departments") {
-      return (
-        <div className={cardClass}>
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Departments & Academic Programs</h2>
           <div className="space-y-4">
-            {data.departments.map((dept, index) => (
-              <div key={dept.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <p className="mb-3 text-sm font-semibold text-slate-800">{dept.name || `Department ${index + 1}`}</p>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Field label="Department Name">
-                    <input className={inputClass} value={dept.name} onChange={(e) => updateDepartment(index, "name", e.target.value)} />
-                  </Field>
-                  <Field label="Department Code">
-                    <input className={inputClass} value={dept.code} onChange={(e) => updateDepartment(index, "code", e.target.value)} />
-                  </Field>
-                  <Field label="HOD">
-                    <input className={inputClass} value={dept.hod} onChange={(e) => updateDepartment(index, "hod", e.target.value)} />
-                  </Field>
-                  <Field label="Profile Path">
-                    <input className={inputClass} value={dept.profilePath} onChange={(e) => updateDepartment(index, "profilePath", e.target.value)} />
-                  </Field>
-                </div>
-                <div className="mt-3 space-y-3">
-                  <Field label="Programs (comma separated)">
-                    <input className={inputClass} value={dept.programs.join(", ")} onChange={(e) => updateDepartmentListField(index, "programs", e.target.value)} />
-                  </Field>
-                  <Field label="Notices (comma separated)">
-                    <input className={inputClass} value={dept.notices.join(", ")} onChange={(e) => updateDepartmentListField(index, "notices", e.target.value)} />
-                  </Field>
+            {facultyProfiles.map((faculty, index) => (
+              <div key={faculty.id || index} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <div className="grid gap-3 md:grid-cols-2">
+                  <Field label="Name"><input className={inputClass} value={faculty.name || ""} onChange={(e) => {
+                    const next = { ...faculty, name: e.target.value };
+                    saveFacultyProfile(next);
+                  }} /></Field>
+                  <Field label="Designation"><input className={inputClass} value={faculty.designation || ""} onChange={(e) => saveFacultyProfile({ ...faculty, designation: e.target.value })} /></Field>
+                  <Field label="Department"><input className={inputClass} value={faculty.department || ""} onChange={(e) => saveFacultyProfile({ ...faculty, department: e.target.value })} /></Field>
+                  <Field label="School"><input className={inputClass} value={faculty.school || ""} onChange={(e) => saveFacultyProfile({ ...faculty, school: e.target.value })} /></Field>
+                  <Field label="Email"><input className={inputClass} value={faculty.email || ""} onChange={(e) => saveFacultyProfile({ ...faculty, email: e.target.value })} /></Field>
+                  <Field label="Phone"><input className={inputClass} value={faculty.phone || ""} onChange={(e) => saveFacultyProfile({ ...faculty, phone: e.target.value })} /></Field>
                 </div>
               </div>
             ))}
@@ -335,83 +312,115 @@ const SchoolDashboard = () => {
       );
     }
 
-    if (activeMainTab === "research") {
-      return (
-        <div className={cardClass}>
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Research Tab Configuration</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Profile Route">
-              <input className={inputClass} value={data.tabContent.research.profilePath} onChange={(e) => updateTabContent("research", "profilePath", e.target.value)} />
-            </Field>
-            <Field label="Consultancy Route">
-              <input className={inputClass} value={data.tabContent.research.consultancyPath} onChange={(e) => updateTabContent("research", "consultancyPath", e.target.value)} />
-            </Field>
-            <Field label="Scholars Route">
-              <input className={inputClass} value={data.tabContent.research.scholarsPath} onChange={(e) => updateTabContent("research", "scholarsPath", e.target.value)} />
-            </Field>
-            <Field label="Projects Route">
-              <input className={inputClass} value={data.tabContent.research.projectsPath} onChange={(e) => updateTabContent("research", "projectsPath", e.target.value)} />
-            </Field>
-            <Field label="Patents Route">
-              <input className={inputClass} value={data.tabContent.research.patentsPath} onChange={(e) => updateTabContent("research", "patentsPath", e.target.value)} />
-            </Field>
-          </div>
-          <div className="mt-4">
-            <Field label="Research Intro Text">
-              <textarea className={`${inputClass} min-h-24`} value={data.tabContent.research.introText} onChange={(e) => updateTabContent("research", "introText", e.target.value)} />
-            </Field>
-          </div>
-        </div>
+    if (activeTab === "events") {
+      return renderCollectionEditor(
+        "events",
+        "Events Management",
+        [
+          { key: "title", label: "Event Title" },
+          { key: "date", label: "Date", type: "date" },
+          { key: "time", label: "Time" },
+          { key: "venue", label: "Venue" },
+          { key: "organizer", label: "Organizer" },
+          { key: "type", label: "Type" },
+          { key: "attendees", label: "Attendees", type: "number" },
+          { key: "price", label: "Price" },
+          { key: "tags", label: "Tags (comma separated)" },
+          { key: "image", label: "Image URL" },
+          { key: "description", label: "Description", type: "textarea" },
+        ],
+        {
+          title: "",
+          date: "",
+          time: "",
+          venue: "",
+          organizer: "",
+          type: "",
+          attendees: 0,
+          price: "Free",
+          tags: "",
+          image: "",
+          description: "",
+        }
       );
     }
 
-    if (activeMainTab === "placement") {
-      return (
-        <div className={cardClass}>
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Placement Tab Configuration</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Placement Route">
-              <input className={inputClass} value={data.tabContent.placement.path} onChange={(e) => updateTabContent("placement", "path", e.target.value)} />
-            </Field>
-            <Field label="Placement Stats Text">
-              <input className={inputClass} value={data.tabContent.placement.statsText} onChange={(e) => updateTabContent("placement", "statsText", e.target.value)} />
-            </Field>
-            <Field label="Top Recruiters (comma separated)">
-              <input className={inputClass} value={data.tabContent.placement.recruiters.join(", ")} onChange={(e) => updateTabContent("placement", "recruiters", e.target.value.split(",").map((x) => x.trim()).filter(Boolean))} />
-            </Field>
-          </div>
-          <div className="mt-4">
-            <Field label="Placement Overview">
-              <textarea className={`${inputClass} min-h-24`} value={data.tabContent.placement.overview} onChange={(e) => updateTabContent("placement", "overview", e.target.value)} />
-            </Field>
-          </div>
-        </div>
+    if (activeTab === "news") {
+      return renderCollectionEditor(
+        "news",
+        "News Management",
+        [
+          { key: "title", label: "News Title" },
+          { key: "date", label: "Date", type: "date" },
+          { key: "category", label: "Category" },
+          { key: "author", label: "Author" },
+          { key: "department", label: "Department" },
+          { key: "tags", label: "Tags (comma separated)" },
+          { key: "priority", label: "Priority" },
+          { key: "featured", label: "Featured (true/false)" },
+          { key: "views", label: "Views", type: "number" },
+          { key: "likes", label: "Likes", type: "number" },
+          { key: "image", label: "Image URL" },
+          { key: "excerpt", label: "Excerpt", type: "textarea" },
+          { key: "content", label: "Content", type: "textarea" },
+          { key: "status", label: "Status" },
+        ],
+        {
+          title: "",
+          date: "",
+          category: "Academic",
+          author: "School Office",
+          department: "",
+          tags: "",
+          priority: "medium",
+          featured: false,
+          views: 0,
+          likes: 0,
+          image: "",
+          excerpt: "",
+          content: "",
+          status: "draft",
+        }
       );
     }
 
-    return (
-      <div className={cardClass}>
-        <h2 className="mb-4 text-lg font-semibold text-slate-900">Contact Us Tab Configuration</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Contact Route">
-            <input className={inputClass} value={data.tabContent.contact.path} onChange={(e) => updateTabContent("contact", "path", e.target.value)} />
-          </Field>
-          <Field label="Office Hours">
-            <input className={inputClass} value={data.tabContent.contact.officeHours} onChange={(e) => updateTabContent("contact", "officeHours", e.target.value)} />
-          </Field>
-          <Field label="Helpdesk Email">
-            <input className={inputClass} value={data.tabContent.contact.helpdeskEmail} onChange={(e) => updateTabContent("contact", "helpdeskEmail", e.target.value)} />
-          </Field>
-          <Field label="Helpdesk Phone">
-            <input className={inputClass} value={data.tabContent.contact.helpdeskPhone} onChange={(e) => updateTabContent("contact", "helpdeskPhone", e.target.value)} />
-          </Field>
-        </div>
-        <div className="mt-4">
-          <Field label="Map URL">
-            <input className={inputClass} value={data.tabContent.contact.mapUrl} onChange={(e) => updateTabContent("contact", "mapUrl", e.target.value)} />
-          </Field>
-        </div>
-      </div>
+    if (activeTab === "notices") {
+      return renderCollectionEditor(
+        "notices",
+        "Notice Management",
+        [
+          { key: "title", label: "Notice Title" },
+          { key: "date", label: "Date", type: "date" },
+          { key: "type", label: "Type" },
+          { key: "priority", label: "Priority" },
+          { key: "isNew", label: "New Badge (true/false)" },
+          { key: "views", label: "Views", type: "number" },
+          { key: "pdfUrl", label: "PDF URL" },
+          { key: "content", label: "Content", type: "textarea" },
+        ],
+        {
+          title: "",
+          date: "",
+          type: "General",
+          priority: "medium",
+          isNew: true,
+          views: 0,
+          pdfUrl: "",
+          content: "",
+        }
+      );
+    }
+
+    return renderCollectionEditor(
+      "eventGallery",
+      "Event Gallery Management",
+      [
+        { key: "title", label: "Gallery Title" },
+        { key: "eventDate", label: "Event Date", type: "date" },
+        { key: "category", label: "Category" },
+        { key: "imageUrl", label: "Image URL" },
+      ],
+      { title: "", eventDate: "", category: "Events", imageUrl: "" }
     );
   };
 
@@ -423,79 +432,50 @@ const SchoolDashboard = () => {
             <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">School Navigation</h2>
 
             <div className="mt-3 flex-1 space-y-2 overflow-y-auto pr-1">
-              {normalizedTabs.map((tab) => {
+              {ACTIVE_TABS.map((tab) => {
                 const Icon = tab.icon;
-                const isActive = activeMainTab === tab.id;
-                const isExpanded = expandedTabId === tab.id;
+                const isActive = activeTab === tab.id;
                 return (
-                  <div key={tab.id} className="rounded-xl border border-slate-200 bg-white">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (tab.hasSubTabs && activeMainTab === tab.id && expandedTabId === tab.id) {
-                          setExpandedTabId("");
-                          return;
-                        }
-                        changeMainTab(tab.id);
-                      }}
-                      className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm transition ${
-                        isActive ? "bg-slate-900 text-white shadow" : "text-slate-700 hover:bg-slate-100"
-                      }`}
-                    >
-                      <span className="flex items-center gap-2">
-                        <Icon className="h-4 w-4" />
-                        {tab.label}
-                      </span>
-                      {tab.hasSubTabs ? (
-                        isExpanded ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )
-                      ) : null}
-                    </button>
-
-                    {tab.hasSubTabs && isExpanded ? (
-                      <div className="px-2 pb-2">
-                        {(tab.subTabs || []).map((subTab) => {
-                          const subTabActive = isActive && activeSubTab === subTab;
-                          return (
-                            <button
-                              key={`${tab.id}-${subTab}`}
-                              type="button"
-                              onClick={() => {
-                                setActiveMainTab(tab.id);
-                                setActiveSubTab(subTab);
-                              }}
-                              className={`mt-1.5 w-full rounded-lg px-3 py-1.5 text-left text-xs transition ${
-                                subTabActive
-                                  ? "bg-slate-200 font-medium text-slate-900"
-                                  : "text-slate-600 hover:bg-slate-100"
-                              }`}
-                            >
-                              {subTab}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ) : null}
-                  </div>
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition ${
+                      isActive ? "bg-slate-900 text-white shadow" : "text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {tab.label}
+                  </button>
                 );
               })}
+
+              <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-2">
+                <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Other Tabs (Inactive)</p>
+                <div className="space-y-1">
+                  {INACTIVE_TABS.map((label) => (
+                    <button
+                      key={label}
+                      type="button"
+                      disabled
+                      className="flex w-full cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-slate-400"
+                    >
+                      <Lock className="h-3.5 w-3.5" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="mt-auto rounded-xl border border-slate-200 bg-slate-50 p-3">
-              {/* <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quick Actions</p> */}
               <div className="mt-2 space-y-2">
                 <button onClick={saveAll} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
                   <Save className="h-4 w-4" /> Save All
                 </button>
-                {/* <button onClick={resetAll} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                <button onClick={resetAll} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
                   <RotateCcw className="h-4 w-4" /> Reset
                 </button>
-                <button onClick={() => navigate("/academics/schools")} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
-                  <ExternalLink className="h-4 w-4" /> View Schools Page
-                </button> */}
                 <button onClick={() => navigate("/login")} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-100">
                   <LogOut className="h-4 w-4" /> Logout
                 </button>
@@ -507,6 +487,7 @@ const SchoolDashboard = () => {
         <main className="flex-1 space-y-6">
           <section className={cardClass}>
             <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">School Dashboard</h1>
+            <p className="mt-1 text-sm text-slate-600">Operational dashboard for school-level content and management.</p>
             {message ? <p className="mt-3 text-sm font-medium text-emerald-700">{message}</p> : null}
           </section>
 
@@ -519,52 +500,7 @@ const SchoolDashboard = () => {
             ))}
           </section>
 
-          <section className={cardClass}>
-            <div className="grid gap-3 md:grid-cols-2">
-              <Field label="Main Tab Name">
-                <input
-                  className={inputClass}
-                  value={currentMainTab.label}
-                  onChange={(e) => updateTabLabel(currentMainTab.id, e.target.value)}
-                />
-              </Field>
-              {currentMainTab.hasSubTabs ? (
-                <Field label="Sub-Tab Dropdown">
-                  <select
-                    className={inputClass}
-                    value={activeSubTab || currentMainTab.subTabs[0] || ""}
-                    onChange={(e) => setActiveSubTab(e.target.value)}
-                  >
-                    {(currentMainTab.subTabs || []).map((subTab) => (
-                      <option key={subTab} value={subTab}>
-                        {subTab}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-              ) : null}
-            </div>
-
-            {currentMainTab.hasSubTabs ? (
-              <div className="mt-4 grid gap-3 md:grid-cols-2">
-                {currentMainTab.subTabs.map((subTab, index) => (
-                  <Field key={`${currentMainTab.id}-${index}`} label={`Sub-Tab ${index + 1} Name`}>
-                    <input
-                      className={inputClass}
-                      value={subTab}
-                      onChange={(e) => updateSubTabLabel(currentMainTab.id, index, e.target.value)}
-                    />
-                  </Field>
-                ))}
-              </div>
-            ) : null}
-
-            <p className="mb-4 mt-4 text-xs text-slate-500">
-              Current group: {currentMainTab.label}
-              {currentMainTab.hasSubTabs && activeSubTab ? ` / ${activeSubTab}` : ""}
-            </p>
-            {renderTabBody()}
-          </section>
+          {renderBody()}
         </main>
       </div>
     </div>
