@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Minimal UI components with Tailwind CSS, matching usage and effects
 
  export const Card = ({ className = "", children, ...props }) => (
@@ -77,74 +78,9 @@ export const Button = ({
 };
 import { Mic, Calendar, MapPin, Users, ExternalLink, Play } from 'lucide-react';
 
-export const TalksTab = () => {
-  const invitedTalks = [
-    {
-      title: "AI-Driven Cybersecurity: Challenges and Opportunities",
-      event: "International Conference on Cybersecurity",
-      date: "March 15, 2024",
-      venue: "Convention Center, New Delhi",
-      host: "IEEE Computer Society",
-      role: "Keynote Speaker",
-      audience: "500+ Researchers and Industry Professionals",
-      type: "keynote",
-      hasRecording: true,
-      hasSlides: true,
-      description: "Comprehensive overview of how artificial intelligence is transforming cybersecurity landscape, covering latest research trends and real-world applications."
-    },
-    {
-      title: "Machine Learning for IoT Security: A Practical Approach",
-      event: "National Workshop on IoT Security",
-      date: "January 20, 2024",
-      venue: "IIT Delhi",
-      host: "Department of Computer Science, IIT Delhi",
-      role: "Invited Speaker",
-      audience: "200+ Faculty and Students",
-      type: "invited",
-      hasRecording: false,
-      hasSlides: true,
-      description: "Hands-on workshop covering practical implementation of ML algorithms for securing IoT devices and networks."
-    },
-    {
-      title: "Federated Learning: Privacy-Preserving AI",
-      event: "Tech Talk Series",
-      date: "November 10, 2023",
-      venue: "Microsoft India Development Center",
-      host: "Microsoft Research India",
-      role: "Guest Lecturer",
-      audience: "100+ Researchers and Engineers",
-      type: "guest-lecture",
-      hasRecording: true,
-      hasSlides: true,
-      description: "Deep dive into federated learning techniques and their applications in maintaining privacy while training machine learning models."
-    },
-    {
-      title: "Future of Recommendation Systems in Education",
-      event: "EdTech Innovation Summit",
-      date: "September 5, 2023",
-      venue: "Bangalore International Exhibition Centre",
-      host: "EdTech India Association",
-      role: "Panel Discussion",
-      audience: "300+ EdTech Professionals",
-      type: "panel",
-      hasRecording: true,
-      hasSlides: false,
-      description: "Panel discussion on emerging trends in educational technology and the role of AI in personalized learning."
-    },
-    {
-      title: "Ethical AI and Algorithmic Fairness",
-      event: "National Conference on AI Ethics",
-      date: "July 18, 2023",
-      venue: "IISC Bangalore",
-      host: "Indian Institute of Science",
-      role: "Invited Speaker",
-      audience: "250+ Academicians and Policymakers",
-      type: "invited",
-      hasRecording: false,
-      hasSlides: true,
-      description: "Discussion on ethical considerations in AI development and the importance of algorithmic fairness in real-world applications."
-    }
-  ];
+export const TalksTab = ({ profile }) => {
+  const tabData = profile?.tabData?.talks || DUMMY_FACULTY_TAB_DATA.talks;
+  const invitedTalks = tabData.invitedTalks || [];
 
   const getTypeColor = (type) => {
     switch (type) {

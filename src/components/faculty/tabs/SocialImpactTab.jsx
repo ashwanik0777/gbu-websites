@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Card Component
 const Card = ({ className = '', children }) => (
   <div className={`rounded-xl bg-white border border-gray-200 border-solid shadow-sm${className}`}>{children}</div>
@@ -46,89 +47,9 @@ const Button = ({ variant = "solid", size = "md", className = '', children, ...p
 };
 import { Heart, Users, Calendar, MapPin, TreePine, GraduationCap, Lightbulb, Camera } from 'lucide-react';
 
-export const SocialImpactTab = () => {
-  const socialActivities = [
-    {
-      title: "Digital Literacy Program for Rural Communities",
-      organization: "NSS Unit, Gautam Buddha University",
-      duration: "2023 - Present",
-      type: "community-outreach",
-      beneficiaries: "500+ villagers",
-      location: "Villages around Greater Noida",
-      description: "Leading digital literacy initiatives to bridge the digital divide by teaching basic computer skills, internet usage, and digital financial services to rural communities.",
-      impact: [
-        "Trained 500+ villagers in basic computer operations",
-        "Helped 200+ families access government digital services",
-        "Established 5 digital learning centers",
-        "Created employment opportunities for 50+ youth"
-      ],
-      images: 3
-    },
-    {
-      title: "Cybersecurity Awareness Campaign",
-      organization: "Cyber Crime Cell, UP Police",
-      duration: "2022 - Present",
-      type: "awareness",
-      beneficiaries: "10,000+ citizens",
-      location: "Uttar Pradesh",
-      description: "Conducting awareness sessions on cybersecurity, online fraud prevention, and safe internet practices for students, senior citizens, and small business owners.",
-      impact: [
-        "Conducted 50+ awareness sessions",
-        "Reached 10,000+ participants across UP",
-        "Developed multilingual awareness materials",
-        "Prevented potential cyber fraud cases"
-      ],
-      images: 5
-    },
-    {
-      title: "Tree Plantation & Environmental Conservation",
-      organization: "Green Campus Initiative",
-      duration: "2021 - Present",
-      type: "environmental",
-      beneficiaries: "University Community",
-      location: "Gautam Buddha University Campus",
-      description: "Leading environmental conservation efforts including tree plantation drives, waste management initiatives, and promoting sustainable practices on campus.",
-      impact: [
-        "Planted 1000+ trees on campus",
-        "Implemented waste segregation system",
-        "Reduced campus plastic usage by 60%",
-        "Created awareness among 5000+ students"
-      ],
-      images: 4
-    },
-    {
-      title: "Free Coding Bootcamp for Underprivileged Students",
-      organization: "Education for All Initiative",
-      duration: "2022 - 2023",
-      type: "education",
-      beneficiaries: "200+ students",
-      location: "Delhi NCR",
-      description: "Organizing free coding workshops and bootcamps for underprivileged students to provide them with technical skills and career opportunities in IT sector.",
-      impact: [
-        "Trained 200+ underprivileged students",
-        "80% placement rate in IT companies",
-        "Partnered with 10+ companies for placements",
-        "Provided scholarships to 50 students"
-      ],
-      images: 6
-    },
-    {
-      title: "COVID-19 Relief & Digital Health Solutions",
-      organization: "University Health Committee",
-      duration: "2020 - 2022",
-      type: "healthcare",
-      beneficiaries: "2000+ individuals",
-      location: "Greater Noida & surrounding areas",
-      description: "Developed digital solutions for health monitoring during COVID-19 and organized relief activities for affected families in the community.",
-      impact: [
-        "Developed contactless health monitoring app",
-        "Distributed relief materials to 500+ families",
-        "Organized virtual health consultations",
-        "Created COVID-19 awareness content"
-      ],
-      images: 2
-    }
-  ];
+export const SocialImpactTab = ({ profile }) => {
+  const tabData = profile?.tabData?.socialImpact || DUMMY_FACULTY_TAB_DATA.socialImpact;
+  const socialActivities = tabData.socialActivities || [];
 
   const getTypeColor = (type) => {
     switch (type) {

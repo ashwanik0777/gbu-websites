@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Card Component
 const Card = ({ className = "", children }) => (
   <div className={`rounded-xl bg-white border shadow-sm ${className}`}>{children}</div>
@@ -51,70 +52,11 @@ const Button = ({
 };
 import { Users, Mail, ExternalLink, Calendar, FileText } from 'lucide-react';
 
-export const ResearchGroupTab = () => {
-  const phdScholars = [
-    {
-      name: "Priya Sharma",
-      program: "PhD Computer Science",
-      year: "2023 - Present",
-      researchArea: "Machine Learning for Cybersecurity",
-      status: "First Year",
-      publications: 2,
-      email: "priya.sharma@gbu.ac.in",
-      thesis: "Deep Learning Approaches for Intrusion Detection in IoT Networks"
-    },
-    {
-      name: "Rajesh Kumar",
-      program: "PhD Computer Science",
-      year: "2022 - Present",
-      researchArea: "Natural Language Processing",
-      status: "Second Year",
-      publications: 4,
-      email: "rajesh.kumar@gbu.ac.in",
-      thesis: "Sentiment Analysis for Mental Health Assessment in Social Media"
-    },
-    {
-      name: "Anita Verma",
-      program: "PhD Computer Science",
-      year: "2021 - Present",
-      researchArea: "Recommendation Systems",
-      status: "Third Year",
-      publications: 6,
-      email: "anita.verma@gbu.ac.in",
-      thesis: "Context-Aware Recommendation Systems for E-Learning Platforms"
-    }
-  ];
-
-  const postdocs = [
-    {
-      name: "Dr. Suresh Patel",
-      position: "Postdoctoral Fellow",
-      duration: "2023 - 2025",
-      researchArea: "AI Ethics and Fairness",
-      previousInstitute: "IIT Delhi",
-      publications: 12,
-      email: "suresh.patel@gbu.ac.in"
-    }
-  ];
-
-  const researchAssistants = [
-    {
-      name: "Neha Gupta",
-      program: "M.Tech Computer Science",
-      year: "2024 - Present",
-      project: "Cybersecurity Framework for IoT",
-      role: "Research Assistant",
-      email: "neha.gupta@gbu.ac.in"
-    },
-    {
-      name: "Amit Singh",
-      program: "M.Tech Computer Science",
-      year: "2024 - Present",
-      project: "Social Media Sentiment Analysis",
-      role: "Research Assistant",
-      email: "amit.singh@gbu.ac.in"
-    }
-  ];
+export const ResearchGroupTab = ({ profile }) => {
+  const tabData = profile?.tabData?.researchGroup || DUMMY_FACULTY_TAB_DATA.researchGroup;
+  const phdScholars = tabData.phdScholars || [];
+  const postdocs = tabData.postdocs || [];
+  const researchAssistants = tabData.researchAssistants || [];
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {

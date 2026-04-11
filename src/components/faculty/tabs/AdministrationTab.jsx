@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Card, CardHeader, CardTitle, CardContent, and Badge components defined here for best UI/UX
 
 const Card = ({ className = '', children }) => (
@@ -29,79 +30,10 @@ const Badge = ({ children, className = '' }) => (
 );
 import { Calendar, MapPin, Settings, Users } from 'lucide-react';
 
-export const AdministrationTab = () => {
-  const administrativeRoles = [
-    {
-      role: "Faculty Coordinator - Research & Development",
-      department: "School of ICT",
-      institution: "Gautam Buddha University",
-      duration: "2023 - Present",
-      status: "ongoing",
-      responsibilities: [
-        "Coordinate research activities across departments",
-        "Facilitate industry-academia collaborations",
-        "Organize research seminars and workshops",
-        "Mentor junior faculty in research endeavors"
-      ]
-    },
-    {
-      role: "Member - Academic Council",
-      department: "University Level",
-      institution: "Gautam Buddha University",
-      duration: "2022 - Present",
-      status: "ongoing",
-      responsibilities: [
-        "Participate in curriculum development decisions",
-        "Review academic policies and procedures",
-        "Contribute to strategic planning initiatives",
-        "Represent faculty interests in university governance"
-      ]
-    },
-    {
-      role: "Coordinator - Clubs & Societies",
-      department: "Student Affairs",
-      institution: "Gautam Buddha University",
-      duration: "2021 - 2023",
-      status: "completed",
-      responsibilities: [
-        "Oversee student club activities and events",
-        "Coordinate inter-collegiate competitions",
-        "Mentor student leadership development",
-        "Organize cultural and technical festivals"
-      ]
-    },
-    {
-      role: "Member - Recruitment Committee",
-      department: "HR Department",
-      institution: "Gautam Buddha University",
-      duration: "2022 - 2023",
-      status: "completed",
-      responsibilities: [
-        "Participate in faculty recruitment processes",
-        "Conduct interviews and evaluate candidates",
-        "Review and recommend policy improvements",
-        "Ensure fair and transparent hiring practices"
-      ]
-    }
-  ];
-
-  const committees = [
-    {
-      name: "Board of Studies - Computer Science",
-      role: "Member",
-      period: "2022 - Present"
-    },
-    {
-      name: "Library Advisory Committee",
-      role: "Faculty Representative",
-      period: "2023 - Present"
-    },
-    {
-      name: "Internal Quality Assurance Cell (IQAC)",
-      role: "Coordinator",
-      period: "2021 - 2022"
-    }
-  ];
+export const AdministrationTab = ({ profile }) => {
+  const tabData = profile?.tabData?.administration || DUMMY_FACULTY_TAB_DATA.administration;
+  const administrativeRoles = tabData.administrativeRoles || [];
+  const committees = tabData.committees || [];
 
   const getStatusColor = (status) => {
     return status === 'ongoing' 

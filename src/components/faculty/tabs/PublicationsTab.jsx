@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 import {
   Filter,
   Calendar,
@@ -93,123 +94,13 @@ const Button = ({
   );
 };
 
-export default function PublicationsTab() {
+export default function PublicationsTab({ profile }) {
   const [activeTab, setActiveTab] = useState("publications");
   const [selectedYear, setSelectedYear] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
-
-  const publications = [
-    {
-      title:
-        "Deep Learning Approaches for Cybersecurity in IoT Networks: A Comprehensive Survey",
-      authors: "G. Kumar, P. Sharma, R. Singh",
-      venue: "IEEE Transactions on Network and Service Management",
-      year: 2024,
-      type: "journal",
-      doi: "10.1109/TNSM.2024.1234567",
-      citations: 45,
-      quartile: "Q1",
-      impactFactor: 4.682,
-    },
-    {
-      title:
-        "Sentiment Analysis for Mental Health Monitoring: A Multi-Modal Deep Learning Framework",
-      authors: "G. Kumar, A. Verma, S. Patel",
-      venue:
-        "Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing",
-      year: 2024,
-      type: "conference",
-      doi: "10.18653/v1/2024.emnlp-main.123",
-      citations: 23,
-      ranking: "A*",
-    },
-    {
-      title: "Context-Aware Recommendation Systems for Personalized E-Learning",
-      authors: "G. Kumar, N. Gupta, R. Kumar",
-      venue: "Computers & Education",
-      year: 2023,
-      type: "journal",
-      doi: "10.1016/j.compedu.2023.104567",
-      citations: 67,
-      quartile: "Q1",
-      impactFactor: 6.757,
-    },
-    {
-      title:
-        "Machine Learning-Based Intrusion Detection for Smart Home IoT Devices",
-      authors: "G. Kumar, P. Sharma",
-      venue: "2023 IEEE International Conference on Communications",
-      year: 2023,
-      type: "conference",
-      doi: "10.1109/ICC45041.2023.9234567",
-      citations: 34,
-      ranking: "A",
-    },
-    {
-      title: "Federated Learning for Privacy-Preserving Recommendation Systems",
-      authors: "G. Kumar, A. Verma, S. Singh",
-      venue: "ACM Transactions on Intelligent Systems and Technology",
-      year: 2023,
-      type: "journal",
-      doi: "10.1145/3567890.1234567",
-      citations: 89,
-      quartile: "Q1",
-      impactFactor: 3.971,
-    },
-    {
-      title: "Explainable AI for Cybersecurity: A Systematic Literature Review",
-      authors: "G. Kumar, R. Singh, P. Sharma",
-      venue: "IEEE Security & Privacy",
-      year: 2022,
-      type: "journal",
-      doi: "10.1109/MSEC.2022.1234567",
-      citations: 156,
-      quartile: "Q1",
-      impactFactor: 2.293,
-    },
-  ];
-
-  const patents = [
-    {
-      title: "AI-Based Intrusion Detection System for IoT Networks",
-      applicationNo: "202341012345",
-      status: "Filed",
-      filedYear: 2024,
-      country: "India",
-      patentOffice: "Indian Patent Office",
-      inventors: ["Dr. Gaurav Kumar", "Priya Sharma", "Rajesh Singh"],
-      description:
-        "A novel machine learning framework for real-time detection and prevention of cyber attacks in Internet of Things networks using deep neural networks and ensemble methods.",
-      technicalField: "Cybersecurity, Machine Learning, IoT",
-      applicationDate: "15th March 2024",
-    },
-    {
-      title: "Context-Aware Recommendation Engine for Educational Platforms",
-      applicationNo: "202341023456",
-      status: "Under Examination",
-      filedYear: 2023,
-      country: "India",
-      patentOffice: "Indian Patent Office",
-      inventors: ["Dr. Gaurav Kumar", "Neha Gupta", "Anita Verma"],
-      description:
-        "An intelligent recommendation system that adapts to learner's context, preferences, and learning patterns to provide personalized educational content and learning paths.",
-      technicalField: "Machine Learning, Education Technology",
-      applicationDate: "8th September 2023",
-    },
-    {
-      title: "Federated Learning System for Privacy-Preserving Data Analytics",
-      applicationNo: "202241034567",
-      status: "Published",
-      filedYear: 2022,
-      country: "India",
-      patentOffice: "Indian Patent Office",
-      inventors: ["Dr. Gaurav Kumar", "Suresh Patel"],
-      description:
-        "A distributed machine learning framework that enables collaborative model training across multiple parties while preserving data privacy and security.",
-      technicalField: "Privacy-Preserving ML, Distributed Systems",
-      applicationDate: "22nd November 2022",
-    },
-  ];
+  const tabData = profile?.tabData?.publications || DUMMY_FACULTY_TAB_DATA.publications;
+  const publications = tabData.publications || [];
+  const patents = tabData.patents || [];
 
   const years = [...new Set(publications.map((p) => p.year))].sort(
     (a, b) => b - a

@@ -1,4 +1,5 @@
 import React from 'react';
+import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Minimal UI components with styles matching usage in this file
  export const Card = ({ className = "", children, ...props }) => (
    <div className={`bg-white rounded-xl border border-gray-200 border-solid shadow-sm${className}`} {...props}>
@@ -71,93 +72,10 @@ export const Button = ({
 };
 import { Award, Calendar, ExternalLink, CheckCircle } from 'lucide-react';
 
-export const CertificationsTab = () => {
-  const certifications = [
-    {
-      title: "Google Cloud Professional Machine Learning Engineer",
-      platform: "Google Cloud",
-      year: 2024,
-      validUntil: "2026",
-      credentialId: "GCP-PML-2024-789456",
-      skills: ["Machine Learning", "TensorFlow", "Google Cloud Platform", "MLOps"],
-      level: "Professional",
-      verified: true
-    },
-    {
-      title: "AWS Certified Solutions Architect - Associate",
-      platform: "Amazon Web Services",
-      year: 2023,
-      validUntil: "2026",
-      credentialId: "AWS-SAA-2023-123456",
-      skills: ["Cloud Architecture", "AWS Services", "Security", "Scalability"],
-      level: "Associate",
-      verified: true
-    },
-    {
-      title: "Certified Ethical Hacker (CEH)",
-      platform: "EC-Council",
-      year: 2023,
-      validUntil: "2026",
-      credentialId: "CEH-2023-654321",
-      skills: ["Penetration Testing", "Vulnerability Assessment", "Network Security", "Ethical Hacking"],
-      level: "Professional",
-      verified: true
-    },
-    {
-      title: "Deep Learning Specialization",
-      platform: "Coursera (DeepLearning.AI)",
-      year: 2022,
-      validUntil: "Lifetime",
-      credentialId: "DL-SPEC-2022-987654",
-      skills: ["Neural Networks", "Deep Learning", "Computer Vision", "NLP"],
-      level: "Specialization",
-      verified: true
-    },
-    {
-      title: "Cisco Certified Network Associate (CCNA)",
-      platform: "Cisco",
-      year: 2022,
-      validUntil: "2025",
-      credentialId: "CCNA-2022-456789",
-      skills: ["Networking", "Routing", "Switching", "Network Security"],
-      level: "Associate",
-      verified: true
-    },
-    {
-      title: "Certified Information Systems Security Professional (CISSP)",
-      platform: "ISC²",
-      year: 2021,
-      validUntil: "2024",
-      credentialId: "CISSP-2021-321654",
-      skills: ["Information Security", "Risk Management", "Security Architecture", "Governance"],
-      level: "Professional",
-      verified: true
-    }
-  ];
-
-  const professionalDevelopment = [
-    {
-      title: "Advanced Research Methodology Workshop",
-      organizer: "University Grants Commission",
-      year: 2024,
-      duration: "5 days",
-      type: "Workshop"
-    },
-    {
-      title: "Faculty Development Program on AI & ML",
-      organizer: "AICTE",
-      year: 2023,
-      duration: "2 weeks",
-      type: "FDP"
-    },
-    {
-      title: "International Conference on Machine Learning (ICML)",
-      organizer: "ICML Foundation",
-      year: 2023,
-      duration: "4 days",
-      type: "Conference"
-    }
-  ];
+export const CertificationsTab = ({ profile }) => {
+  const tabData = profile?.tabData?.certifications || DUMMY_FACULTY_TAB_DATA.certifications;
+  const certifications = tabData.certifications || [];
+  const professionalDevelopment = tabData.professionalDevelopment || [];
 
   const getLevelColor = (level) => {
     switch (level.toLowerCase()) {

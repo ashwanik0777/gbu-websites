@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 import {
   Filter,
   Calendar,
@@ -82,62 +83,10 @@ const Button = ({
 };
 
 // Research Projects Tab Component
-const ResearchProjectsTab = () => {
+const ResearchProjectsTab = ({ profile }) => {
   const [filterStatus, setFilterStatus] = useState("all");
-
-  const projects = [
-    {
-      title: "AI-Driven Cybersecurity Framework for IoT Networks",
-      fundingAgency: "Department of Science & Technology (DST)",
-      role: "Principal Investigator",
-      duration: "2023 - 2026",
-      budget: "₹12,50,000",
-      status: "ongoing",
-      description:
-        "Development of machine learning algorithms for real-time threat detection and prevention in Internet of Things networks.",
-      collaborators: ["Dr. Rajesh Singh", "Dr. Priya Sharma"],
-      deliverables: [
-        "Novel ML algorithms for IoT security",
-        "Research publications in top-tier journals",
-        "Patent filing for developed framework",
-        "Training of 2 PhD students",
-      ],
-    },
-    {
-      title: "Sentiment Analysis for Social Media Mental Health Monitoring",
-      fundingAgency: "Indian Council of Medical Research (ICMR)",
-      role: "Co-Principal Investigator",
-      duration: "2022 - 2024",
-      budget: "₹8,75,000",
-      status: "ongoing",
-      description:
-        "Advanced NLP techniques for early detection of mental health issues through social media content analysis.",
-      collaborators: ["Dr. Anita Verma", "Dr. Suresh Kumar"],
-      deliverables: [
-        "Mental health monitoring system",
-        "Dataset of annotated social media posts",
-        "Clinical validation studies",
-        "Mobile application prototype",
-      ],
-    },
-    {
-      title: "Recommendation Systems for E-Learning Platforms",
-      fundingAgency: "University Grants Commission (UGC)",
-      role: "Principal Investigator",
-      duration: "2021 - 2023",
-      budget: "₹6,25,000",
-      status: "completed",
-      description:
-        "Personalized learning path recommendation using collaborative filtering and content-based approaches.",
-      collaborators: ["Dr. Neha Gupta"],
-      deliverables: [
-        "Recommendation engine prototype",
-        "Conference proceedings",
-        "Industry partnership with EdTech company",
-        "Training of 3 M.Tech students",
-      ],
-    },
-  ];
+  const tabData = profile?.tabData?.researchProjects || DUMMY_FACULTY_TAB_DATA.researchProjects;
+  const projects = tabData.projects || [];
 
   const filteredProjects =
     filterStatus === "all"
@@ -305,71 +254,11 @@ const ResearchProjectsTab = () => {
 };
 
 // Research Group Tab Component
-const ResearchGroupTab = () => {
-  const phdScholars = [
-    {
-      name: "Priya Sharma",
-      program: "PhD Computer Science",
-      year: "2023 - Present",
-      researchArea: "Machine Learning for Cybersecurity",
-      status: "First Year",
-      publications: 2,
-      email: "priya.sharma@gbu.ac.in",
-      thesis:
-        "Deep Learning Approaches for Intrusion Detection in IoT Networks",
-    },
-    {
-      name: "Rajesh Kumar",
-      program: "PhD Computer Science",
-      year: "2022 - Present",
-      researchArea: "Natural Language Processing",
-      status: "Second Year",
-      publications: 4,
-      email: "rajesh.kumar@gbu.ac.in",
-      thesis: "Sentiment Analysis for Mental Health Assessment in Social Media",
-    },
-    {
-      name: "Anita Verma",
-      program: "PhD Computer Science",
-      year: "2021 - Present",
-      researchArea: "Recommendation Systems",
-      status: "Third Year",
-      publications: 6,
-      email: "anita.verma@gbu.ac.in",
-      thesis: "Context-Aware Recommendation Systems for E-Learning Platforms",
-    },
-  ];
-
-  const postdocs = [
-    {
-      name: "Dr. Suresh Patel",
-      position: "Postdoctoral Fellow",
-      duration: "2023 - 2025",
-      researchArea: "AI Ethics and Fairness",
-      previousInstitute: "IIT Delhi",
-      publications: 12,
-      email: "suresh.patel@gbu.ac.in",
-    },
-  ];
-
-  const researchAssistants = [
-    {
-      name: "Neha Gupta",
-      program: "M.Tech Computer Science",
-      year: "2024 - Present",
-      project: "Cybersecurity Framework for IoT",
-      role: "Research Assistant",
-      email: "neha.gupta@gbu.ac.in",
-    },
-    {
-      name: "Amit Singh",
-      program: "M.Tech Computer Science",
-      year: "2024 - Present",
-      project: "Social Media Sentiment Analysis",
-      role: "Research Assistant",
-      email: "amit.singh@gbu.ac.in",
-    },
-  ];
+const ResearchGroupTab = ({ profile }) => {
+  const tabData = profile?.tabData?.researchGroup || DUMMY_FACULTY_TAB_DATA.researchGroup;
+  const phdScholars = tabData.phdScholars || [];
+  const postdocs = tabData.postdocs || [];
+  const researchAssistants = tabData.researchAssistants || [];
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
@@ -617,7 +506,7 @@ const ResearchGroupTab = () => {
 };
 
 // Main Combined Component
-const ResearchProjectsAndGroup = () => {
+const ResearchProjectsAndGroup = ({ profile }) => {
   const [activeTab, setActiveTab] = useState("projects");
 
   return (
@@ -663,9 +552,9 @@ const ResearchProjectsAndGroup = () => {
         {/* Tab Content */}
         <div className="transition-opacity duration-300">
           {activeTab === "projects" ? (
-            <ResearchProjectsTab />
+            <ResearchProjectsTab profile={profile} />
           ) : (
-            <ResearchGroupTab />
+            <ResearchGroupTab profile={profile} />
           )}
         </div>
       </div>
