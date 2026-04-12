@@ -1263,7 +1263,6 @@ const AdminDashboard = () => {
           <section className={cardClass}>
             <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">Admin Dashboard</h1>
             <p className="mt-1 text-sm text-slate-600">
-                {/* simple 2 words only  */}
                 Manage your school data, faculty profiles, and user accounts all in one place.
 
             </p>
