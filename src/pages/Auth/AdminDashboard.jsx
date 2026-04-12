@@ -64,8 +64,8 @@ const Field = ({ label, children }) => (
 
 const FilterBar = ({ searchValue, onSearchChange, searchPlaceholder, children, onClear }) => (
   <div className="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-      <div className="relative">
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="relative min-w-[220px] flex-1">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <input
           className="w-full rounded-xl border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-slate-700"
@@ -76,7 +76,7 @@ const FilterBar = ({ searchValue, onSearchChange, searchPlaceholder, children, o
         />
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
         <span className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-2 py-2 text-xs font-medium text-slate-600">
           <ListFilter className="h-3.5 w-3.5" /> Filters
         </span>
@@ -258,7 +258,9 @@ const AdminDashboard = () => {
 
   const filteredAccounts = useMemo(() => {
     const query = accountFilters.query.trim().toLowerCase();
-    return accounts.filter((acc) => {
+    return accounts
+      .map((acc, index) => ({ acc, index }))
+      .filter(({ acc }) => {
       const matchesQuery =
         !query ||
         [acc.name, acc.username, acc.linkedFacultyId, acc.linkedSchool]
@@ -269,7 +271,7 @@ const AdminDashboard = () => {
       const matchesRole = accountFilters.role === "all" || acc.role === accountFilters.role;
       const matchesStatus = accountFilters.status === "all" || acc.status === accountFilters.status;
       return matchesQuery && matchesRole && matchesStatus;
-    });
+      });
   }, [accounts, accountFilters]);
 
   const departmentOptions = useMemo(() => {
@@ -281,7 +283,9 @@ const AdminDashboard = () => {
 
   const filteredFacultyProfiles = useMemo(() => {
     const query = facultyFilters.query.trim().toLowerCase();
-    return facultyProfiles.filter((faculty) => {
+    return facultyProfiles
+      .map((faculty, index) => ({ faculty, index }))
+      .filter(({ faculty }) => {
       const matchesQuery =
         !query ||
         [faculty.name, faculty.designation, faculty.department, faculty.email, faculty.phone]
@@ -292,7 +296,7 @@ const AdminDashboard = () => {
       const matchesDepartment =
         facultyFilters.department === "all" || faculty.department === facultyFilters.department;
       return matchesQuery && matchesDepartment;
-    });
+      });
   }, [facultyProfiles, facultyFilters]);
 
   const renderCollectionEditor = (listKey, title, fields, newItemTemplate) => (
@@ -493,8 +497,7 @@ const AdminDashboard = () => {
             </FilterBar>
 
             <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
-              {filteredAccounts.map((acc, index) => {
-                const actualIndex = accounts.findIndex((item) => item.id === acc.id);
+              {filteredAccounts.map(({ acc, index: actualIndex }, index) => {
                 return (
               <div key={acc.id || index} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                 <div className="flex items-start justify-between gap-2">
@@ -701,8 +704,7 @@ const AdminDashboard = () => {
           </FilterBar>
 
           <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
-            {filteredFacultyProfiles.map((faculty, index) => {
-              const actualIndex = facultyProfiles.findIndex((item) => item.id === faculty.id);
+            {filteredFacultyProfiles.map(({ faculty, index: actualIndex }, index) => {
               return (
             <div key={faculty.id || index} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
               <div className="flex items-start justify-between gap-2">
