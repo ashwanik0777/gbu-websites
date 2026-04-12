@@ -626,34 +626,8 @@ const AdminDashboard = () => {
 
   const renderSchoolTab = () => (
     <div className="space-y-4">
-      <div className={cardClass}>
-        <h2 className="mb-4 text-lg font-semibold text-slate-900">School Content Manager</h2>
-        <p className="mb-4 text-sm text-slate-600">
-          Separate tabs for each content area so data is easier to manage.
-        </p>
 
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
-          {schoolContentTabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeSchoolSubTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveSchoolSubTab(tab.id)}
-                className={`inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${
-                  isActive
-                    ? "bg-slate-900 text-white shadow"
-                    : "border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+       
 
       {activeSchoolSubTab === "basic" && (
         <div className={cardClass}>
@@ -813,17 +787,48 @@ const AdminDashboard = () => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
                 return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition ${
-                      isActive ? "bg-slate-900 text-white shadow" : "text-slate-700 hover:bg-slate-100"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {tab.label}
-                  </button>
+                  <div key={tab.id} className="space-y-1">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition ${
+                        isActive ? "bg-slate-900 text-white shadow" : "text-slate-700 hover:bg-slate-100"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {tab.label}
+                    </button>
+
+                    {tab.id === "school" && isActive && (
+                      <div className="relative ml-2 mt-2 space-y-2 pl-5">
+                        <div className="pointer-events-none absolute bottom-2 left-1 top-2 w-1 rounded-full bg-gradient-to-b from-blue-200 via-indigo-200 to-sky-200" />
+                        {schoolContentTabs.map((subTab) => {
+                          const SubIcon = subTab.icon;
+                          const isSubActive = activeSchoolSubTab === subTab.id;
+                          return (
+                            <button
+                              key={subTab.id}
+                              type="button"
+                              onClick={() => setActiveSchoolSubTab(subTab.id)}
+                              className={`group relative flex w-full items-center gap-2 rounded-2xl border px-3 py-2.5 text-left text-xs font-semibold transition-all duration-200 ${
+                                isSubActive
+                                  ? "border-blue-400 bg-blue-50 text-slate-900 shadow-sm"
+                                  : "border-transparent bg-slate-50/70 text-slate-600 hover:border-slate-200 hover:bg-white hover:text-slate-900"
+                              }`}
+                            >
+                              <span
+                                className={`absolute -left-[18px] h-2.5 w-2.5 rounded-full ring-4 ring-white transition ${
+                                  isSubActive ? "bg-blue-500" : "bg-slate-300 group-hover:bg-slate-400"
+                                }`}
+                              />
+                              <SubIcon className={`h-3.5 w-3.5 ${isSubActive ? "text-blue-600" : "text-slate-500"}`} />
+                              {subTab.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -857,7 +862,9 @@ const AdminDashboard = () => {
           <section className={cardClass}>
             <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">Admin Dashboard</h1>
             <p className="mt-1 text-sm text-slate-600">
-              Single control center for School + Faculty + User account management.
+                {/* simple 2 words only  */}
+                Manage your school data, faculty profiles, and user accounts all in one place.
+
             </p>
             {message ? <p className="mt-3 text-sm font-medium text-emerald-700">{message}</p> : null}
           </section>
