@@ -1,6 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserCog, School, GraduationCap, Eye, EyeOff, ShieldCheck, Building2 } from "lucide-react";
+import {
+  ADMIN_PORTAL_ACCOUNTS_KEY,
+  DEFAULT_ADMIN_PORTAL_ACCOUNTS,
+} from "../../Data/adminDashboardData";
 
 const ROLE_OPTIONS = [
   {
@@ -45,6 +49,36 @@ const LoginPortal = () => {
       return;
     }
 
+    let accounts = DEFAULT_ADMIN_PORTAL_ACCOUNTS;
+    try {
+      const raw = localStorage.getItem(ADMIN_PORTAL_ACCOUNTS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length) accounts = parsed;
+      }
+    } catch {
+      accounts = DEFAULT_ADMIN_PORTAL_ACCOUNTS;
+    }
+
+    const roleMap = {
+      teacher: ["teacher", "faculty"],
+      school: ["school"],
+      admin: ["admin"],
+    };
+
+    const matched = accounts.find(
+      (acc) =>
+        acc?.status !== "inactive" &&
+        roleMap[role]?.includes(acc?.role) &&
+        String(acc?.username || "").trim() === username.trim() &&
+        String(acc?.password || "").trim() === password.trim(),
+    );
+
+    if (!matched) {
+      setError("Invalid credentials for selected role.");
+      return;
+    }
+
     if (role === "teacher") {
       navigate("/faculty-portal/dashboard");
       return;
@@ -55,7 +89,7 @@ const LoginPortal = () => {
       return;
     }
 
-    navigate("/comingSoon");
+    navigate("/admin-portal/dashboard");
   };
 
   return (

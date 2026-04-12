@@ -21,7 +21,8 @@ function App() {
   const isICTPage = location.pathname.startsWith("/schools");
   const isFacultyPortalPage = location.pathname.startsWith("/faculty-portal");
   const isSchoolPortalPage = location.pathname.startsWith("/school-portal");
-  const isPortalPage = isFacultyPortalPage || isSchoolPortalPage;
+  const isAdminPortalPage = location.pathname.startsWith("/admin-portal");
+  const isPortalPage = isFacultyPortalPage || isSchoolPortalPage || isAdminPortalPage;
 
   useEffect(() => {
     if (isPreloadComplete) {
