@@ -16,6 +16,8 @@ import {
   Trash2,
   Plus,
   KeyRound,
+  Search,
+  ListFilter,
 } from "lucide-react";
 import {
   DEFAULT_SCHOOL_DASHBOARD_DATA,
@@ -57,6 +59,37 @@ const Field = ({ label, children }) => (
   <div>
     <label className="mb-1 block text-sm font-medium text-slate-700">{label}</label>
     {children}
+  </div>
+);
+
+const FilterBar = ({ searchValue, onSearchChange, searchPlaceholder, children, onClear }) => (
+  <div className="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+    <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <input
+          className="w-full rounded-xl border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-slate-700"
+          type="text"
+          value={searchValue}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder={searchPlaceholder}
+        />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <span className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-2 py-2 text-xs font-medium text-slate-600">
+          <ListFilter className="h-3.5 w-3.5" /> Filters
+        </span>
+        {children}
+        <button
+          type="button"
+          onClick={onClear}
+          className="rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100"
+        >
+          Clear
+        </button>
+      </div>
+    </div>
   </div>
 );
 
@@ -137,6 +170,9 @@ const AdminDashboard = () => {
   const [accountEditor, setAccountEditor] = useState({ index: null, form: null });
   const [facultyEditor, setFacultyEditor] = useState({ index: null, form: null });
   const [collectionEditors, setCollectionEditors] = useState({});
+  const [accountFilters, setAccountFilters] = useState({ query: "", role: "all", status: "all" });
+  const [facultyFilters, setFacultyFilters] = useState({ query: "", department: "all" });
+  const [collectionFilters, setCollectionFilters] = useState({});
 
   const summary = useMemo(
     () => [
@@ -220,6 +256,45 @@ const AdminDashboard = () => {
     }));
   };
 
+  const filteredAccounts = useMemo(() => {
+    const query = accountFilters.query.trim().toLowerCase();
+    return accounts.filter((acc) => {
+      const matchesQuery =
+        !query ||
+        [acc.name, acc.username, acc.linkedFacultyId, acc.linkedSchool]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+      const matchesRole = accountFilters.role === "all" || acc.role === accountFilters.role;
+      const matchesStatus = accountFilters.status === "all" || acc.status === accountFilters.status;
+      return matchesQuery && matchesRole && matchesStatus;
+    });
+  }, [accounts, accountFilters]);
+
+  const departmentOptions = useMemo(() => {
+    const allDepartments = facultyProfiles
+      .map((item) => (item.department || "").trim())
+      .filter(Boolean);
+    return [...new Set(allDepartments)].sort((a, b) => a.localeCompare(b));
+  }, [facultyProfiles]);
+
+  const filteredFacultyProfiles = useMemo(() => {
+    const query = facultyFilters.query.trim().toLowerCase();
+    return facultyProfiles.filter((faculty) => {
+      const matchesQuery =
+        !query ||
+        [faculty.name, faculty.designation, faculty.department, faculty.email, faculty.phone]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+      const matchesDepartment =
+        facultyFilters.department === "all" || faculty.department === facultyFilters.department;
+      return matchesQuery && matchesDepartment;
+    });
+  }, [facultyProfiles, facultyFilters]);
+
   const renderCollectionEditor = (listKey, title, fields, newItemTemplate) => (
     <div className={cardClass}>
       <div className="mb-3 flex items-center justify-between">
@@ -234,36 +309,66 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="max-h-[420px] space-y-2 overflow-y-auto pr-1">
-          {(schoolData[listKey] || []).map((item, index) => {
-            const primaryValue = item.title || item.name || item.id || `Item ${index + 1}`;
-            return (
-              <div key={`${listKey}-${item.id || index}`} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-slate-900">{primaryValue}</p>
-                    <p className="text-xs text-slate-500">Item {index + 1}</p>
+        <div>
+          <FilterBar
+            searchValue={collectionFilters[listKey] || ""}
+            onSearchChange={(value) =>
+              setCollectionFilters((prev) => ({
+                ...prev,
+                [listKey]: value,
+              }))
+            }
+            searchPlaceholder={`Search ${title.toLowerCase()}...`}
+            onClear={() =>
+              setCollectionFilters((prev) => ({
+                ...prev,
+                [listKey]: "",
+              }))
+            }
+          />
+
+          <div className="max-h-[420px] space-y-2 overflow-y-auto pr-1">
+            {(schoolData[listKey] || [])
+              .map((item, index) => ({ item, index }))
+              .filter(({ item }) => {
+                const query = (collectionFilters[listKey] || "").trim().toLowerCase();
+                if (!query) return true;
+                return Object.values(item || {})
+                  .filter((value) => value !== null && value !== undefined)
+                  .join(" ")
+                  .toLowerCase()
+                  .includes(query);
+              })
+              .map(({ item, index }) => {
+                const primaryValue = item.title || item.name || item.id || `Item ${index + 1}`;
+                return (
+                  <div key={`${listKey}-${item.id || index}`} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-slate-900">{primaryValue}</p>
+                        <p className="text-xs text-slate-500">Item {index + 1}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openCollectionEdit(listKey, index, item)}
+                          className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        >
+                          <Pencil className="h-3.5 w-3.5" /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteCollectionItem(listKey, index)}
+                          className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Delete
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => openCollectionEdit(listKey, index, item)}
-                      className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
-                    >
-                      <Pencil className="h-3.5 w-3.5" /> Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => deleteCollectionItem(listKey, index)}
-                      className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" /> Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+                );
+              })}
+          </div>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -359,8 +464,38 @@ const AdminDashboard = () => {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2">
-          <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
-            {accounts.map((acc, index) => (
+          <div>
+            <FilterBar
+              searchValue={accountFilters.query}
+              onSearchChange={(value) => setAccountFilters((prev) => ({ ...prev, query: value }))}
+              searchPlaceholder="Search by name, username, faculty ID, school code..."
+              onClear={() => setAccountFilters({ query: "", role: "all", status: "all" })}
+            >
+              <select
+                className="rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs font-medium text-slate-700"
+                value={accountFilters.role}
+                onChange={(e) => setAccountFilters((prev) => ({ ...prev, role: e.target.value }))}
+              >
+                <option value="all">All Roles</option>
+                <option value="admin">admin</option>
+                <option value="school">school</option>
+                <option value="teacher">teacher</option>
+              </select>
+              <select
+                className="rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs font-medium text-slate-700"
+                value={accountFilters.status}
+                onChange={(e) => setAccountFilters((prev) => ({ ...prev, status: e.target.value }))}
+              >
+                <option value="all">All Status</option>
+                <option value="active">active</option>
+                <option value="inactive">inactive</option>
+              </select>
+            </FilterBar>
+
+            <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
+              {filteredAccounts.map((acc, index) => {
+                const actualIndex = accounts.findIndex((item) => item.id === acc.id);
+                return (
               <div key={acc.id || index} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
@@ -372,14 +507,14 @@ const AdminDashboard = () => {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setAccountEditor({ index, form: { ...acc } })}
+                      onClick={() => setAccountEditor({ index: actualIndex, form: { ...acc } })}
                       className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
                     >
                       <Pencil className="h-3.5 w-3.5" /> Edit
                     </button>
                     <button
                       type="button"
-                      onClick={() => setAccounts((prev) => prev.filter((_, i) => i !== index))}
+                      onClick={() => setAccounts((prev) => prev.filter((_, i) => i !== actualIndex))}
                       className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
                     >
                       <Trash2 className="h-3.5 w-3.5" /> Delete
@@ -387,7 +522,9 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               </div>
-            ))}
+                );
+              })}
+            </div>
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -542,8 +679,31 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
-          {facultyProfiles.map((faculty, index) => (
+        <div>
+          <FilterBar
+            searchValue={facultyFilters.query}
+            onSearchChange={(value) => setFacultyFilters((prev) => ({ ...prev, query: value }))}
+            searchPlaceholder="Search by name, designation, department, email, phone..."
+            onClear={() => setFacultyFilters({ query: "", department: "all" })}
+          >
+            <select
+              className="rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs font-medium text-slate-700"
+              value={facultyFilters.department}
+              onChange={(e) => setFacultyFilters((prev) => ({ ...prev, department: e.target.value }))}
+            >
+              <option value="all">All Departments</option>
+              {departmentOptions.map((department) => (
+                <option key={department} value={department}>
+                  {department}
+                </option>
+              ))}
+            </select>
+          </FilterBar>
+
+          <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
+            {filteredFacultyProfiles.map((faculty, index) => {
+              const actualIndex = facultyProfiles.findIndex((item) => item.id === faculty.id);
+              return (
             <div key={faculty.id || index} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -554,14 +714,14 @@ const AdminDashboard = () => {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => setFacultyEditor({ index, form: { ...faculty } })}
+                    onClick={() => setFacultyEditor({ index: actualIndex, form: { ...faculty } })}
                     className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
                   >
                     <Pencil className="h-3.5 w-3.5" /> Edit
                   </button>
                   <button
                     type="button"
-                    onClick={() => setFacultyProfiles((prev) => prev.filter((_, i) => i !== index))}
+                    onClick={() => setFacultyProfiles((prev) => prev.filter((_, i) => i !== actualIndex))}
                     className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
                   >
                     <Trash2 className="h-3.5 w-3.5" /> Delete
@@ -569,7 +729,9 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white p-4">
