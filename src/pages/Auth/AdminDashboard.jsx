@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Save,
@@ -18,6 +18,13 @@ import {
   KeyRound,
   Search,
   ListFilter,
+  Download,
+  Upload,
+  Activity,
+  AlertTriangle,
+  Eye,
+  EyeOff,
+  Sparkles,
 } from "lucide-react";
 import {
   DEFAULT_SCHOOL_DASHBOARD_DATA,
@@ -34,6 +41,7 @@ import {
 
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 const ensureArray = (value, fallback) => (Array.isArray(value) ? value : fallback);
+const ADMIN_ACTIVITY_LOG_KEY = "gbu_admin_activity_log";
 
 const cardClass = "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
 const inputClass =
@@ -157,6 +165,26 @@ const getFacultyProfiles = () => {
   return list;
 };
 
+const getInitialActivityLog = () => {
+  try {
+    const raw = localStorage.getItem(ADMIN_ACTIVITY_LOG_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const generateStrongPassword = () => {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$%!&*";
+  let password = "";
+  for (let i = 0; i < 12; i += 1) {
+    password += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return password;
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
@@ -173,6 +201,9 @@ const AdminDashboard = () => {
   const [accountFilters, setAccountFilters] = useState({ query: "", role: "all", status: "all" });
   const [facultyFilters, setFacultyFilters] = useState({ query: "", department: "all" });
   const [collectionFilters, setCollectionFilters] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [activityLog, setActivityLog] = useState(getInitialActivityLog);
+  const backupInputRef = useRef(null);
 
   const summary = useMemo(
     () => [
@@ -192,6 +223,14 @@ const AdminDashboard = () => {
         localStorage.setItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${faculty.id}`, JSON.stringify(faculty));
       }
     });
+    setActivityLog((prev) => [
+      {
+        id: `log-${Date.now()}`,
+        action: "Saved all dashboard data",
+        time: new Date().toISOString(),
+      },
+      ...prev,
+    ].slice(0, 12));
     setMessage("Admin dashboard saved. School + Faculty + User login system updated.");
   };
 
@@ -201,7 +240,89 @@ const AdminDashboard = () => {
     setFacultyProfiles([deepClone(DUMMY_FACULTY_DETAIL)]);
     localStorage.removeItem(SCHOOL_DASHBOARD_STORAGE_KEY);
     localStorage.removeItem(ADMIN_PORTAL_ACCOUNTS_KEY);
+    setActivityLog((prev) => [
+      {
+        id: `log-${Date.now()}`,
+        action: "Reset dashboard to defaults",
+        time: new Date().toISOString(),
+      },
+      ...prev,
+    ].slice(0, 12));
     setMessage("Admin dashboard reset to default data.");
+  };
+
+  useEffect(() => {
+    localStorage.setItem(ADMIN_ACTIVITY_LOG_KEY, JSON.stringify(activityLog));
+  }, [activityLog]);
+
+  const exportBackup = () => {
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      schoolData,
+      accounts,
+      facultyProfiles,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `gbu-admin-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setActivityLog((prev) => [
+      {
+        id: `log-${Date.now()}`,
+        action: "Exported admin backup",
+        time: new Date().toISOString(),
+      },
+      ...prev,
+    ].slice(0, 12));
+    setMessage("Backup exported successfully.");
+  };
+
+  const importBackup = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if (!parsed || typeof parsed !== "object") throw new Error("Invalid file format");
+
+      const importedSchoolData = parsed.schoolData
+        ? { ...deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA), ...parsed.schoolData }
+        : deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA);
+      const importedAccounts = Array.isArray(parsed.accounts)
+        ? parsed.accounts
+        : deepClone(DEFAULT_ADMIN_PORTAL_ACCOUNTS);
+      const importedFaculty = Array.isArray(parsed.facultyProfiles)
+        ? parsed.facultyProfiles
+        : [deepClone(DUMMY_FACULTY_DETAIL)];
+
+      setSchoolData(importedSchoolData);
+      setAccounts(importedAccounts);
+      setFacultyProfiles(importedFaculty);
+      localStorage.setItem(SCHOOL_DASHBOARD_STORAGE_KEY, JSON.stringify(importedSchoolData));
+      localStorage.setItem(ADMIN_PORTAL_ACCOUNTS_KEY, JSON.stringify(importedAccounts));
+      importedFaculty.forEach((faculty) => {
+        if (faculty?.id) {
+          localStorage.setItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${faculty.id}`, JSON.stringify(faculty));
+        }
+      });
+
+      setActivityLog((prev) => [
+        {
+          id: `log-${Date.now()}`,
+          action: "Imported admin backup",
+          time: new Date().toISOString(),
+        },
+        ...prev,
+      ].slice(0, 12));
+      setMessage("Backup imported and applied successfully.");
+    } catch {
+      setMessage("Backup import failed. Please select a valid JSON backup file.");
+    } finally {
+      event.target.value = "";
+    }
   };
 
   const normalizeFieldInput = (field, value) => {
@@ -298,6 +419,51 @@ const AdminDashboard = () => {
       return matchesQuery && matchesDepartment;
       });
   }, [facultyProfiles, facultyFilters]);
+
+  const healthChecks = useMemo(() => {
+    const inactiveAccounts = accounts.filter((item) => item.status === "inactive").length;
+    const schoolUsersWithoutCode = accounts.filter(
+      (item) => item.role === "school" && !String(item.linkedSchool || "").trim(),
+    ).length;
+    const facultyWithoutEmail = facultyProfiles.filter((item) => !String(item.email || "").trim()).length;
+    const sectionsMissingData = [
+      { key: "events", value: schoolData.events?.length || 0, label: "Events" },
+      { key: "news", value: schoolData.news?.length || 0, label: "News" },
+      { key: "notices", value: schoolData.notices?.length || 0, label: "Notices" },
+      { key: "newsletters", value: schoolData.newsletters?.length || 0, label: "Newsletters" },
+      { key: "gallery", value: schoolData.eventGallery?.length || 0, label: "Event Gallery" },
+    ]
+      .filter((item) => item.value === 0)
+      .map((item) => item.label);
+
+    return [
+      {
+        id: "inactive-accounts",
+        title: "Inactive Accounts",
+        value: inactiveAccounts,
+        status: inactiveAccounts > 0 ? "warning" : "good",
+      },
+      {
+        id: "school-code",
+        title: "School Users Missing Code",
+        value: schoolUsersWithoutCode,
+        status: schoolUsersWithoutCode > 0 ? "warning" : "good",
+      },
+      {
+        id: "faculty-email",
+        title: "Faculty Missing Email",
+        value: facultyWithoutEmail,
+        status: facultyWithoutEmail > 0 ? "warning" : "good",
+      },
+      {
+        id: "sections-empty",
+        title: "Empty Content Sections",
+        value: sectionsMissingData.length,
+        detail: sectionsMissingData.join(", "),
+        status: sectionsMissingData.length > 0 ? "warning" : "good",
+      },
+    ];
+  }, [accounts, facultyProfiles, schoolData]);
 
   const renderCollectionEditor = (listKey, title, fields, newItemTemplate) => (
     <div className={cardClass}>
@@ -566,13 +732,36 @@ const AdminDashboard = () => {
                     />
                   </Field>
                   <Field label="Password">
-                    <input
-                      className={inputClass}
-                      value={accountEditor.form.password || ""}
-                      onChange={(e) =>
-                        setAccountEditor((prev) => ({ ...prev, form: { ...prev.form, password: e.target.value } }))
-                      }
-                    />
+                    <div className="flex items-center gap-2">
+                      <input
+                        className={inputClass}
+                        type={showPassword ? "text" : "password"}
+                        value={accountEditor.form.password || ""}
+                        onChange={(e) =>
+                          setAccountEditor((prev) => ({ ...prev, form: { ...prev.form, password: e.target.value } }))
+                        }
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-slate-600 hover:bg-slate-100"
+                        title={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setAccountEditor((prev) => ({
+                            ...prev,
+                            form: { ...prev.form, password: generateStrongPassword() },
+                          }))
+                        }
+                        className="inline-flex h-10 items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                      >
+                        <Sparkles className="h-3.5 w-3.5" /> Generate
+                      </button>
+                    </div>
                   </Field>
                   <Field label="Role">
                     <select
@@ -630,6 +819,15 @@ const AdminDashboard = () => {
                       setMessage("Username, password and role are required.");
                       return;
                     }
+                    const duplicate = accounts.some(
+                      (item, idx) =>
+                        idx !== accountEditor.index &&
+                        String(item.username || "").toLowerCase() === String(form.username || "").toLowerCase(),
+                    );
+                    if (duplicate) {
+                      setMessage("This username already exists. Please use a unique username.");
+                      return;
+                    }
                     setAccounts((prev) => {
                       const next = [...prev];
                       if (accountEditor.index === null) next.push(form);
@@ -637,6 +835,14 @@ const AdminDashboard = () => {
                       return next;
                     });
                     setAccountEditor({ index: null, form: null });
+                    setActivityLog((prev) => [
+                      {
+                        id: `log-${Date.now()}`,
+                        action: `Updated login account: ${form.username}`,
+                        time: new Date().toISOString(),
+                      },
+                      ...prev,
+                    ].slice(0, 12));
                     setMessage("Login account updated.");
                   }}
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
@@ -764,12 +970,24 @@ const AdminDashboard = () => {
               <button
                 type="button"
                 onClick={() => {
+                  if (!facultyEditor.form?.name?.trim()) {
+                    setMessage("Faculty name is required.");
+                    return;
+                  }
                   setFacultyProfiles((prev) => {
                     const next = [...prev];
                     if (facultyEditor.index === null) next.push(facultyEditor.form);
                     else next[facultyEditor.index] = facultyEditor.form;
                     return next;
                   });
+                  setActivityLog((prev) => [
+                    {
+                      id: `log-${Date.now()}`,
+                      action: `Updated faculty profile: ${facultyEditor.form.name}`,
+                      time: new Date().toISOString(),
+                    },
+                    ...prev,
+                  ].slice(0, 12));
                   setFacultyEditor({ index: null, form: null });
                   setMessage("Faculty profile updated.");
                 }}
@@ -1000,6 +1218,25 @@ const AdminDashboard = () => {
             <div className="mt-auto rounded-xl border border-slate-200 bg-slate-50 p-3">
               <div className="mt-2 space-y-2">
                 <button
+                  onClick={exportBackup}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                >
+                  <Download className="h-4 w-4" /> Export Backup
+                </button>
+                {/* <button
+                  onClick={() => backupInputRef.current?.click()}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                >
+                  <Upload className="h-4 w-4" /> Import Backup
+                </button> */}
+                <input
+                  ref={backupInputRef}
+                  type="file"
+                  accept="application/json"
+                  onChange={importBackup}
+                  className="hidden"
+                />
+                <button
                   onClick={saveAll}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
                 >
@@ -1043,23 +1280,74 @@ const AdminDashboard = () => {
           </section>
 
           {activeTab === "overview" && (
-            <section className={cardClass}>
-              <h2 className="mb-4 text-lg font-semibold text-slate-900">What You Can Control</h2>
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="mb-2 inline-flex rounded-lg bg-blue-100 p-2 text-blue-700"><KeyRound className="h-4 w-4" /></div>
-                  <p className="font-semibold text-slate-900">User Management</p>
-                  <p className="mt-1 text-sm text-slate-600">Generate login IDs/passwords for admin, school, and faculty users.</p>
+            <section className="space-y-4">
+              <div className={cardClass}>
+                <h2 className="mb-4 text-lg font-semibold text-slate-900">What You Can Control</h2>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="mb-2 inline-flex rounded-lg bg-blue-100 p-2 text-blue-700"><KeyRound className="h-4 w-4" /></div>
+                    <p className="font-semibold text-slate-900">User Management</p>
+                    <p className="mt-1 text-sm text-slate-600">Generate login IDs/passwords for admin, school, and faculty users.</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="mb-2 inline-flex rounded-lg bg-green-100 p-2 text-green-700"><Users className="h-4 w-4" /></div>
+                    <p className="font-semibold text-slate-900">Faculty Management</p>
+                    <p className="mt-1 text-sm text-slate-600">Create and update faculty profiles directly from admin panel.</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="mb-2 inline-flex rounded-lg bg-indigo-100 p-2 text-indigo-700"><School className="h-4 w-4" /></div>
+                    <p className="font-semibold text-slate-900">School Content</p>
+                    <p className="mt-1 text-sm text-slate-600">Manage events, news, notices, newsletters, and gallery data.</p>
+                  </div>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="mb-2 inline-flex rounded-lg bg-green-100 p-2 text-green-700"><Users className="h-4 w-4" /></div>
-                  <p className="font-semibold text-slate-900">Faculty Management</p>
-                  <p className="mt-1 text-sm text-slate-600">Create and update faculty profiles directly from admin panel.</p>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div className={cardClass}>
+                  <div className="mb-3 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    <h3 className="text-base font-semibold text-slate-900">System Health Checks</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {healthChecks.map((item) => (
+                      <div key={item.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-sm font-medium text-slate-800">{item.title}</p>
+                          <span
+                            className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                              item.status === "warning"
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-emerald-100 text-emerald-700"
+                            }`}
+                          >
+                            {item.value}
+                          </span>
+                        </div>
+                        {item.detail ? <p className="mt-1 text-xs text-slate-500">{item.detail}</p> : null}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="mb-2 inline-flex rounded-lg bg-indigo-100 p-2 text-indigo-700"><School className="h-4 w-4" /></div>
-                  <p className="font-semibold text-slate-900">School Content</p>
-                  <p className="mt-1 text-sm text-slate-600">Manage events, news, notices, newsletters, and gallery data.</p>
+
+                <div className={cardClass}>
+                  <div className="mb-3 flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-blue-600" />
+                    <h3 className="text-base font-semibold text-slate-900">Recent Activity</h3>
+                  </div>
+                  {activityLog.length ? (
+                    <div className="max-h-[260px] space-y-2 overflow-y-auto pr-1">
+                      {activityLog.map((log) => (
+                        <div key={log.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                          <p className="text-sm font-medium text-slate-800">{log.action}</p>
+                          <p className="mt-1 text-xs text-slate-500">{new Date(log.time).toLocaleString()}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                      No recent activity yet. Actions will appear here.
+                    </p>
+                  )}
                 </div>
               </div>
             </section>
