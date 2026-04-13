@@ -1,141 +1,143 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import gbuFull from "../../assets/gbuFull.png";
 import gbuHalf from "../../assets/gbuHalf.png";
 
-// Load Saira Condensed font
+/* ✅ Load Font */
 const loadFont = () => {
   if (!document.querySelector('link[href*="Saira+Condensed"]')) {
-    const fontLink = document.createElement("link");
-    fontLink.href =
+    const link = document.createElement("link");
+    link.href =
       "https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;700;900&display=swap";
-    fontLink.rel = "stylesheet";
-    document.head.appendChild(fontLink);
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
   }
 };
 
+/* 🎬 Premium easing */
+const smooth = { duration: 0.8, ease: [0.22, 1, 0.36, 1] };
+
 const PreLoad = ({ onComplete }) => {
-  const [animationComplete, setAnimationComplete] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
+  const [show, setShow] = useState(true);
+  const [startText, setStartText] = useState(false);
 
   useEffect(() => {
-    // Load font
     loadFont();
 
-    // Start animation
-    const animationTimer = setTimeout(() => {
-      setAnimationComplete(true);
-    }, 100);
+    const textTimer = setTimeout(() => setStartText(true), 500);
 
-    // Auto-hide preloader after animation completes
-    const hideTimer = setTimeout(() => {
-      setIsVisible(false);
-      if (onComplete) {
-        onComplete();
-      }
-    }, 4000); // Adjust timing as needed
+    const timer = setTimeout(() => {
+      setShow(false);
+      onComplete?.();
+    }, 4200);
 
     return () => {
-      clearTimeout(animationTimer);
-      clearTimeout(hideTimer);
+      clearTimeout(timer);
+      clearTimeout(textTimer);
     };
   }, [onComplete]);
 
-  if (!isVisible) return null;
-
   return (
-    <motion.div
-      className="fixed inset-0 w-full h-screen overflow-hidden z-50"
-      initial={{ opacity: 1 }}
-      animate={{ opacity: isVisible ? 1 : 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      {/* Layer 1: Background - Full Image */}
-      <div
-        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url(${gbuFull})`,
-          backgroundPosition: "center center",
-        }}
-      />
-
-      {/* Layer 2: Animated Text - Middle Layer */}
-      <div className="absolute inset-0 flex items-center justify-center z-10">
+    <AnimatePresence>
+      {show && (
         <motion.div
-          initial={{ y: 400, opacity: 0 }}
-          animate={
-            animationComplete ? { y: -250, opacity: 1 } : { y: 400, opacity: 0 }
-          }
-          transition={{
-            duration: 2,
-            ease: [0.25, 0.46, 0.45, 0.94],
-            delay: 0.2,
-          }}
-          className="text-center px-4"
+          className="fixed inset-0 z-50 overflow-hidden"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }} // ✨ smoother exit
+          transition={{ duration: 0.8, ease: "easeInOut" }}
         >
-          <motion.h1
-            className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-normal text-white drop-shadow-2xl tracking-wider"
-            style={{ fontFamily: "'Saira Condensed', sans-serif" }}
-            initial={{ scale: 0.9 }}
-            animate={animationComplete ? { scale: 1 } : { scale: 0.9 }}
-            transition={{
-              duration: 1.5,
-              ease: "easeOut",
-              delay: 0.5,
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={
-                animationComplete ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
-              }
-              transition={{ duration: 0.6, delay: 0.8 }}
-              className="block mb-2 text-white font-bold"
-            >
-              WELCOME TO
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={
-                animationComplete ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
-              }
-              transition={{ duration: 0.6, delay: 1.1 }}
-              className="block text-white font-bold"
-            >
-              SMART CAMPUS
-            </motion.div>
-          </motion.h1>
-        </motion.div>
-      </div>
-
-      {/* Layer 3: Building Only (Top Layer) - Masks the text */}
-      <motion.div
-        initial={{ opacity: 1 }}
-        animate={{ opacity: 1 }}
-        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none z-20"
-        style={{
-          backgroundImage: `url(${gbuHalf})`,
-          backgroundPosition: "center center",
-        }}
-      />
-
-      {/* Optional: Loading indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
-        <motion.div
-          className="w-16 h-1 bg-white/30 rounded-full overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
+          {/* 🌌 BACKGROUND */}
           <motion.div
-            className="h-full bg-white rounded-full"
-            initial={{ width: "0%" }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 3.5, delay: 0.5 }}
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${gbuFull})` }}
+            initial={{ scale: 1.12 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 4.2, ease: [0.16, 1, 0.3, 1] }}
           />
+
+          {/* 🎨 DEPTH OVERLAY */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/50 backdrop-blur-[2px]" />
+
+          {/* ✨ TEXT */}
+          <div className="absolute inset-0 flex items-center justify-center z-10 px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              animate={startText ? { opacity: 1, y: -255 } : {}}
+              transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+              className="text-center d-flex flex-column align-items-center justify-content-center"
+            >
+              <motion.h1
+                className="text-white drop-shadow-2xl tracking-wider text-4xl sm:text-5xl md:text-7xl lg:text-8xl"
+                style={{ fontFamily: "'Saira Condensed', sans-serif" }}
+              >
+                {/* Sub Heading */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={startText ? { opacity: 0.8, y: 0 } : {}}
+                  transition={{ ...smooth, delay: 0.2 }}
+                  className="block mb-2 text-white font-bold"
+                >
+                  WELCOME TO
+                </motion.div>
+
+                {/* Main Heading */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={startText ? { opacity: 1, y: 0 } : {}}
+                  transition={{ ...smooth, delay: 0.4 }}
+                  className="d-block display-6 display-sm-5 display-md-3 display-lg-1 fw-bold text-white"
+                >
+                  OUR SMART CAMPUS
+                </motion.div>
+              </motion.h1>
+            </motion.div>
+          </div>
+
+          {/* 🏛️ FOREGROUND */}
+          <motion.div
+            className="absolute inset-0 bg-cover bg-center pointer-events-none z-20"
+            style={{ backgroundImage: `url(${gbuHalf})` }}
+            initial={{ y: 60, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.33, 1] }}
+          />
+
+          {/* ⏳ LOADER */}
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center justify-center w-full px-4">
+            {/* Bar */}
+            <div className="w-40 sm:w-56 md:w-64 h-[3px] bg-white/20 rounded-full overflow-hidden relative">
+              {/* Glow effect */}
+              <motion.div
+                className="absolute inset-0 bg-white/30 blur-sm"
+                animate={{ opacity: [0.2, 0.5, 0.2] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+
+              {/* Progress */}
+              <motion.div
+                className="h-full bg-white rounded-full relative z-10"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{
+                  duration: 4.6,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              />
+            </div>
+
+            {/* Text */}
+            <motion.p
+              className="text-white/70 text-[10px] sm:text-xs mt-3 text-center tracking-[0.25em]"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+            >
+              WELCOME TO GAUTAM BUDDHA UNIVERSITY
+            </motion.p>
+          </div>
         </motion.div>
-      </div>
-    </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

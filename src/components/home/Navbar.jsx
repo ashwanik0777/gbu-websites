@@ -44,7 +44,10 @@ const NAVIGATION_CONFIG = [
       { slug: "academic-calendar", label: "Academic Calendar & Regulations" },
       { slug: "cbcs-framework", label: "CBCS Curriculum Framework" },
       { slug: "centers-of-excellence", label: "Centers of Excellence" },
-      { slug: "international-collaboration", label: "International Collaboration" },
+      {
+        slug: "international-collaboration",
+        label: "International Collaboration",
+      },
       { slug: "reports-publications", label: "Reports & Publications" },
     ],
   },
@@ -68,7 +71,10 @@ const NAVIGATION_CONFIG = [
     baseRoute: "/research",
     items: [
       { slug: "research-centers", label: "Center of Excellence and Labs" },
-      { slug: "publications-patents", label: "Publications, Patents and Projects" },
+      {
+        slug: "publications-patents",
+        label: "Publications, Patents and Projects",
+      },
       { slug: "incubation", label: "GBU Incubation Cell" },
       { slug: "institution-innovation", label: "Institution and Innovation" },
       { slug: "ipr-cell", label: "IPR Cell" },
@@ -85,14 +91,8 @@ const NAVIGATION_CONFIG = [
       { slug: "sports-fitness", label: "Sports" },
       { slug: "clubs-societies", label: "Clubs and Societies" },
       { slug: "meditation-center", label: "Meditation Centre" },
-      {
-        slug: "NSS",
-        label: "National Service Scheme (NSS)",
-      },
-      {
-        slug: "NCC",
-        label: "National Cadet Corps (NCC)",
-      },
+      { slug: "NSS", label: "National Service Scheme (NSS)" },
+      { slug: "NCC", label: "National Cadet Corps (NCC)" },
     ],
   },
   {
@@ -128,13 +128,12 @@ const NAVIGATION_CONFIG = [
   },
 ];
 
-// Custom hooks for navbar functionality
+// Hooks
 const useScrollDetection = () => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -147,59 +146,42 @@ const useDropdownMenu = () => {
   const menuRefs = useRef(new Map());
 
   const toggleMenu = (menuKey) => {
-    setActiveMenu(prev => prev === menuKey ? null : menuKey);
+    setActiveMenu((prev) => (prev === menuKey ? null : menuKey));
   };
 
   const closeMenu = () => setActiveMenu(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      const isInsideMenu = Array.from(menuRefs.current.values())
-        .some(ref => ref?.contains(event.target));
-
-      if (!isInsideMenu) {
-        closeMenu();
-      }
+      const isInsideMenu = Array.from(menuRefs.current.values()).some((ref) =>
+        ref?.contains(event.target),
+      );
+      if (!isInsideMenu) closeMenu();
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  return {
-    activeMenu,
-    toggleMenu,
-    closeMenu,
-    menuRefs,
-  };
+  return { activeMenu, toggleMenu, closeMenu, menuRefs };
 };
 
 const useMobileMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSubmenus, setExpandedSubmenus] = useState(new Set());
 
-  const toggle = () => setIsOpen(prev => !prev);
+  const toggle = () => setIsOpen((prev) => !prev);
   const close = () => setIsOpen(false);
 
   const toggleSubmenu = (menuKey) => {
-    setExpandedSubmenus(prev => {
+    setExpandedSubmenus((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(menuKey)) {
-        newSet.delete(menuKey);
-      } else {
-        newSet.add(menuKey);
-      }
+      newSet.has(menuKey) ? newSet.delete(menuKey) : newSet.add(menuKey);
       return newSet;
     });
   };
 
-  return {
-    isOpen,
-    toggle,
-    close,
-    expandedSubmenus,
-    toggleSubmenu,
-  };
+  return { isOpen, toggle, close, expandedSubmenus, toggleSubmenu };
 };
 
 // UI Components
@@ -210,12 +192,12 @@ const DropdownMenuItem = ({ item, baseRoute, onClick }) => {
     ? { href: item.slug, target: "_blank", rel: "noopener noreferrer" }
     : { to: `${baseRoute}/${item.slug}` };
 
-  const LinkComponent = item.isExternal ? 'a' : Link;
+  const LinkComponent = item.isExternal ? "a" : Link;
 
   return (
     <LinkComponent
       {...linkProps}
-      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
       onClick={onClick}
     >
       {item.label}
@@ -236,13 +218,19 @@ const DropdownMenu = ({ items, baseRoute, onItemClick }) => (
   </div>
 );
 
-const DesktopMenuItem = ({ menu, isActive, onToggle, menuRef, onMenuClose }) => {
+const DesktopMenuItem = ({
+  menu,
+  isActive,
+  onToggle,
+  menuRef,
+  onMenuClose,
+}) => {
   if (menu.directPath) {
     return (
       <li>
         <Link
           to={menu.directPath}
-          className="flex items-center gap-1 hover:text-blue-600 text-gray-700 px-3 py-2 text-sm font-medium transition-colors"
+          className="flex items-center gap-1 hover:text-blue-600 text-gray-700 px-3 py-2 text-sm font-medium transition-colors cursor-pointer"
         >
           <MenuIcon icon={menu.icon} />
           {menu.label}
@@ -252,11 +240,10 @@ const DesktopMenuItem = ({ menu, isActive, onToggle, menuRef, onMenuClose }) => 
   }
 
   return (
-    <li className="relative" ref={menuRef} aria-haspopup="true">
+    <li className="relative" ref={menuRef}>
       <button
         onClick={() => onToggle(menu.key)}
-        className="flex items-center gap-1 hover:text-blue-600 text-gray-700 px-3 py-2 text-sm font-medium transition-colors"
-        aria-expanded={isActive}
+        className="flex items-center gap-1 hover:text-blue-600 text-gray-700 px-3 py-2 text-sm font-medium transition-colors cursor-pointer"
       >
         <MenuIcon icon={menu.icon} />
         {menu.label}
@@ -279,7 +266,7 @@ const MobileMenuItem = ({ menu, isExpanded, onToggle, onSubmenuToggle }) => {
     return (
       <Link
         to={menu.directPath}
-        className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+        className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
         onClick={onToggle}
       >
         <span className="flex items-center gap-2">
@@ -294,7 +281,7 @@ const MobileMenuItem = ({ menu, isExpanded, onToggle, onSubmenuToggle }) => {
     <div>
       <button
         onClick={() => onSubmenuToggle(menu.key)}
-        className="w-full flex items-center justify-between px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
       >
         <span className="flex items-center gap-2">
           <MenuIcon icon={menu.icon} />
@@ -319,43 +306,36 @@ const MobileMenuItem = ({ menu, isExpanded, onToggle, onSubmenuToggle }) => {
   );
 };
 
-// Main Navbar Component
+// Main Navbar
 const Navbar = () => {
   const isScrolled = useScrollDetection();
   const { activeMenu, toggleMenu, closeMenu, menuRefs } = useDropdownMenu();
-  const { isOpen: isMobileOpen, toggle: toggleMobile, close: closeMobile, expandedSubmenus, toggleSubmenu } = useMobileMenu();
+  const {
+    isOpen: isMobileOpen,
+    toggle: toggleMobile,
+    close: closeMobile,
+    expandedSubmenus,
+    toggleSubmenu,
+  } = useMobileMenu();
 
-  // Memoize navigation items to prevent unnecessary re-renders
   const navigationItems = useMemo(() => NAVIGATION_CONFIG, []);
 
   const setMenuRef = (menuKey, ref) => {
-    if (ref) {
-      menuRefs.current.set(menuKey, ref);
-    } else {
-      menuRefs.current.delete(menuKey);
-    }
+    if (ref) menuRefs.current.set(menuKey, ref);
+    else menuRefs.current.delete(menuKey);
   };
 
   return (
     <SearchableWrapper>
       <nav
-        className={`fixed top-9 left-0 w-full z-40 bg-white transition-all duration-300 ${isScrolled ? "shadow-md" : "shadow"
-          }`}
-        role="navigation"
-        aria-label="Main navigation"
+        className={`fixed top-9 left-0 w-full z-40 bg-white ${isScrolled ? "shadow-md" : "shadow"}`}
       >
-        <div className="px-4 md:px-">
+        <div className="px-4 md:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link to="/" className="flex items-center" aria-label="GBU Home">
-              <img
-                src="/assets/logo.svg"
-                alt="GBU Logo"
-                className="h-12 w-auto"
-              />
+            <Link to="/" className="flex items-center">
+              <img src="/assets/logo.svg" alt="GBU Logo" className="h-12" />
             </Link>
 
-            {/* Desktop Navigation */}
             <div className="hidden xl:flex items-center">
               <ul className="flex items-center space-x-1">
                 {navigationItems.map((menu) => (
@@ -369,22 +349,17 @@ const Navbar = () => {
                   />
                 ))}
               </ul>
-              {/* Desktop SearchBar */}
               <SearchBar />
             </div>
 
-            {/* Mobile Menu Toggle */}
             <button
               onClick={toggleMobile}
-              className="xl:hidden p-2 text-gray-700 transition-colors"
-              aria-label={isMobileOpen ? "Close menu" : "Open menu"}
-              aria-expanded={isMobileOpen}
+              className="xl:hidden p-2 text-gray-700 cursor-pointer"
             >
               {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
 
-          {/* Mobile Navigation */}
           {isMobileOpen && (
             <div className="xl:hidden border-t border-gray-200">
               <div className="py-2">
@@ -397,7 +372,6 @@ const Navbar = () => {
                     onSubmenuToggle={toggleSubmenu}
                   />
                 ))}
-                {/* Mobile SearchBar */}
                 <SearchBar isMobile />
               </div>
             </div>
