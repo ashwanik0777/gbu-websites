@@ -22,7 +22,8 @@ function App() {
   const isFacultyPortalPage = location.pathname.startsWith("/faculty-portal");
   const isSchoolPortalPage = location.pathname.startsWith("/school-portal");
   const isAdminPortalPage = location.pathname.startsWith("/admin-portal");
-  const isPortalPage = isFacultyPortalPage || isSchoolPortalPage || isAdminPortalPage;
+  const isPortalPage =
+    isFacultyPortalPage || isSchoolPortalPage || isAdminPortalPage;
 
   useEffect(() => {
     if (isPreloadComplete) {
@@ -30,28 +31,38 @@ function App() {
     }
   }, [isPreloadComplete]);
 
+  const Loader = () => (
+    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white">
+      <div className="animate-pulse text-lg tracking-widest">
+        🙏🏽 Welcome to Gautam Buddha University! 🙏🏽
+      </div>
+    </div>
+  );
 
   return (
     <div className="App">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<Loader />}>
+        {" "}
         {!isPreloadComplete ? (
           <PreLoad onComplete={() => setIsPreloadComplete(true)} />
         ) : (
           <>
-          <ScrollToTop>
-            {!isPortalPage && <Primarynavbar />}
-            {!isPortalPage &&
-              (isICTPage ? (
-                <div className="mt-9">
-                  <DepartmentNavbar />
-                </div>
-              ) : (
-                <Navbar />
-              ))}
-            <div className={isPortalPage ? "pt-0" : isICTPage ? "pt-8" : "pt-[6.3rem]"}>
-              <AppRouter />
-            </div>
-            {!isPortalPage && <Footer />}
+            <ScrollToTop>
+              {!isPortalPage && <Primarynavbar />}
+              {!isPortalPage &&
+                (isICTPage ? (
+                  <div className="mt-10">
+                    <DepartmentNavbar />
+                  </div>
+                ) : (
+                  <Navbar />
+                ))}
+              <div
+                className={`transition-all duration-500 ${isPortalPage ? "pt-0" : isICTPage ? "pt-8" : "pt-[6.3rem]"}`}
+              >
+                <AppRouter />
+              </div>
+              {!isPortalPage && <Footer />}
             </ScrollToTop>
           </>
         )}
