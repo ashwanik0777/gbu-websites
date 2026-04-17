@@ -43,9 +43,9 @@ const SidebarNav = ({ sections, activeSection, onSelect, onSave, onReset, onView
             <button onClick={onSave} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
               Save
             </button>
-            <button onClick={onReset} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+            {/* <button onClick={onReset} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
               Reset
-            </button>
+            </button> */}
             <button onClick={onViewPublic} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
               View Public Profile
             </button>

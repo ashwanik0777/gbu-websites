@@ -89,6 +89,7 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       tags: ["Competition", "Legal Studies"],
       image:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTK2NnCSPRdgMAEkEafMhZojs0fdgEv6hFY0A&s",
+      imageLink: "",
       description: "Organized by School of Law, extended submission date."
     },
     {
@@ -103,6 +104,7 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       price: "Free",
       tags: ["AI", "Research"],
       image: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=1200",
+      imageLink: "",
       description: "Faculty and research scholars will present ongoing AI and data science work."
     },
     {
@@ -117,6 +119,7 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       price: "Free",
       tags: ["Sports", "Campus Life"],
       image: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200",
+      imageLink: "",
       description: "Annual inter-school athletics and team sports championship."
     }
   ],
@@ -136,7 +139,8 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       priority: "high",
       views: 940,
       likes: 84,
-      image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200"
+      image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200",
+      imageLink: ""
     },
     {
       id: "news-2",
@@ -153,7 +157,8 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       priority: "medium",
       views: 610,
       likes: 47,
-      image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1200"
+      image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1200",
+      imageLink: ""
     },
     {
       id: "news-3",
@@ -170,7 +175,8 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       priority: "medium",
       views: 720,
       likes: 91,
-      image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=1200"
+      image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=1200",
+      imageLink: ""
     },
     {
       id: "news-4",
@@ -187,7 +193,8 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       priority: "low",
       views: 420,
       likes: 28,
-      image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200"
+      image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200",
+      imageLink: ""
     },
     {
       id: "news-5",
@@ -204,7 +211,8 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       priority: "low",
       views: 350,
       likes: 25,
-      image: "https://images.unsplash.com/photo-1472145246862-b24cf25c4a36?w=1200"
+      image: "https://images.unsplash.com/photo-1472145246862-b24cf25c4a36?w=1200",
+      imageLink: ""
     },
     {
       id: "news-6",
@@ -221,7 +229,8 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       priority: "medium",
       views: 530,
       likes: 39,
-      image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200"
+      image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200",
+      imageLink: ""
     },
     {
       id: "news-7",
@@ -238,7 +247,8 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       priority: "high",
       views: 810,
       likes: 102,
-      image: "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=1200"
+      image: "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=1200",
+      imageLink: ""
     }
   ],
   newsletters: [
@@ -251,6 +261,7 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       excerpt: "Highlights from placements, research, and student activities.",
       content: "This issue covers recent school updates, student achievements, and key announcements.",
       coverImage: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200",
+      imageLink: "",
       pdfLink: "",
       views: 320,
       isPublished: true
@@ -264,6 +275,7 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       excerpt: "Special issue focused on innovation projects and labs.",
       content: "A special edition featuring startup ideas, innovation day, and student-led product demos.",
       coverImage: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200",
+      imageLink: "",
       pdfLink: "",
       views: 280,
       isPublished: true
@@ -321,28 +333,36 @@ export const DEFAULT_SCHOOL_DASHBOARD_DATA = {
       title: "Innovation Day Highlights",
       eventDate: "2026-03-22",
       category: "Events",
-      imageUrl: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200"
+      imageUrl: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200",
+      images: ["https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200"],
+      imageLink: ""
     },
     {
       id: "gallery-2",
       title: "Research Poster Showcase",
       eventDate: "2025-02-10",
       category: "Research",
-      imageUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200"
+      imageUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200",
+      images: ["https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200"],
+      imageLink: ""
     },
     {
       id: "gallery-3",
       title: "Sports Meet Moments",
       eventDate: "2025-01-29",
       category: "Sports",
-      imageUrl: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200"
+      imageUrl: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200",
+      images: ["https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200"],
+      imageLink: ""
     },
     {
       id: "gallery-4",
       title: "Cultural Evening Snaps",
       eventDate: "2024-12-14",
       category: "Cultural",
-      imageUrl: "https://images.unsplash.com/photo-1506157786151-b8491531f063?w=1200"
+      imageUrl: "https://images.unsplash.com/photo-1506157786151-b8491531f063?w=1200",
+      images: ["https://images.unsplash.com/photo-1506157786151-b8491531f063?w=1200"],
+      imageLink: ""
     }
   ],
   navigation: {

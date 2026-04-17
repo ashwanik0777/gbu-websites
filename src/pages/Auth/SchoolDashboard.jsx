@@ -57,6 +57,16 @@ const Field = ({ label, children }) => (
 );
 
 const ensureArray = (value, fallback) => (Array.isArray(value) ? value : fallback);
+const toList = (value) => {
+  if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean);
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
 
 const getInitialSchoolData = () => {
   try {
@@ -215,6 +225,26 @@ const SchoolDashboard = () => {
   };
 
   const openCollectionEdit = (listKey, index, item) => {
+    if (listKey === "eventGallery") {
+      const sourceImages = toList(item.images);
+      const baseImages = [item.imageUrl, ...sourceImages].map((image) => String(image || "").trim()).filter(Boolean);
+      const uniqueImages = [...new Set(baseImages)].slice(0, 4);
+      setCollectionEditors((prev) => ({
+        ...prev,
+        [listKey]: {
+          index,
+          form: {
+            ...item,
+            imageUrl: uniqueImages[0] || "",
+            imageUrl2: uniqueImages[1] || "",
+            imageUrl3: uniqueImages[2] || "",
+            imageUrl4: uniqueImages[3] || "",
+          },
+        },
+      }));
+      return;
+    }
+
     setCollectionEditors((prev) => ({
       ...prev,
       [listKey]: { index, form: { ...item } },
@@ -245,12 +275,39 @@ const SchoolDashboard = () => {
     const editor = collectionEditors[listKey];
     if (!editor?.form) return;
 
+    let nextForm = { ...editor.form };
+    if (listKey === "eventGallery") {
+      const galleryImages = [
+        nextForm.imageUrl,
+        nextForm.imageUrl2,
+        nextForm.imageUrl3,
+        nextForm.imageUrl4,
+        ...toList(nextForm.images),
+      ]
+        .map((item) => String(item || "").trim())
+        .filter(Boolean);
+
+      const uniqueImages = [...new Set(galleryImages)].slice(0, 4);
+      if (galleryImages.length > 4) {
+        setMessage("Event Gallery supports maximum 4 images per item.");
+      }
+
+      nextForm = {
+        ...nextForm,
+        imageUrl: uniqueImages[0] || "",
+        images: uniqueImages,
+      };
+      delete nextForm.imageUrl2;
+      delete nextForm.imageUrl3;
+      delete nextForm.imageUrl4;
+    }
+
     setData((prev) => {
       const next = [...(prev[listKey] || [])];
       if (editor.index === null || editor.index === undefined) {
-        next.push(editor.form);
+        next.push(nextForm);
       } else {
-        next[editor.index] = editor.form;
+        next[editor.index] = nextForm;
       }
       return { ...prev, [listKey]: next };
     });
@@ -550,6 +607,7 @@ const SchoolDashboard = () => {
           { key: "price", label: "Price" },
           { key: "tags", label: "Tags (comma separated)" },
           { key: "image", label: "Image URL" },
+          { key: "imageLink", label: "Image Click Link" },
           { key: "coverImageUrl", label: "Cover Image URL" },
           { key: "images", label: "Gallery Images (comma separated URLs)" },
           { key: "registrationUrl", label: "Registration URL" },
@@ -571,6 +629,7 @@ const SchoolDashboard = () => {
           price: "Free",
           tags: "",
           image: "",
+          imageLink: "",
           coverImageUrl: "",
           images: "",
           registrationUrl: "",
@@ -595,6 +654,7 @@ const SchoolDashboard = () => {
           { key: "views", label: "Views", type: "number" },
           { key: "likes", label: "Likes", type: "number" },
           { key: "image", label: "Image URL" },
+          { key: "imageLink", label: "Image Click Link" },
           { key: "coverImageUrl", label: "Cover Image URL" },
           { key: "pdfUrl", label: "PDF URL" },
           { key: "link", label: "External Link" },
@@ -614,6 +674,7 @@ const SchoolDashboard = () => {
           views: 0,
           likes: 0,
           image: "",
+          imageLink: "",
           coverImageUrl: "",
           pdfUrl: "",
           link: "",
@@ -635,6 +696,7 @@ const SchoolDashboard = () => {
           { key: "issueNumber", label: "Issue Number" },
           { key: "views", label: "Views", type: "number" },
           { key: "coverImage", label: "Cover Image URL" },
+          { key: "imageLink", label: "Image Click Link" },
           { key: "pdfLink", label: "PDF Link" },
           { key: "excerpt", label: "Excerpt", type: "textarea" },
           { key: "content", label: "Content", type: "textarea" },
@@ -647,6 +709,7 @@ const SchoolDashboard = () => {
           issueNumber: "",
           views: 0,
           coverImage: "",
+          imageLink: "",
           pdfLink: "",
           excerpt: "",
           content: "",
@@ -666,6 +729,8 @@ const SchoolDashboard = () => {
           { key: "priority", label: "Priority" },
           { key: "isNew", label: "New Badge", type: "boolean" },
           { key: "views", label: "Views", type: "number" },
+          { key: "image", label: "Image URL" },
+          { key: "imageLink", label: "Image Click Link" },
           { key: "pdfUrl", label: "PDF URL" },
           { key: "content", label: "Content", type: "textarea" },
         ],
@@ -676,6 +741,8 @@ const SchoolDashboard = () => {
           priority: "medium",
           isNew: true,
           views: 0,
+          image: "",
+          imageLink: "",
           pdfUrl: "",
           content: "",
         }
@@ -689,10 +756,22 @@ const SchoolDashboard = () => {
         { key: "title", label: "Gallery Title" },
         { key: "eventDate", label: "Event Date", type: "date" },
         { key: "category", label: "Category" },
-        { key: "imageUrl", label: "Image URL" },
-        { key: "images", label: "Additional Images (comma separated URLs)" },
+        { key: "imageUrl", label: "Image 1 URL" },
+        { key: "imageUrl2", label: "Image 2 URL" },
+        { key: "imageUrl3", label: "Image 3 URL" },
+        { key: "imageUrl4", label: "Image 4 URL" },
+        { key: "imageLink", label: "Image Click Link" },
       ],
-      { title: "", eventDate: "", category: "Events", imageUrl: "", images: "" }
+      {
+        title: "",
+        eventDate: "",
+        category: "Events",
+        imageUrl: "",
+        imageUrl2: "",
+        imageUrl3: "",
+        imageUrl4: "",
+        imageLink: "",
+      }
     );
   };
 
@@ -745,9 +824,9 @@ const SchoolDashboard = () => {
                 <button onClick={saveAll} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
                   <Save className="h-4 w-4" /> Save All
                 </button>
-                <button onClick={resetAll} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                {/* <button onClick={resetAll} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
                   <RotateCcw className="h-4 w-4" /> Reset
-                </button>
+                </button> */}
                 <button onClick={() => navigate("/login")} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-100">
                   <LogOut className="h-4 w-4" /> Logout
                 </button>

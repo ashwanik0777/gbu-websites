@@ -51,6 +51,8 @@ export const getSchoolAnnouncements = () => {
     content:
       item.content || `Official notice from ${schoolName}. Please check details with school office.`,
     pdfUrl: item.pdfUrl || "",
+    image: item.image || "",
+    imageLink: item.imageLink || item.link || "",
     isNew: normalizeBool(item.isNew, true),
     views: Number(item.views || 0),
     schoolName,
@@ -83,6 +85,7 @@ export const getSchoolAnnouncements = () => {
         item.description || `${item.title || "Event"} organized by ${schoolName}.`,
       coverImageUrl: item.coverImageUrl || item.image || fallbackImage,
       image: item.image || item.coverImageUrl || fallbackImage,
+      imageLink: item.imageLink || item.link || "",
       images: normalizeList(item.images, [item.image || item.coverImageUrl || fallbackImage]),
       attendees: Number(item.attendees || 100),
       price: item.price || "Free",
@@ -115,6 +118,7 @@ export const getSchoolAnnouncements = () => {
       likes: Number(item.likes || 0),
       coverImageUrl: item.coverImageUrl || item.image || fallbackImage,
       image: item.image || item.coverImageUrl || fallbackImage,
+      imageLink: item.imageLink || item.link || "",
       featured: normalizeBool(item.featured, false),
       status: item.status || "published",
       schoolName,
@@ -141,6 +145,7 @@ export const getSchoolAnnouncements = () => {
       item.issueNumber || `Vol. ${new Date(item.date || new Date().toISOString()).getFullYear()}, Issue ${index + 1}`,
     date: item.date || new Date().toISOString().slice(0, 10),
     coverImage: item.coverImage || item.image || galleryFallback,
+    imageLink: item.imageLink || item.link || "",
     excerpt: item.excerpt || `${item.title || "Newsletter"} from ${schoolName}.`,
     pdfLink: item.pdfLink || item.pdfUrl || item.link || "",
     views: Number(item.views || 0),
@@ -156,8 +161,9 @@ export const getSchoolAnnouncements = () => {
     category: item.category || "Events",
     year: String(new Date(item.eventDate || new Date().toISOString()).getFullYear()),
     date: item.eventDate || new Date().toISOString().slice(0, 10),
-    images: normalizeList(item.images, [item.imageUrl || galleryFallback]),
+    images: normalizeList(item.images, [item.imageUrl || galleryFallback]).slice(0, 4),
     coverImage: item.imageUrl || galleryFallback,
+    imageLink: item.imageLink || item.link || "",
     schoolName,
   }));
 

@@ -42,6 +42,55 @@ import {
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 const ensureArray = (value, fallback) => (Array.isArray(value) ? value : fallback);
 const ADMIN_ACTIVITY_LOG_KEY = "gbu_admin_activity_log";
+const FACULTY_MAIL_QUEUE_KEY = "gbu_faculty_mail_queue";
+
+const toList = (value) => {
+  if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean);
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
+
+const parseCsvRow = (line) => {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i += 1) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+    if (ch === "," && !inQuotes) {
+      result.push(current.trim());
+      current = "";
+      continue;
+    }
+    current += ch;
+  }
+  result.push(current.trim());
+  return result;
+};
+
+const toBool = (value, fallback = false) => {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "true" || normalized === "yes" || normalized === "1") return true;
+    if (normalized === "false" || normalized === "no" || normalized === "0") return false;
+  }
+  return fallback;
+};
 
 const cardClass = "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
 const inputClass =
@@ -176,6 +225,17 @@ const getInitialActivityLog = () => {
   }
 };
 
+const getInitialMailQueue = () => {
+  try {
+    const raw = localStorage.getItem(FACULTY_MAIL_QUEUE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
 const generateStrongPassword = () => {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$%!&*";
   let password = "";
@@ -203,7 +263,9 @@ const AdminDashboard = () => {
   const [collectionFilters, setCollectionFilters] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [activityLog, setActivityLog] = useState(getInitialActivityLog);
+  const [mailQueue, setMailQueue] = useState(getInitialMailQueue);
   const backupInputRef = useRef(null);
+  const bulkFacultyInputRef = useRef(null);
 
   const summary = useMemo(
     () => [
@@ -254,6 +316,170 @@ const AdminDashboard = () => {
   useEffect(() => {
     localStorage.setItem(ADMIN_ACTIVITY_LOG_KEY, JSON.stringify(activityLog));
   }, [activityLog]);
+
+  useEffect(() => {
+    localStorage.setItem(FACULTY_MAIL_QUEUE_KEY, JSON.stringify(mailQueue));
+  }, [mailQueue]);
+
+  const buildUniqueUsername = (seed, existingAccounts) => {
+    const sanitized = String(seed || "faculty.user")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]/g, "") || "faculty.user";
+    let candidate = sanitized;
+    let suffix = 1;
+    const existing = new Set(existingAccounts.map((item) => String(item.username || "").toLowerCase()));
+    while (existing.has(candidate)) {
+      candidate = `${sanitized}${suffix}`;
+      suffix += 1;
+    }
+    return candidate;
+  };
+
+  const createFacultyAccount = (faculty, existingAccounts, passwordOverride) => {
+    const usernameSeed = faculty.email ? faculty.email.split("@")[0] : faculty.id || faculty.name;
+    const username = buildUniqueUsername(usernameSeed, existingAccounts);
+    const password = passwordOverride || generateStrongPassword();
+    return {
+      id: `acc-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      name: faculty.name || username,
+      username,
+      password,
+      role: "teacher",
+      status: "active",
+      linkedFacultyId: faculty.id || "",
+      linkedSchool: faculty.school || schoolData.schoolCode || "",
+    };
+  };
+
+  const downloadFacultyTemplate = () => {
+    const header = [
+      "name",
+      "designation",
+      "department",
+      "school",
+      "email",
+      "phone",
+      "createLoginAccount",
+      "sendCredentialsEmail",
+    ];
+    const example = [
+      "Dr. New Faculty",
+      "Assistant Professor",
+      "Computer Science",
+      schoolData.schoolName || "School of ICT",
+      "faculty@gbu.ac.in",
+      "+91-9876543210",
+      "true",
+      "true",
+    ];
+    const csv = `${header.join(",")}\n${example.join(",")}\n`;
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "faculty_bulk_upload_template.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+    setMessage("Faculty bulk upload template downloaded.");
+  };
+
+  const handleBulkFacultyUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const lines = text
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+      if (lines.length < 2) {
+        setMessage("CSV is empty. Please use the template and add at least one row.");
+        return;
+      }
+
+      const headers = parseCsvRow(lines[0]).map((item) => item.trim());
+      const requiredHeaders = ["name", "designation", "department", "school", "email", "phone"];
+      const missing = requiredHeaders.filter((header) => !headers.includes(header));
+      if (missing.length) {
+        setMessage(`Missing required CSV columns: ${missing.join(", ")}`);
+        return;
+      }
+
+      let nextAccounts = [...accounts];
+      const uploadedFaculty = [];
+      const queuedEmails = [];
+
+      for (let i = 1; i < lines.length; i += 1) {
+        const values = parseCsvRow(lines[i]);
+        const row = Object.fromEntries(headers.map((header, idx) => [header, values[idx] || ""]));
+        if (!row.name) continue;
+
+        const faculty = {
+          id: `faculty-${Date.now()}-${i}`,
+          name: row.name,
+          designation: row.designation,
+          department: row.department,
+          school: row.school || schoolData.schoolName || "",
+          email: row.email,
+          phone: row.phone,
+        };
+        uploadedFaculty.push(faculty);
+
+        const shouldCreateLogin = toBool(row.createLoginAccount, true);
+        const shouldSendEmail = toBool(row.sendCredentialsEmail, true);
+
+        if (shouldCreateLogin) {
+          const generatedPassword = generateStrongPassword();
+          const account = createFacultyAccount(faculty, nextAccounts, generatedPassword);
+          nextAccounts = [...nextAccounts, account];
+
+          if (shouldSendEmail && faculty.email) {
+            queuedEmails.push({
+              id: `mail-${Date.now()}-${i}`,
+              to: faculty.email,
+              subject: "GBU Faculty Portal Credentials",
+              status: "pending-backend",
+              payload: {
+                facultyName: faculty.name,
+                username: account.username,
+                password: account.password,
+                linkedFacultyId: account.linkedFacultyId,
+              },
+              createdAt: new Date().toISOString(),
+            });
+          }
+        }
+      }
+
+      if (!uploadedFaculty.length) {
+        setMessage("No valid rows found in CSV.");
+        return;
+      }
+
+      setFacultyProfiles((prev) => [...prev, ...uploadedFaculty]);
+      setAccounts(nextAccounts);
+      if (queuedEmails.length) {
+        setMailQueue((prev) => [...queuedEmails, ...prev].slice(0, 100));
+      }
+      setActivityLog((prev) => [
+        {
+          id: `log-${Date.now()}`,
+          action: `Bulk uploaded ${uploadedFaculty.length} faculty profiles`,
+          time: new Date().toISOString(),
+        },
+        ...prev,
+      ].slice(0, 12));
+      setMessage(
+        `Bulk upload completed: ${uploadedFaculty.length} faculty added, ${queuedEmails.length} credential emails queued.`,
+      );
+    } catch {
+      setMessage("Bulk upload failed. Please upload a valid CSV template file.");
+    } finally {
+      event.target.value = "";
+    }
+  };
 
   const exportBackup = () => {
     const payload = {
@@ -339,6 +565,26 @@ const AdminDashboard = () => {
   };
 
   const openCollectionEdit = (listKey, index, item) => {
+    if (listKey === "eventGallery") {
+      const sourceImages = toList(item.images);
+      const baseImages = [item.imageUrl, ...sourceImages].map((image) => String(image || "").trim()).filter(Boolean);
+      const uniqueImages = [...new Set(baseImages)].slice(0, 4);
+      setCollectionEditors((prev) => ({
+        ...prev,
+        [listKey]: {
+          index,
+          form: {
+            ...item,
+            imageUrl: uniqueImages[0] || "",
+            imageUrl2: uniqueImages[1] || "",
+            imageUrl3: uniqueImages[2] || "",
+            imageUrl4: uniqueImages[3] || "",
+          },
+        },
+      }));
+      return;
+    }
+
     setCollectionEditors((prev) => ({
       ...prev,
       [listKey]: { index, form: { ...item } },
@@ -361,10 +607,37 @@ const AdminDashboard = () => {
   const saveCollectionForm = (listKey) => {
     const editor = collectionEditors[listKey];
     if (!editor?.form) return;
+
+    let nextForm = { ...editor.form };
+    if (listKey === "eventGallery") {
+      const galleryImages = [
+        nextForm.imageUrl,
+        nextForm.imageUrl2,
+        nextForm.imageUrl3,
+        nextForm.imageUrl4,
+        ...toList(nextForm.images),
+      ]
+        .map((item) => String(item || "").trim())
+        .filter(Boolean);
+
+      const uniqueImages = [...new Set(galleryImages)].slice(0, 4);
+      if (galleryImages.length > 4) {
+        setMessage("Event Gallery supports maximum 4 images per item.");
+      }
+      nextForm = {
+        ...nextForm,
+        imageUrl: uniqueImages[0] || "",
+        images: uniqueImages,
+      };
+      delete nextForm.imageUrl2;
+      delete nextForm.imageUrl3;
+      delete nextForm.imageUrl4;
+    }
+
     setSchoolData((prev) => {
       const next = [...(prev[listKey] || [])];
-      if (editor.index === null || editor.index === undefined) next.push(editor.form);
-      else next[editor.index] = editor.form;
+      if (editor.index === null || editor.index === undefined) next.push(nextForm);
+      else next[editor.index] = nextForm;
       return { ...prev, [listKey]: next };
     });
     setCollectionEditors((prev) => ({ ...prev, [listKey]: { index: null, form: null } }));
@@ -864,27 +1137,56 @@ const AdminDashboard = () => {
   const renderFacultyTab = () => (
     <div className={cardClass}>
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900">Faculty Management</h2>
-        <button
-          type="button"
-          onClick={() =>
-            setFacultyEditor({
-              index: null,
-              form: {
-                id: `faculty-${Date.now()}`,
-                name: "",
-                designation: "",
-                department: "",
-                school: schoolData.schoolName || "",
-                email: "",
-                phone: "",
-              },
-            })
-          }
-          className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
-        >
-          <Plus className="h-3.5 w-3.5" /> Add Faculty
-        </button>
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">Faculty Management</h2>
+          <p className="text-xs text-slate-500">Bulk upload with template + auto faculty login generation supported.</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={downloadFacultyTemplate}
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+          >
+            <Download className="h-3.5 w-3.5" /> Download Template
+          </button>
+          <button
+            type="button"
+            onClick={() => bulkFacultyInputRef.current?.click()}
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+          >
+            <Upload className="h-3.5 w-3.5" /> Bulk Upload CSV
+          </button>
+          <input
+            ref={bulkFacultyInputRef}
+            type="file"
+            accept=".csv,text/csv"
+            onChange={handleBulkFacultyUpload}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() =>
+              setFacultyEditor({
+                index: null,
+                form: {
+                  id: `faculty-${Date.now()}`,
+                  name: "",
+                  designation: "",
+                  department: "",
+                  school: schoolData.schoolName || "",
+                  email: "",
+                  phone: "",
+                  createLoginAccount: true,
+                  sendCredentialsEmail: true,
+                  generatedPassword: generateStrongPassword(),
+                },
+              })
+            }
+            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+          >
+            <Plus className="h-3.5 w-3.5" /> Add Faculty
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -965,6 +1267,53 @@ const AdminDashboard = () => {
                 <Field label="School"><input className={inputClass} value={facultyEditor.form.school || ""} onChange={(e) => setFacultyEditor((prev) => ({ ...prev, form: { ...prev.form, school: e.target.value } }))} /></Field>
                 <Field label="Email"><input className={inputClass} value={facultyEditor.form.email || ""} onChange={(e) => setFacultyEditor((prev) => ({ ...prev, form: { ...prev.form, email: e.target.value } }))} /></Field>
                 <Field label="Phone"><input className={inputClass} value={facultyEditor.form.phone || ""} onChange={(e) => setFacultyEditor((prev) => ({ ...prev, form: { ...prev.form, phone: e.target.value } }))} /></Field>
+                <Field label="Create Login Account">
+                  <select
+                    className={inputClass}
+                    value={String(facultyEditor.form.createLoginAccount ?? true)}
+                    onChange={(e) =>
+                      setFacultyEditor((prev) => ({
+                        ...prev,
+                        form: { ...prev.form, createLoginAccount: e.target.value === "true" },
+                      }))
+                    }
+                  >
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </select>
+                </Field>
+                <Field label="Send Credentials Email (queue for backend)">
+                  <select
+                    className={inputClass}
+                    value={String(facultyEditor.form.sendCredentialsEmail ?? true)}
+                    onChange={(e) =>
+                      setFacultyEditor((prev) => ({
+                        ...prev,
+                        form: { ...prev.form, sendCredentialsEmail: e.target.value === "true" },
+                      }))
+                    }
+                  >
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </select>
+                </Field>
+                <Field label="Generated Password">
+                  <div className="flex items-center gap-2">
+                    <input className={inputClass} value={facultyEditor.form.generatedPassword || ""} readOnly />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFacultyEditor((prev) => ({
+                          ...prev,
+                          form: { ...prev.form, generatedPassword: generateStrongPassword() },
+                        }))
+                      }
+                      className="inline-flex h-10 items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" /> Regenerate
+                    </button>
+                  </div>
+                </Field>
               </div>
 
               <button
@@ -974,22 +1323,61 @@ const AdminDashboard = () => {
                     setMessage("Faculty name is required.");
                     return;
                   }
+                  const facultyForm = {
+                    ...facultyEditor.form,
+                    createLoginAccount: toBool(facultyEditor.form.createLoginAccount, true),
+                    sendCredentialsEmail: toBool(facultyEditor.form.sendCredentialsEmail, true),
+                  };
+
                   setFacultyProfiles((prev) => {
                     const next = [...prev];
-                    if (facultyEditor.index === null) next.push(facultyEditor.form);
-                    else next[facultyEditor.index] = facultyEditor.form;
+                    if (facultyEditor.index === null) next.push(facultyForm);
+                    else next[facultyEditor.index] = facultyForm;
                     return next;
                   });
+
+                  if (facultyForm.createLoginAccount) {
+                    const isEdit = facultyEditor.index !== null;
+                    const existingForFaculty = accounts.find(
+                      (item) => item.linkedFacultyId && item.linkedFacultyId === facultyForm.id,
+                    );
+                    const generatedPassword = facultyForm.generatedPassword || generateStrongPassword();
+                    const account = createFacultyAccount(facultyForm, accounts, generatedPassword);
+
+                    if (!(isEdit && existingForFaculty)) {
+                      setAccounts((prev) => [...prev, account]);
+                    }
+
+                    if (facultyForm.sendCredentialsEmail && facultyForm.email) {
+                      setMailQueue((prev) => [
+                        {
+                          id: `mail-${Date.now()}`,
+                          to: facultyForm.email,
+                          subject: "GBU Faculty Portal Credentials",
+                          status: "pending-backend",
+                          payload: {
+                            facultyName: facultyForm.name,
+                            username: account.username,
+                            password: account.password,
+                            linkedFacultyId: facultyForm.id,
+                          },
+                          createdAt: new Date().toISOString(),
+                        },
+                        ...prev,
+                      ].slice(0, 100));
+                    }
+                  }
+
                   setActivityLog((prev) => [
                     {
                       id: `log-${Date.now()}`,
-                      action: `Updated faculty profile: ${facultyEditor.form.name}`,
+                      action: `Updated faculty profile: ${facultyForm.name}`,
                       time: new Date().toISOString(),
                     },
                     ...prev,
                   ].slice(0, 12));
                   setFacultyEditor({ index: null, form: null });
-                  setMessage("Faculty profile updated.");
+                  setMessage("Faculty profile updated. Login + email queue processed as selected.");
                 }}
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
               >
@@ -1043,6 +1431,43 @@ const AdminDashboard = () => {
                 onChange={(e) => setSchoolData((prev) => ({ ...prev, email: e.target.value }))}
               />
             </Field>
+            <Field label="Phone">
+              <input
+                className={inputClass}
+                value={schoolData.phone || ""}
+                onChange={(e) => setSchoolData((prev) => ({ ...prev, phone: e.target.value }))}
+              />
+            </Field>
+            <Field label="Website URL">
+              <input
+                className={inputClass}
+                value={schoolData.websiteUrl || ""}
+                onChange={(e) => setSchoolData((prev) => ({ ...prev, websiteUrl: e.target.value }))}
+              />
+            </Field>
+            <Field label="Banner Image URL">
+              <input
+                className={inputClass}
+                value={schoolData.bannerImage || ""}
+                onChange={(e) => setSchoolData((prev) => ({ ...prev, bannerImage: e.target.value }))}
+              />
+            </Field>
+            <Field label="Address">
+              <input
+                className={inputClass}
+                value={schoolData.address || ""}
+                onChange={(e) => setSchoolData((prev) => ({ ...prev, address: e.target.value }))}
+              />
+            </Field>
+          </div>
+          <div className="mt-4">
+            <Field label="School Description">
+              <textarea
+                className={`${inputClass} min-h-28`}
+                value={schoolData.schoolDescription || ""}
+                onChange={(e) => setSchoolData((prev) => ({ ...prev, schoolDescription: e.target.value }))}
+              />
+            </Field>
           </div>
         </div>
       )}
@@ -1054,20 +1479,44 @@ const AdminDashboard = () => {
           [
             { key: "title", label: "Event Title" },
             { key: "date", label: "Date", type: "date" },
+            { key: "startsAt", label: "Starts At" },
+            { key: "endDate", label: "End Date", type: "date" },
+            { key: "endsAt", label: "Ends At" },
             { key: "time", label: "Time" },
             { key: "venue", label: "Venue" },
+            { key: "location", label: "Location" },
             { key: "type", label: "Type" },
+            { key: "mode", label: "Mode" },
             { key: "organizer", label: "Organizer" },
+            { key: "attendees", label: "Attendees", type: "number" },
+            { key: "price", label: "Price" },
+            { key: "tags", label: "Tags (comma separated)" },
+            { key: "image", label: "Image URL" },
+            { key: "imageLink", label: "Image Click Link" },
+            { key: "coverImageUrl", label: "Cover Image URL" },
+            { key: "images", label: "Gallery Images (comma separated URLs)" },
             { key: "registrationUrl", label: "Registration URL" },
             { key: "description", label: "Description", type: "textarea" },
           ],
           {
             title: "",
             date: "",
+            startsAt: "",
+            endDate: "",
+            endsAt: "",
             time: "",
             venue: "",
+            location: "",
             type: "",
+            mode: "Offline",
             organizer: "",
+            attendees: 0,
+            price: "Free",
+            tags: "",
+            image: "",
+            imageLink: "",
+            coverImageUrl: "",
+            images: "",
             registrationUrl: "",
             description: "",
           },
@@ -1081,17 +1530,41 @@ const AdminDashboard = () => {
             { key: "title", label: "News Title" },
             { key: "date", label: "Date", type: "date" },
             { key: "category", label: "Category" },
+            { key: "author", label: "Author" },
+            { key: "department", label: "Department" },
+            { key: "tags", label: "Tags (comma separated)" },
             { key: "priority", label: "Priority" },
+            { key: "featured", label: "Featured", type: "boolean" },
+            { key: "views", label: "Views", type: "number" },
+            { key: "likes", label: "Likes", type: "number" },
+            { key: "image", label: "Image URL" },
+            { key: "imageLink", label: "Image Click Link" },
+            { key: "coverImageUrl", label: "Cover Image URL" },
+            { key: "pdfUrl", label: "PDF URL" },
+            { key: "link", label: "External Link" },
             { key: "excerpt", label: "Excerpt", type: "textarea" },
             { key: "content", label: "Content", type: "textarea" },
+            { key: "status", label: "Status" },
           ],
           {
             title: "",
             date: "",
             category: "Academic",
+            author: "School Office",
+            department: "",
+            tags: "",
             priority: "medium",
+            featured: false,
+            views: 0,
+            likes: 0,
+            image: "",
+            imageLink: "",
+            coverImageUrl: "",
+            pdfUrl: "",
+            link: "",
             excerpt: "",
             content: "",
+            status: "draft",
           },
         )}
 
@@ -1105,6 +1578,10 @@ const AdminDashboard = () => {
             { key: "type", label: "Type" },
             { key: "priority", label: "Priority" },
             { key: "isNew", label: "New Badge", type: "boolean" },
+            { key: "views", label: "Views", type: "number" },
+            { key: "image", label: "Image URL" },
+            { key: "imageLink", label: "Image Click Link" },
+            { key: "pdfUrl", label: "PDF URL" },
             { key: "content", label: "Content", type: "textarea" },
           ],
           {
@@ -1113,6 +1590,10 @@ const AdminDashboard = () => {
             type: "General",
             priority: "medium",
             isNew: true,
+            views: 0,
+            image: "",
+            imageLink: "",
+            pdfUrl: "",
             content: "",
           },
         )}
@@ -1126,14 +1607,26 @@ const AdminDashboard = () => {
             { key: "date", label: "Date", type: "date" },
             { key: "issueNumber", label: "Issue Number" },
             { key: "category", label: "Category" },
+            { key: "views", label: "Views", type: "number" },
+            { key: "coverImage", label: "Cover Image URL" },
+            { key: "imageLink", label: "Image Click Link" },
             { key: "pdfLink", label: "PDF Link" },
+            { key: "excerpt", label: "Excerpt", type: "textarea" },
+            { key: "content", label: "Content", type: "textarea" },
+            { key: "isPublished", label: "Published", type: "boolean" },
           ],
           {
             title: "",
             date: "",
             issueNumber: "",
             category: "School Update",
+            views: 0,
+            coverImage: "",
+            imageLink: "",
             pdfLink: "",
+            excerpt: "",
+            content: "",
+            isPublished: true,
           },
         )}
 
@@ -1145,13 +1638,21 @@ const AdminDashboard = () => {
             { key: "title", label: "Gallery Title" },
             { key: "eventDate", label: "Event Date", type: "date" },
             { key: "category", label: "Category" },
-            { key: "imageUrl", label: "Image URL" },
+            { key: "imageUrl", label: "Image 1 URL" },
+            { key: "imageUrl2", label: "Image 2 URL" },
+            { key: "imageUrl3", label: "Image 3 URL" },
+            { key: "imageUrl4", label: "Image 4 URL" },
+            { key: "imageLink", label: "Image Click Link" },
           ],
           {
             title: "",
             eventDate: "",
             category: "Events",
             imageUrl: "",
+            imageUrl2: "",
+            imageUrl3: "",
+            imageUrl4: "",
+            imageLink: "",
           },
         )}
     </div>
@@ -1242,12 +1743,12 @@ const AdminDashboard = () => {
                 >
                   <Save className="h-4 w-4" /> Save All
                 </button>
-                <button
+                {/* <button
                   onClick={resetAll}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
                 >
                   <RotateCcw className="h-4 w-4" /> Reset
-                </button>
+                </button> */}
                 <button
                   onClick={() => navigate("/login")}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-100"
