@@ -1,5 +1,6 @@
-import React, { useState, createContext, useContext } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { GraduationCap, Users, FlaskConical, BriefcaseBusiness, Archive } from "lucide-react";
 import RecruitmentBlock from "../../components/recruitments/RecruitmentBlock";
 import RecruitmentContent from "../../components/recruitments/RecruitmentContent";
 import BannerSection from "../../components/HeroBanner";
@@ -9,145 +10,103 @@ function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-// ✅ Tabs Context
-const TabsContext = createContext();
-
-const Tabs = ({ defaultValue, children }) => {
-  const [activeTab, setActiveTab] = useState(defaultValue);
-  return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
-      {children}
-    </TabsContext.Provider>
-  );
-};
-
-const TabsList = React.forwardRef(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "inline-flex h-10 items-center justify-center rounded-full bg-muted p-1 text-muted-foreground",
-      className
-    )}
-    {...props}
-  />
-));
-TabsList.displayName = "TabsList";
-
-const TabsTrigger = React.forwardRef(
-  ({ value, className, children, ...props }, ref) => {
-    const { activeTab, setActiveTab } = useContext(TabsContext);
-    const isActive = activeTab === value;
-
-    return (
-      <button
-        ref={ref}
-        onClick={() => setActiveTab(value)}
-        className={cn(
-          "inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-2 text-sm font-medium ring-offset-background transition-all duration-300",
-          isActive
-            ? "bg-black text-white shadow-md scale-105"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </button>
-    );
-  }
-);
-TabsTrigger.displayName = "TabsTrigger";
-
-const TabsContent = React.forwardRef(
-  ({ value, className, children, ...props }, ref) => {
-    const { activeTab } = useContext(TabsContext);
-    return activeTab === value ? (
-      <motion.div
-        ref={ref}
-        className={cn("mt-4", className)}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    ) : null;
-  }
-);
-TabsContent.displayName = "TabsContent";
-
 const RecruitMain = () => {
+  const [activeTab, setActiveTab] = useState("current");
   const [activeArchiveTab, setActiveArchiveTab] = useState("archived2023");
 
+  const currentCategories = [
+    { title: "Teaching", type: "teaching", icon: GraduationCap },
+    { title: "Non-Teaching", type: "non-teaching", icon: Users },
+    { title: "Project / Research", type: "project-research", icon: FlaskConical },
+    { title: "Others", type: "others", icon: BriefcaseBusiness },
+  ];
+
   return (
-    <motion.div
-      className="min-h-screen mb-10"
+    <motion.section
+      className="min-h-screen bg-slate-50 pb-14"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      {/* ✅ Fixed background image */}
-      <div className="fixed inset-0 z-0 opacity-10 pointer-events-none bg-white bg-center bg-no-repeat bg-cover" />
+      <BannerSection
+        title="RECRUITMENTS"
+        subtitle="Faculty and Staff Recruitment"
+        bgTheme={9}
+      />
 
-<BannerSection
-  title="RECRUITMENTS"
-  subtitle="Faculty/Staff Recruitment"
-  bgTheme={9} // or any theme number from 1–10, choose based on design preference
-/>
+      <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6">
 
+        <div className="mb-8 flex flex-wrap gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          <button
+            type="button"
+            onClick={() => setActiveTab("current")}
+            className={cn(
+              "rounded-xl px-5 py-2.5 text-sm font-semibold transition",
+              activeTab === "current"
+                ? "bg-slate-900 text-white"
+                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+            )}
+          >
+            Current Opportunities
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("archived")}
+            className={cn(
+              "inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition",
+              activeTab === "archived"
+                ? "bg-slate-900 text-white"
+                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+            )}
+          >
+            <Archive className="h-4 w-4" /> Archived Opportunities
+          </button>
+        </div>
 
-      <div className="container w-8/10 mx-auto px-4 py-12">
-        <Tabs defaultValue="current">
-          <div className="flex justify-center mb-10">
-            <TabsList>
-              <TabsTrigger value="current">Current Opportunities</TabsTrigger>
-              <TabsTrigger value="archived">Archived Opportunities</TabsTrigger>
-            </TabsList>
-          </div>
-
-          {/* ✅ Current Opportunities */}
-          <TabsContent value="current">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <RecruitmentBlock title="TEACHING" type="teaching" icon="👨‍🏫" />
+        {activeTab === "current" ? (
+          <motion.div
+            className="grid grid-cols-1 gap-6 lg:grid-cols-2"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {currentCategories.map((item) => (
               <RecruitmentBlock
-                title="NON-TEACHING"
-                type="non-teaching"
-                icon="👥"
+                key={item.type}
+                title={item.title}
+                type={item.type}
+                icon={item.icon}
               />
-              <RecruitmentBlock
-                title="PROJECT / RESEARCH"
-                type="project-research"
-                icon="🔬"
-              />
-              <RecruitmentBlock title="OTHERS" type="others" icon="⚙️" />
-            </div>
-          </TabsContent>
-
-          {/* ✅ Archived Opportunities */}
-          <TabsContent value="archived">
-            <div className="flex justify-center mb-6 gap-4 flex-wrap">
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="mb-6 flex flex-wrap gap-3">
               {["archived2023", "archived2022", "archived2021"].map((year) => (
                 <button
                   key={year}
+                  type="button"
                   onClick={() => setActiveArchiveTab(year)}
                   className={cn(
-                    "px-5 py-2 rounded-full text-sm font-medium transition-all duration-200",
+                    "rounded-xl px-4 py-2 text-sm font-semibold transition",
                     activeArchiveTab === year
-                      ? "bg-black text-white shadow-md scale-105"
-                      : "bg-muted text-muted-foreground hover:bg-muted/70"
+                      ? "bg-slate-900 text-white"
+                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
                   )}
                 >
                   {year.replace("archived", "")}
                 </button>
               ))}
             </div>
-
             <RecruitmentContent tabId={activeArchiveTab} />
-          </TabsContent>
-        </Tabs>
+          </motion.div>
+        )}
       </div>
-    </motion.div>
+    </motion.section>
   );
 };
 
