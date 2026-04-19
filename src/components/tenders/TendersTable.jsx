@@ -1,51 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ButtonGroup from '../TabsData.jsx';
+import {
+  DEFAULT_TENDERS,
+  TENDERS_STORAGE_KEY,
+  getTenderAutoHideDate,
+  splitTendersByStatus,
+} from "../../Data/tendersData";
 
-const currentTenders = [
-  {
-    id: 1,
-    title: "Supply of IT Equipment and Software Licenses",
-    description:
-      "Procurement of computers, servers, and enterprise software licenses for government offices.",
-    closingDate: "2025-07-15",
-    documentUrl: "/documents/tender-001.pdf",
-  },
-  {
-    id: 2,
-    title: "Construction of Municipal Water Treatment Plant",
-    description:
-      "Design, construction and commissioning of water treatment facility with 50ML/day capacity.",
-    closingDate: "2025-07-22",
-    documentUrl: "/documents/tender-002.pdf",
-  },
-  {
-    id: 3,
-    title: "Digital Infrastructure Upgrade Project",
-    description:
-      "Upgrade of fiber optic network and installation of 5G infrastructure across the city.",
-    closingDate: "2025-08-10",
-    documentUrl: "/documents/tender-004.pdf",
-  },
-];
+const getInitialTenders = () => {
+  try {
+    const raw = localStorage.getItem(TENDERS_STORAGE_KEY);
+    if (!raw) return DEFAULT_TENDERS;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return DEFAULT_TENDERS;
+    return parsed;
+  } catch {
+    return DEFAULT_TENDERS;
+  }
+};
 
-const archivedTenders = [
-  {
-    id: 4,
-    title: "Maintenance Services for Public Transportation Fleet",
-    description:
-      "Comprehensive maintenance and repair services for city bus fleet including spare parts.",
-    closingDate: "2025-06-30",
-    documentUrl: "/documents/tender-003.pdf",
-  },
-  {
-    id: 5,
-    title: "Renewable Energy Solar Panel Installation",
-    description:
-      "Installation of solar panels on government buildings with total capacity of 2MW.",
-    closingDate: "2025-07-05",
-    documentUrl: "/documents/tender-005.pdf",
-  },
-];
+const formatAutoHideLabel = (closingDate) => {
+  const autoHideDate = getTenderAutoHideDate(closingDate);
+  if (!autoHideDate) return "N/A";
+  return autoHideDate.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
 
 // ✅ Tender Card UI
 const TenderCard = ({ tender, index, variant = "current" }) => (
@@ -85,6 +67,22 @@ const TenderCard = ({ tender, index, variant = "current" }) => (
 // ✅ Tenders Table Page
 const TendersTable = () => {
   const [activeTab, setActiveTab] = useState("current");
+  const [tenders, setTenders] = useState(getInitialTenders);
+
+  useEffect(() => {
+    const syncTenders = () => setTenders(getInitialTenders());
+    window.addEventListener("storage", syncTenders);
+    window.addEventListener("tenders-data-updated", syncTenders);
+    return () => {
+      window.removeEventListener("storage", syncTenders);
+      window.removeEventListener("tenders-data-updated", syncTenders);
+    };
+  }, []);
+
+  const { current: currentTenders, archived: archivedTenders } = useMemo(
+    () => splitTendersByStatus(tenders),
+    [tenders],
+  );
 
   const tabButtons = [
     { id: "current", label: "Current Opportunities", tooltip: "View active tenders" },
@@ -110,9 +108,19 @@ const TendersTable = () => {
       {/* Tab Content */}
       {activeTab === "current" && (
         <div className="space-y-5">
+          <div className="rounded-lg border-l-4 border-teal-400 bg-teal-50 p-4">
+            <p className="text-sm text-teal-800">
+              Tender closing date ke 1 din baad yeh list se automatically remove ho jata hai.
+            </p>
+          </div>
           {currentTenders.map((t, i) => (
             <TenderCard tender={t} index={i} key={t.id} variant="current" />
           ))}
+          {!currentTenders.length ? (
+            <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-5 text-sm text-gray-600">
+              Abhi koi active tender available nahi hai.
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -121,12 +129,20 @@ const TendersTable = () => {
           {archivedTenders.map((t, i) => (
             <TenderCard tender={t} index={i} key={t.id} variant="archived" />
           ))}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border-l-4 border-orange-400">
-            <p className="text-sm text-gray-600 italic">
-              These tenders are no longer active and are shown for reference
-              only.
-            </p>
-          </div>
+          {!archivedTenders.length ? (
+            <div className="mt-6 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-5 text-sm text-gray-600">
+              Archived tenders abhi available nahi hain.
+            </div>
+          ) : (
+            <div className="mt-6 rounded-lg border-l-4 border-orange-400 bg-gray-50 p-4">
+              <p className="text-sm text-gray-600 italic">
+                In tenders ka auto-hide cutoff closing date ke 1 din baad hota hai.
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                Latest cutoff: {formatAutoHideLabel(archivedTenders[0]?.closingDate)}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

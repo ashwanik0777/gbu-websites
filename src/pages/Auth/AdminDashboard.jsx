@@ -25,6 +25,7 @@ import {
   Eye,
   EyeOff,
   Sparkles,
+  FileText,
 } from "lucide-react";
 import {
   DEFAULT_SCHOOL_DASHBOARD_DATA,
@@ -38,6 +39,19 @@ import {
   DUMMY_FACULTY_DETAIL,
   FACULTY_PROFILE_STORAGE_PREFIX,
 } from "../../Data/facultyDummyData";
+import {
+  DEFAULT_TENDERS,
+  TENDERS_STORAGE_KEY,
+  getTenderAutoHideDate,
+  isTenderActive,
+  splitTendersByStatus,
+} from "../../Data/tendersData";
+import {
+  createTender,
+  deleteTender,
+  listTenders,
+  updateTender,
+} from "../../services/tendersService";
 
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 const ensureArray = (value, fallback) => (Array.isArray(value) ? value : fallback);
@@ -101,6 +115,7 @@ const tabs = [
   { id: "accounts", label: "User & Login Management", icon: KeyRound },
   { id: "faculty", label: "Faculty Management", icon: Users },
   { id: "school", label: "School Content", icon: School },
+  { id: "tenders", label: "Tender Management", icon: FileText },
 ];
 
 const schoolContentTabs = [
@@ -192,6 +207,17 @@ const getInitialAccounts = () => {
   }
 };
 
+const getInitialTenders = () => {
+  try {
+    const raw = localStorage.getItem(TENDERS_STORAGE_KEY);
+    if (!raw) return deepClone(DEFAULT_TENDERS);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : deepClone(DEFAULT_TENDERS);
+  } catch {
+    return deepClone(DEFAULT_TENDERS);
+  }
+};
+
 const getFacultyProfiles = () => {
   const list = [];
   try {
@@ -253,33 +279,43 @@ const AdminDashboard = () => {
 
   const [schoolData, setSchoolData] = useState(getInitialSchoolData);
   const [accounts, setAccounts] = useState(getInitialAccounts);
+  const [tenders, setTenders] = useState(getInitialTenders);
   const [facultyProfiles, setFacultyProfiles] = useState(getFacultyProfiles);
 
   const [accountEditor, setAccountEditor] = useState({ index: null, form: null });
   const [facultyEditor, setFacultyEditor] = useState({ index: null, form: null });
   const [collectionEditors, setCollectionEditors] = useState({});
+  const [tenderEditor, setTenderEditor] = useState({ index: null, form: null });
   const [accountFilters, setAccountFilters] = useState({ query: "", role: "all", status: "all" });
   const [facultyFilters, setFacultyFilters] = useState({ query: "", department: "all" });
+  const [tenderFilters, setTenderFilters] = useState({ query: "", status: "all" });
   const [collectionFilters, setCollectionFilters] = useState({});
+  const [isTenderLoading, setIsTenderLoading] = useState(false);
+  const [isTenderSaving, setIsTenderSaving] = useState(false);
+  const [tenderDeletingKey, setTenderDeletingKey] = useState("");
+  const [tenderApiError, setTenderApiError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [activityLog, setActivityLog] = useState(getInitialActivityLog);
   const [mailQueue, setMailQueue] = useState(getInitialMailQueue);
   const backupInputRef = useRef(null);
   const bulkFacultyInputRef = useRef(null);
 
+  const tenderSplit = useMemo(() => splitTendersByStatus(tenders), [tenders]);
+
   const summary = useMemo(
     () => [
       { label: "Total Accounts", value: accounts.length },
       { label: "Faculty Profiles", value: facultyProfiles.length },
       { label: "School Events", value: schoolData.events?.length || 0 },
-      { label: "News + Notices", value: (schoolData.news?.length || 0) + (schoolData.notices?.length || 0) },
+      { label: "Active Tenders", value: tenderSplit.current.length },
     ],
-    [accounts, facultyProfiles, schoolData],
+    [accounts, facultyProfiles, schoolData, tenderSplit.current.length],
   );
 
   const saveAll = () => {
     localStorage.setItem(SCHOOL_DASHBOARD_STORAGE_KEY, JSON.stringify(schoolData));
     localStorage.setItem(ADMIN_PORTAL_ACCOUNTS_KEY, JSON.stringify(accounts));
+    localStorage.setItem(TENDERS_STORAGE_KEY, JSON.stringify(tenders));
     facultyProfiles.forEach((faculty) => {
       if (faculty?.id) {
         localStorage.setItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${faculty.id}`, JSON.stringify(faculty));
@@ -294,14 +330,17 @@ const AdminDashboard = () => {
       ...prev,
     ].slice(0, 12));
     setMessage("Admin dashboard saved. School + Faculty + User login system updated.");
+    window.dispatchEvent(new Event("tenders-data-updated"));
   };
 
   const resetAll = () => {
     setSchoolData(deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA));
     setAccounts(deepClone(DEFAULT_ADMIN_PORTAL_ACCOUNTS));
+    setTenders(deepClone(DEFAULT_TENDERS));
     setFacultyProfiles([deepClone(DUMMY_FACULTY_DETAIL)]);
     localStorage.removeItem(SCHOOL_DASHBOARD_STORAGE_KEY);
     localStorage.removeItem(ADMIN_PORTAL_ACCOUNTS_KEY);
+    localStorage.removeItem(TENDERS_STORAGE_KEY);
     setActivityLog((prev) => [
       {
         id: `log-${Date.now()}`,
@@ -320,6 +359,40 @@ const AdminDashboard = () => {
   useEffect(() => {
     localStorage.setItem(FACULTY_MAIL_QUEUE_KEY, JSON.stringify(mailQueue));
   }, [mailQueue]);
+
+  useEffect(() => {
+    localStorage.setItem(TENDERS_STORAGE_KEY, JSON.stringify(tenders));
+    window.dispatchEvent(new Event("tenders-data-updated"));
+  }, [tenders]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncTendersFromServer = async () => {
+      setIsTenderLoading(true);
+      setTenderApiError("");
+      try {
+        const serverTenders = await listTenders();
+        if (!isMounted) return;
+        setTenders(serverTenders);
+      } catch (error) {
+        if (!isMounted) return;
+        setTenderApiError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Unable to fetch tenders from backend. Local data is being used.",
+        );
+      } finally {
+        if (isMounted) setIsTenderLoading(false);
+      }
+    };
+
+    syncTendersFromServer();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const buildUniqueUsername = (seed, existingAccounts) => {
     const sanitized = String(seed || "faculty.user")
@@ -486,6 +559,7 @@ const AdminDashboard = () => {
       exportedAt: new Date().toISOString(),
       schoolData,
       accounts,
+      tenders,
       facultyProfiles,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -520,15 +594,18 @@ const AdminDashboard = () => {
       const importedAccounts = Array.isArray(parsed.accounts)
         ? parsed.accounts
         : deepClone(DEFAULT_ADMIN_PORTAL_ACCOUNTS);
+      const importedTenders = Array.isArray(parsed.tenders) ? parsed.tenders : deepClone(DEFAULT_TENDERS);
       const importedFaculty = Array.isArray(parsed.facultyProfiles)
         ? parsed.facultyProfiles
         : [deepClone(DUMMY_FACULTY_DETAIL)];
 
       setSchoolData(importedSchoolData);
       setAccounts(importedAccounts);
+      setTenders(importedTenders);
       setFacultyProfiles(importedFaculty);
       localStorage.setItem(SCHOOL_DASHBOARD_STORAGE_KEY, JSON.stringify(importedSchoolData));
       localStorage.setItem(ADMIN_PORTAL_ACCOUNTS_KEY, JSON.stringify(importedAccounts));
+      localStorage.setItem(TENDERS_STORAGE_KEY, JSON.stringify(importedTenders));
       importedFaculty.forEach((faculty) => {
         if (faculty?.id) {
           localStorage.setItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${faculty.id}`, JSON.stringify(faculty));
@@ -544,6 +621,7 @@ const AdminDashboard = () => {
         ...prev,
       ].slice(0, 12));
       setMessage("Backup imported and applied successfully.");
+      window.dispatchEvent(new Event("tenders-data-updated"));
     } catch {
       setMessage("Backup import failed. Please select a valid JSON backup file.");
     } finally {
@@ -692,6 +770,178 @@ const AdminDashboard = () => {
       return matchesQuery && matchesDepartment;
       });
   }, [facultyProfiles, facultyFilters]);
+
+  const filteredTenders = useMemo(() => {
+    const query = tenderFilters.query.trim().toLowerCase();
+    return tenders
+      .map((tender, index) => ({ tender, index }))
+      .filter(({ tender }) => {
+        const matchesQuery =
+          !query ||
+          [tender.title, tender.description, tender.documentUrl, tender.id]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase()
+            .includes(query);
+
+        const isActive = isTenderActive(tender);
+        const matchesStatus =
+          tenderFilters.status === "all" ||
+          (tenderFilters.status === "active" && isActive) ||
+          (tenderFilters.status === "archived" && !isActive);
+
+        return matchesQuery && matchesStatus;
+      });
+  }, [tenders, tenderFilters]);
+
+  const handleDeleteTender = async (tender, actualIndex) => {
+    const key = tender.localId || tender.id || `tender-${actualIndex}`;
+    const previous = [...tenders];
+
+    setTenderApiError("");
+    setTenderDeletingKey(String(key));
+    setTenders((prev) => prev.filter((_, i) => i !== actualIndex));
+
+    try {
+      if (tender.id && !String(tender.id).startsWith("tmp-")) {
+        await deleteTender(tender.id);
+      }
+
+      setActivityLog((prev) => [
+        {
+          id: `log-${Date.now()}`,
+          action: `Deleted tender: ${tender.title || tender.id || "untitled"}`,
+          time: new Date().toISOString(),
+        },
+        ...prev,
+      ].slice(0, 12));
+      setMessage("Tender deleted successfully.");
+    } catch (error) {
+      setTenders(previous);
+      setTenderApiError(
+        error?.response?.data?.message || error?.message || "Failed to delete tender from backend.",
+      );
+      setMessage("Tender delete failed. Previous data restored.");
+    } finally {
+      setTenderDeletingKey("");
+    }
+  };
+
+  const handleSaveTender = async () => {
+    const form = tenderEditor.form;
+    if (!form?.title || !form?.description || !form?.closingDate || !form?.documentUrl) {
+      setMessage("Title, description, closing date, and document URL are required.");
+      return;
+    }
+
+    setIsTenderSaving(true);
+    setTenderApiError("");
+
+    const payload = {
+      id: form.id || "",
+      title: String(form.title).trim(),
+      description: String(form.description).trim(),
+      closingDate: form.closingDate,
+      documentUrl: String(form.documentUrl).trim(),
+      localId: form.localId || `tender-${Date.now()}`,
+    };
+
+    const isCreate = tenderEditor.index === null;
+    const rollbackState = [...tenders];
+
+    if (isCreate) {
+      const tempId = `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const optimisticTender = {
+        ...payload,
+        id: tempId,
+        localId: tempId,
+      };
+
+      setTenders((prev) => [optimisticTender, ...prev]);
+      setTenderEditor({ index: null, form: null });
+
+      try {
+        const created = await createTender(payload);
+        setTenders((prev) =>
+          prev.map((item) => (item.localId === tempId ? { ...item, ...created, localId: created.localId || created.id || tempId } : item)),
+        );
+        setActivityLog((prev) => [
+          {
+            id: `log-${Date.now()}`,
+            action: `Created tender: ${created.title}`,
+            time: new Date().toISOString(),
+          },
+          ...prev,
+        ].slice(0, 12));
+        setMessage("Tender created and synced with backend.");
+      } catch (error) {
+        setTenders(rollbackState);
+        setTenderApiError(
+          error?.response?.data?.message || error?.message || "Failed to create tender on backend.",
+        );
+        setMessage("Tender create failed. Previous data restored.");
+      } finally {
+        setIsTenderSaving(false);
+      }
+      return;
+    }
+
+    const target = tenders[tenderEditor.index];
+    const targetKey = target?.localId || target?.id || payload.localId;
+
+    setTenders((prev) =>
+      prev.map((item, index) =>
+        index === tenderEditor.index || item.localId === targetKey
+          ? {
+              ...item,
+              ...payload,
+              localId: item.localId || payload.localId,
+            }
+          : item,
+      ),
+    );
+    setTenderEditor({ index: null, form: null });
+
+    try {
+      if (target?.id && !String(target.id).startsWith("tmp-")) {
+        const updated = await updateTender(target.id, payload);
+        setTenders((prev) =>
+          prev.map((item) =>
+            item.localId === targetKey || item.id === target.id
+              ? { ...item, ...updated, localId: updated.localId || updated.id || targetKey }
+              : item,
+          ),
+        );
+      } else {
+        const created = await createTender(payload);
+        setTenders((prev) =>
+          prev.map((item) =>
+            item.localId === targetKey
+              ? { ...item, ...created, localId: created.localId || created.id || targetKey }
+              : item,
+          ),
+        );
+      }
+
+      setActivityLog((prev) => [
+        {
+          id: `log-${Date.now()}`,
+          action: `Updated tender: ${payload.title}`,
+          time: new Date().toISOString(),
+        },
+        ...prev,
+      ].slice(0, 12));
+      setMessage("Tender updated and synced with backend.");
+    } catch (error) {
+      setTenders(rollbackState);
+      setTenderApiError(
+        error?.response?.data?.message || error?.message || "Failed to update tender on backend.",
+      );
+      setMessage("Tender update failed. Previous data restored.");
+    } finally {
+      setIsTenderSaving(false);
+    }
+  };
 
   const healthChecks = useMemo(() => {
     const inactiveAccounts = accounts.filter((item) => item.status === "inactive").length;
@@ -1394,6 +1644,213 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const renderTendersTab = () => (
+    <div className="space-y-4">
+      <div className={cardClass}>
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">Tender Management</h2>
+          </div>
+          <button
+            type="button"
+            onClick={() =>
+              setTenderEditor({
+                index: null,
+                form: {
+                  id: "",
+                  title: "",
+                  description: "",
+                  closingDate: "",
+                  documentUrl: "",
+                  localId: `tender-${Date.now()}`,
+                },
+              })
+            }
+            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+          >
+            <Plus className="h-3.5 w-3.5" /> Add Tender
+          </button>
+        </div>
+
+        {isTenderLoading ? (
+          <div className="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800">
+            Loading tenders from backend API...
+          </div>
+        ) : null}
+
+        {tenderApiError ? (
+          <div className="mb-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
+            API Error: {tenderApiError}
+          </div>
+        ) : null}
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div>
+            <FilterBar
+              searchValue={tenderFilters.query}
+              onSearchChange={(value) => setTenderFilters((prev) => ({ ...prev, query: value }))}
+              searchPlaceholder="Search by title, description, document url..."
+              onClear={() => setTenderFilters({ query: "", status: "all" })}
+            >
+              <select
+                className="rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs font-medium text-slate-700"
+                value={tenderFilters.status}
+                onChange={(e) => setTenderFilters((prev) => ({ ...prev, status: e.target.value }))}
+              >
+                <option value="all">All</option>
+                <option value="active">Active</option>
+                <option value="archived">Archived</option>
+              </select>
+            </FilterBar>
+
+            <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
+              {filteredTenders.map(({ tender, index: actualIndex }) => {
+                const autoHideDate = getTenderAutoHideDate(tender.closingDate);
+                const isActive = isTenderActive(tender);
+                return (
+                  <div key={tender.localId || tender.id || actualIndex} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-slate-900">{tender.title || "Untitled Tender"}</p>
+                        <p className="text-xs text-slate-500">
+                          Closing: {tender.closingDate || "N/A"} | Auto-hide: {autoHideDate ? autoHideDate.toISOString().slice(0, 10) : "N/A"}
+                        </p>
+                        <p className="mt-1 text-xs font-medium text-slate-700">
+                          Status: {isActive ? "active" : "archived"}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          disabled={isTenderSaving || tenderDeletingKey === String(tender.localId || tender.id || actualIndex)}
+                          onClick={() =>
+                            setTenderEditor({
+                              index: actualIndex,
+                              form: {
+                                id: tender.id || "",
+                                title: tender.title || "",
+                                description: tender.description || "",
+                                closingDate: tender.closingDate || "",
+                                documentUrl: tender.documentUrl || "",
+                                localId: tender.localId || `tender-${Date.now()}`,
+                              },
+                            })
+                          }
+                          className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        >
+                          <Pencil className="h-3.5 w-3.5" /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isTenderSaving || tenderDeletingKey === String(tender.localId || tender.id || actualIndex)}
+                          onClick={() => handleDeleteTender(tender, actualIndex)}
+                          className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          {tenderDeletingKey === String(tender.localId || tender.id || actualIndex) ? "Deleting..." : "Delete"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-white p-4">
+            {tenderEditor.form ? (
+              <>
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-slate-800">
+                    {tenderEditor.index === null ? "Add Tender" : "Edit Tender"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setTenderEditor({ index: null, form: null })}
+                    className="text-xs font-medium text-slate-500 hover:text-slate-700"
+                  >
+                    Cancel
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  <Field label="Tender ID (Backend Generated)">
+                    <input className={inputClass} value={tenderEditor.form.id || "Auto-generated by backend"} disabled />
+                  </Field>
+                  <Field label="Title">
+                    <input
+                      className={inputClass}
+                      value={tenderEditor.form.title || ""}
+                      onChange={(e) =>
+                        setTenderEditor((prev) => ({ ...prev, form: { ...prev.form, title: e.target.value } }))
+                      }
+                    />
+                  </Field>
+                  <Field label="Description">
+                    <textarea
+                      className={`${inputClass} min-h-24`}
+                      value={tenderEditor.form.description || ""}
+                      onChange={(e) =>
+                        setTenderEditor((prev) => ({ ...prev, form: { ...prev.form, description: e.target.value } }))
+                      }
+                    />
+                  </Field>
+                  <Field label="Closing Date">
+                    <input
+                      className={inputClass}
+                      type="date"
+                      value={tenderEditor.form.closingDate || ""}
+                      onChange={(e) =>
+                        setTenderEditor((prev) => ({ ...prev, form: { ...prev.form, closingDate: e.target.value } }))
+                      }
+                    />
+                  </Field>
+                  <Field label="Document URL">
+                    <input
+                      className={inputClass}
+                      value={tenderEditor.form.documentUrl || ""}
+                      onChange={(e) =>
+                        setTenderEditor((prev) => ({ ...prev, form: { ...prev.form, documentUrl: e.target.value } }))
+                      }
+                    />
+                  </Field>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={isTenderSaving}
+                  onClick={handleSaveTender}
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                >
+                  {isTenderSaving ? "Saving..." : "Save Tender"}
+                </button>
+              </>
+            ) : (
+              <div className="flex h-full min-h-[180px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
+                Select tender to edit or add a new tender.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className={cardClass}>
+        <h3 className="mb-3 text-base font-semibold text-slate-900">Tender Snapshot</h3>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Active Tenders</p>
+            <p className="mt-1 text-2xl font-bold text-slate-900">{tenderSplit.current.length}</p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Archived Tenders</p>
+            <p className="mt-1 text-2xl font-bold text-slate-900">{tenderSplit.archived.length}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderSchoolTab = () => (
     <div className="space-y-4">
 
@@ -1799,6 +2256,11 @@ const AdminDashboard = () => {
                     <p className="font-semibold text-slate-900">School Content</p>
                     <p className="mt-1 text-sm text-slate-600">Manage events, news, notices, newsletters, and gallery data.</p>
                   </div>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="mb-2 inline-flex rounded-lg bg-orange-100 p-2 text-orange-700"><FileText className="h-4 w-4" /></div>
+                    <p className="font-semibold text-slate-900">Tender Management</p>
+                    <p className="mt-1 text-sm text-slate-600">Create tenders with full fields and auto archive after closing date + 1 day.</p>
+                  </div>
                 </div>
               </div>
 
@@ -1856,6 +2318,7 @@ const AdminDashboard = () => {
           {activeTab === "accounts" && renderAccountsTab()}
           {activeTab === "faculty" && renderFacultyTab()}
           {activeTab === "school" && renderSchoolTab()}
+          {activeTab === "tenders" && renderTendersTab()}
         </main>
       </div>
     </div>
