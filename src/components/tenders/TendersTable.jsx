@@ -108,17 +108,13 @@ const TendersTable = () => {
       {/* Tab Content */}
       {activeTab === "current" && (
         <div className="space-y-5">
-          <div className="rounded-lg border-l-4 border-teal-400 bg-teal-50 p-4">
-            <p className="text-sm text-teal-800">
-              Tender closing date ke 1 din baad yeh list se automatically remove ho jata hai.
-            </p>
-          </div>
+         
           {currentTenders.map((t, i) => (
             <TenderCard tender={t} index={i} key={t.id} variant="current" />
           ))}
           {!currentTenders.length ? (
             <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-5 text-sm text-gray-600">
-              Abhi koi active tender available nahi hai.
+              There are no active tenders available right now.
             </div>
           ) : null}
         </div>
@@ -131,12 +127,12 @@ const TendersTable = () => {
           ))}
           {!archivedTenders.length ? (
             <div className="mt-6 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-5 text-sm text-gray-600">
-              Archived tenders abhi available nahi hain.
+              There are no archived tenders available right now.
             </div>
           ) : (
             <div className="mt-6 rounded-lg border-l-4 border-orange-400 bg-gray-50 p-4">
               <p className="text-sm text-gray-600 italic">
-                In tenders ka auto-hide cutoff closing date ke 1 din baad hota hai.
+               The auto-hide cutoff for these tenders happens 1 day after the closing date.
               </p>
               <p className="mt-1 text-xs text-gray-500">
                 Latest cutoff: {formatAutoHideLabel(archivedTenders[0]?.closingDate)}
