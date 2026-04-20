@@ -26,6 +26,7 @@ import {
   EyeOff,
   Sparkles,
   FileText,
+  BriefcaseBusiness,
 } from "lucide-react";
 import {
   DEFAULT_SCHOOL_DASHBOARD_DATA,
@@ -52,6 +53,10 @@ import {
   listTenders,
   updateTender,
 } from "../../services/tendersService";
+import {
+  DEFAULT_RECRUITMENT_DASHBOARD_DATA,
+  RECRUITMENT_DASHBOARD_STORAGE_KEY,
+} from "../../Data/recruitmentData";
 
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 const ensureArray = (value, fallback) => (Array.isArray(value) ? value : fallback);
@@ -116,6 +121,7 @@ const tabs = [
   { id: "faculty", label: "Faculty Management", icon: Users },
   { id: "school", label: "School Content", icon: School },
   { id: "tenders", label: "Tender Management", icon: FileText },
+  { id: "recruitment", label: "Recruitment Management", icon: BriefcaseBusiness },
 ];
 
 const schoolContentTabs = [
@@ -218,6 +224,24 @@ const getInitialTenders = () => {
   }
 };
 
+const getInitialRecruitmentData = () => {
+  try {
+    const raw = localStorage.getItem(RECRUITMENT_DASHBOARD_STORAGE_KEY);
+    if (!raw) return deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA);
+    const parsed = JSON.parse(raw);
+    return {
+      categories: Array.isArray(parsed?.categories)
+        ? parsed.categories
+        : deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA.categories),
+      archived: Array.isArray(parsed?.archived)
+        ? parsed.archived
+        : deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA.archived),
+    };
+  } catch {
+    return deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA);
+  }
+};
+
 const getFacultyProfiles = () => {
   const list = [];
   try {
@@ -280,15 +304,18 @@ const AdminDashboard = () => {
   const [schoolData, setSchoolData] = useState(getInitialSchoolData);
   const [accounts, setAccounts] = useState(getInitialAccounts);
   const [tenders, setTenders] = useState(getInitialTenders);
+  const [recruitmentData, setRecruitmentData] = useState(getInitialRecruitmentData);
   const [facultyProfiles, setFacultyProfiles] = useState(getFacultyProfiles);
 
   const [accountEditor, setAccountEditor] = useState({ index: null, form: null });
   const [facultyEditor, setFacultyEditor] = useState({ index: null, form: null });
   const [collectionEditors, setCollectionEditors] = useState({});
   const [tenderEditor, setTenderEditor] = useState({ index: null, form: null });
+  const [recruitmentEditor, setRecruitmentEditor] = useState({ mode: null, index: null, form: null });
   const [accountFilters, setAccountFilters] = useState({ query: "", role: "all", status: "all" });
   const [facultyFilters, setFacultyFilters] = useState({ query: "", department: "all" });
   const [tenderFilters, setTenderFilters] = useState({ query: "", status: "all" });
+  const [recruitmentFilter, setRecruitmentFilter] = useState("");
   const [collectionFilters, setCollectionFilters] = useState({});
   const [isTenderLoading, setIsTenderLoading] = useState(false);
   const [isTenderSaving, setIsTenderSaving] = useState(false);
@@ -301,6 +328,14 @@ const AdminDashboard = () => {
   const bulkFacultyInputRef = useRef(null);
 
   const tenderSplit = useMemo(() => splitTendersByStatus(tenders), [tenders]);
+  const recruitmentPostCount = useMemo(
+    () =>
+      (recruitmentData.categories || []).reduce(
+        (count, category) => count + (Array.isArray(category.tabs) ? category.tabs.length : 0),
+        0,
+      ),
+    [recruitmentData],
+  );
 
   const summary = useMemo(
     () => [
@@ -308,14 +343,16 @@ const AdminDashboard = () => {
       { label: "Faculty Profiles", value: facultyProfiles.length },
       { label: "School Events", value: schoolData.events?.length || 0 },
       { label: "Active Tenders", value: tenderSplit.current.length },
+      { label: "Recruitment Posts", value: recruitmentPostCount },
     ],
-    [accounts, facultyProfiles, schoolData, tenderSplit.current.length],
+    [accounts, facultyProfiles, schoolData, tenderSplit.current.length, recruitmentPostCount],
   );
 
   const saveAll = () => {
     localStorage.setItem(SCHOOL_DASHBOARD_STORAGE_KEY, JSON.stringify(schoolData));
     localStorage.setItem(ADMIN_PORTAL_ACCOUNTS_KEY, JSON.stringify(accounts));
     localStorage.setItem(TENDERS_STORAGE_KEY, JSON.stringify(tenders));
+    localStorage.setItem(RECRUITMENT_DASHBOARD_STORAGE_KEY, JSON.stringify(recruitmentData));
     facultyProfiles.forEach((faculty) => {
       if (faculty?.id) {
         localStorage.setItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${faculty.id}`, JSON.stringify(faculty));
@@ -331,16 +368,19 @@ const AdminDashboard = () => {
     ].slice(0, 12));
     setMessage("Admin dashboard saved. School + Faculty + User login system updated.");
     window.dispatchEvent(new Event("tenders-data-updated"));
+    window.dispatchEvent(new Event("recruitment-data-updated"));
   };
 
   const resetAll = () => {
     setSchoolData(deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA));
     setAccounts(deepClone(DEFAULT_ADMIN_PORTAL_ACCOUNTS));
     setTenders(deepClone(DEFAULT_TENDERS));
+    setRecruitmentData(deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA));
     setFacultyProfiles([deepClone(DUMMY_FACULTY_DETAIL)]);
     localStorage.removeItem(SCHOOL_DASHBOARD_STORAGE_KEY);
     localStorage.removeItem(ADMIN_PORTAL_ACCOUNTS_KEY);
     localStorage.removeItem(TENDERS_STORAGE_KEY);
+    localStorage.removeItem(RECRUITMENT_DASHBOARD_STORAGE_KEY);
     setActivityLog((prev) => [
       {
         id: `log-${Date.now()}`,
@@ -364,6 +404,11 @@ const AdminDashboard = () => {
     localStorage.setItem(TENDERS_STORAGE_KEY, JSON.stringify(tenders));
     window.dispatchEvent(new Event("tenders-data-updated"));
   }, [tenders]);
+
+  useEffect(() => {
+    localStorage.setItem(RECRUITMENT_DASHBOARD_STORAGE_KEY, JSON.stringify(recruitmentData));
+    window.dispatchEvent(new Event("recruitment-data-updated"));
+  }, [recruitmentData]);
 
   useEffect(() => {
     let isMounted = true;
@@ -560,6 +605,7 @@ const AdminDashboard = () => {
       schoolData,
       accounts,
       tenders,
+      recruitmentData,
       facultyProfiles,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -595,6 +641,16 @@ const AdminDashboard = () => {
         ? parsed.accounts
         : deepClone(DEFAULT_ADMIN_PORTAL_ACCOUNTS);
       const importedTenders = Array.isArray(parsed.tenders) ? parsed.tenders : deepClone(DEFAULT_TENDERS);
+      const importedRecruitmentData = parsed.recruitmentData
+        ? {
+            categories: Array.isArray(parsed.recruitmentData.categories)
+              ? parsed.recruitmentData.categories
+              : deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA.categories),
+            archived: Array.isArray(parsed.recruitmentData.archived)
+              ? parsed.recruitmentData.archived
+              : deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA.archived),
+          }
+        : deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA);
       const importedFaculty = Array.isArray(parsed.facultyProfiles)
         ? parsed.facultyProfiles
         : [deepClone(DUMMY_FACULTY_DETAIL)];
@@ -602,10 +658,12 @@ const AdminDashboard = () => {
       setSchoolData(importedSchoolData);
       setAccounts(importedAccounts);
       setTenders(importedTenders);
+      setRecruitmentData(importedRecruitmentData);
       setFacultyProfiles(importedFaculty);
       localStorage.setItem(SCHOOL_DASHBOARD_STORAGE_KEY, JSON.stringify(importedSchoolData));
       localStorage.setItem(ADMIN_PORTAL_ACCOUNTS_KEY, JSON.stringify(importedAccounts));
       localStorage.setItem(TENDERS_STORAGE_KEY, JSON.stringify(importedTenders));
+      localStorage.setItem(RECRUITMENT_DASHBOARD_STORAGE_KEY, JSON.stringify(importedRecruitmentData));
       importedFaculty.forEach((faculty) => {
         if (faculty?.id) {
           localStorage.setItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${faculty.id}`, JSON.stringify(faculty));
@@ -622,6 +680,7 @@ const AdminDashboard = () => {
       ].slice(0, 12));
       setMessage("Backup imported and applied successfully.");
       window.dispatchEvent(new Event("tenders-data-updated"));
+      window.dispatchEvent(new Event("recruitment-data-updated"));
     } catch {
       setMessage("Backup import failed. Please select a valid JSON backup file.");
     } finally {
@@ -793,6 +852,152 @@ const AdminDashboard = () => {
         return matchesQuery && matchesStatus;
       });
   }, [tenders, tenderFilters]);
+
+  const recruitmentCurrentItems = useMemo(
+    () =>
+      (recruitmentData.categories || []).flatMap((category, categoryIndex) =>
+        (category.tabs || []).map((tab, tabIndex) => ({
+          ...tab,
+          categoryType: category.type,
+          categoryTitle: category.title,
+          categoryIndex,
+          tabIndex,
+        })),
+      ),
+    [recruitmentData.categories],
+  );
+
+  const filteredRecruitmentCurrentItems = useMemo(() => {
+    const query = recruitmentFilter.trim().toLowerCase();
+    if (!query) return recruitmentCurrentItems;
+    return recruitmentCurrentItems.filter((item) =>
+      [item.title, item.label, item.ref, item.date, item.categoryTitle]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query),
+    );
+  }, [recruitmentCurrentItems, recruitmentFilter]);
+
+  const filteredRecruitmentArchivedItems = useMemo(() => {
+    const query = recruitmentFilter.trim().toLowerCase();
+    const list = recruitmentData.archived || [];
+    if (!query) return list;
+    return list.filter((item) =>
+      [item.title, item.ref, item.date, item.year]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query),
+    );
+  }, [recruitmentData.archived, recruitmentFilter]);
+
+  const parseRecruitmentDocuments = (value) => {
+    return String(value || "")
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [name, description, url] = line.split("|");
+        return {
+          name: (name || "Document").trim(),
+          description: (description || "Official recruitment document").trim(),
+          url: (url || "#").trim(),
+        };
+      });
+  };
+
+  const formatRecruitmentDocuments = (docs) => {
+    return (Array.isArray(docs) ? docs : [])
+      .map(
+        (doc) =>
+          `${doc.name || "Document"}|${doc.description || "Official recruitment document"}|${doc.url || "#"}`,
+      )
+      .join("\n");
+  };
+
+  const saveRecruitmentEditor = () => {
+    const form = recruitmentEditor.form;
+    if (!form?.title?.trim() || !form?.ref?.trim() || !form?.date) {
+      setMessage("Recruitment title, reference number and date are required.");
+      return;
+    }
+
+    const payload = {
+      id: form.id || `rec-${Date.now()}`,
+      label: form.label || form.title,
+      title: form.title,
+      ref: form.ref,
+      date: form.date,
+      status: form.status || "active",
+      documents: parseRecruitmentDocuments(form.documentsText),
+    };
+
+    if (recruitmentEditor.mode === "current") {
+      setRecruitmentData((prev) => {
+        const categories = [...(prev.categories || [])];
+        const targetCategory = categories.find((item) => item.type === form.categoryType);
+        if (!targetCategory) return prev;
+
+        const tabs = [...(targetCategory.tabs || [])];
+        const existingIndex = tabs.findIndex((item) => item.id === form.id);
+        const nextTab = {
+          ...payload,
+          id: form.id || `tab-${Date.now()}`,
+          label: form.label || payload.label,
+        };
+
+        if (existingIndex >= 0) tabs[existingIndex] = nextTab;
+        else tabs.push(nextTab);
+
+        const targetCategoryIndex = categories.findIndex((item) => item.type === form.categoryType);
+        categories[targetCategoryIndex] = { ...targetCategory, tabs };
+        return { ...prev, categories };
+      });
+      setMessage("Current recruitment post updated.");
+    }
+
+    if (recruitmentEditor.mode === "archived") {
+      setRecruitmentData((prev) => {
+        const archived = [...(prev.archived || [])];
+        const existingIndex = archived.findIndex((item) => item.id === form.id);
+        const nextArchived = {
+          ...payload,
+          id: form.id || `archived-${form.year || Date.now()}`,
+          year: form.year || "",
+          status: "archived",
+        };
+
+        if (existingIndex >= 0) archived[existingIndex] = nextArchived;
+        else archived.push(nextArchived);
+
+        return { ...prev, archived };
+      });
+      setMessage("Archived recruitment post updated.");
+    }
+
+    setRecruitmentEditor({ mode: null, index: null, form: null });
+  };
+
+  const deleteRecruitmentCurrent = (item) => {
+    setRecruitmentData((prev) => {
+      const categories = [...(prev.categories || [])];
+      const categoryIndex = categories.findIndex((category) => category.type === item.categoryType);
+      if (categoryIndex < 0) return prev;
+      const tabs = (categories[categoryIndex].tabs || []).filter((tab) => tab.id !== item.id);
+      categories[categoryIndex] = { ...categories[categoryIndex], tabs };
+      return { ...prev, categories };
+    });
+    setMessage("Current recruitment post deleted.");
+  };
+
+  const deleteRecruitmentArchived = (item) => {
+    setRecruitmentData((prev) => ({
+      ...prev,
+      archived: (prev.archived || []).filter((entry) => entry.id !== item.id),
+    }));
+    setMessage("Archived recruitment post deleted.");
+  };
 
   const handleDeleteTender = async (tender, actualIndex) => {
     const key = tender.localId || tender.id || `tender-${actualIndex}`;
@@ -2115,6 +2320,291 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const renderRecruitmentTab = () => {
+    const defaultDocumentsText =
+      "Extension Notice|Official extension notification|#\nDetailed Advertisement|Complete vacancy details|#";
+
+    return (
+      <div className="space-y-4">
+        <div className={cardClass}>
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">Recruitment Management</h2>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  setRecruitmentEditor({
+                    mode: "current",
+                    index: null,
+                    form: {
+                      id: "",
+                      categoryType: (recruitmentData.categories || [])[0]?.type || "teaching",
+                      label: "",
+                      title: "",
+                      ref: "",
+                      date: "",
+                      status: "active",
+                      documentsText: defaultDocumentsText,
+                    },
+                  })
+                }
+                className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+              >
+                <Plus className="h-3.5 w-3.5" /> Add Current
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setRecruitmentEditor({
+                    mode: "archived",
+                    index: null,
+                    form: {
+                      id: "",
+                      year: "",
+                      title: "",
+                      ref: "",
+                      date: "",
+                      status: "archived",
+                      documentsText: "Archived Advertisement|Official archived recruitment notice|#",
+                    },
+                  })
+                }
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+              >
+                <Plus className="h-3.5 w-3.5" /> Add Archived
+              </button>
+            </div>
+          </div>
+
+          <FilterBar
+            searchValue={recruitmentFilter}
+            onSearchChange={setRecruitmentFilter}
+            searchPlaceholder="Search recruitment title, reference, year..."
+            onClear={() => setRecruitmentFilter("")}
+          />
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <h3 className="mb-3 text-sm font-semibold text-slate-900">Current Recruitment Tabs</h3>
+              <div className="max-h-[430px] space-y-2 overflow-y-auto pr-1">
+                {filteredRecruitmentCurrentItems.map((item) => (
+                  <div key={`${item.categoryType}-${item.id}`} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                        <p className="text-xs text-slate-500">{item.categoryTitle} • {item.ref} • {item.date}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setRecruitmentEditor({
+                              mode: "current",
+                              index: null,
+                              form: {
+                                id: item.id,
+                                categoryType: item.categoryType,
+                                label: item.label || "",
+                                title: item.title || "",
+                                ref: item.ref || "",
+                                date: item.date || "",
+                                status: item.status || "active",
+                                documentsText: formatRecruitmentDocuments(item.documents),
+                              },
+                            })
+                          }
+                          className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        >
+                          <Pencil className="h-3.5 w-3.5" /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteRecruitmentCurrent(item)}
+                          className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <h3 className="mb-3 text-sm font-semibold text-slate-900">Archived Recruitment Years</h3>
+              <div className="max-h-[430px] space-y-2 overflow-y-auto pr-1">
+                {filteredRecruitmentArchivedItems.map((item) => (
+                  <div key={item.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                        <p className="text-xs text-slate-500">Year {item.year} • {item.ref} • {item.date}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setRecruitmentEditor({
+                              mode: "archived",
+                              index: null,
+                              form: {
+                                id: item.id,
+                                year: item.year || "",
+                                title: item.title || "",
+                                ref: item.ref || "",
+                                date: item.date || "",
+                                status: "archived",
+                                documentsText: formatRecruitmentDocuments(item.documents),
+                              },
+                            })
+                          }
+                          className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        >
+                          <Pencil className="h-3.5 w-3.5" /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteRecruitmentArchived(item)}
+                          className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className={cardClass}>
+          {recruitmentEditor.form ? (
+            <>
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-base font-semibold text-slate-900">
+                  {recruitmentEditor.mode === "archived" ? "Edit Archived Recruitment" : "Edit Current Recruitment"}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setRecruitmentEditor({ mode: null, index: null, form: null })}
+                  className="text-xs font-medium text-slate-500 hover:text-slate-700"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                {recruitmentEditor.mode === "current" ? (
+                  <Field label="Category Type">
+                    <select
+                      className={inputClass}
+                      value={recruitmentEditor.form.categoryType || "teaching"}
+                      onChange={(e) =>
+                        setRecruitmentEditor((prev) => ({
+                          ...prev,
+                          form: { ...prev.form, categoryType: e.target.value },
+                        }))
+                      }
+                    >
+                      {(recruitmentData.categories || []).map((category) => (
+                        <option key={category.type} value={category.type}>
+                          {category.title}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                ) : (
+                  <Field label="Year">
+                    <input
+                      className={inputClass}
+                      value={recruitmentEditor.form.year || ""}
+                      onChange={(e) =>
+                        setRecruitmentEditor((prev) => ({ ...prev, form: { ...prev.form, year: e.target.value } }))
+                      }
+                    />
+                  </Field>
+                )}
+
+                <Field label="Tab Label">
+                  <input
+                    className={inputClass}
+                    value={recruitmentEditor.form.label || ""}
+                    onChange={(e) =>
+                      setRecruitmentEditor((prev) => ({ ...prev, form: { ...prev.form, label: e.target.value } }))
+                    }
+                    placeholder="Example: Assistant Professor's"
+                  />
+                </Field>
+
+                <Field label="Title">
+                  <input
+                    className={inputClass}
+                    value={recruitmentEditor.form.title || ""}
+                    onChange={(e) =>
+                      setRecruitmentEditor((prev) => ({ ...prev, form: { ...prev.form, title: e.target.value } }))
+                    }
+                  />
+                </Field>
+
+                <Field label="Reference Number">
+                  <input
+                    className={inputClass}
+                    value={recruitmentEditor.form.ref || ""}
+                    onChange={(e) =>
+                      setRecruitmentEditor((prev) => ({ ...prev, form: { ...prev.form, ref: e.target.value } }))
+                    }
+                  />
+                </Field>
+
+                <Field label="Published Date">
+                  <input
+                    className={inputClass}
+                    type="date"
+                    value={recruitmentEditor.form.date || ""}
+                    onChange={(e) =>
+                      setRecruitmentEditor((prev) => ({ ...prev, form: { ...prev.form, date: e.target.value } }))
+                    }
+                  />
+                </Field>
+              </div>
+
+              <div className="mt-4">
+                <Field label="Documents (one per line format: Name|Description|URL)">
+                  <textarea
+                    className={`${inputClass} min-h-32`}
+                    value={recruitmentEditor.form.documentsText || ""}
+                    onChange={(e) =>
+                      setRecruitmentEditor((prev) => ({
+                        ...prev,
+                        form: { ...prev.form, documentsText: e.target.value },
+                      }))
+                    }
+                  />
+                </Field>
+              </div>
+
+              <button
+                type="button"
+                onClick={saveRecruitmentEditor}
+                className="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              >
+                Save Recruitment Data
+              </button>
+            </>
+          ) : (
+            <div className="flex min-h-[170px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
+              Select a current or archived recruitment entry to edit.
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 p-2 md:p-4">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:flex-row">
@@ -2261,6 +2751,11 @@ const AdminDashboard = () => {
                     <p className="font-semibold text-slate-900">Tender Management</p>
                     <p className="mt-1 text-sm text-slate-600">Create tenders with full fields and auto archive after closing date + 1 day.</p>
                   </div>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="mb-2 inline-flex rounded-lg bg-violet-100 p-2 text-violet-700"><BriefcaseBusiness className="h-4 w-4" /></div>
+                    <p className="font-semibold text-slate-900">Recruitment Management</p>
+                    <p className="mt-1 text-sm text-slate-600">Update recruitment categories, tabs, archived years, and documents for the public page.</p>
+                  </div>
                 </div>
               </div>
 
@@ -2319,6 +2814,7 @@ const AdminDashboard = () => {
           {activeTab === "faculty" && renderFacultyTab()}
           {activeTab === "school" && renderSchoolTab()}
           {activeTab === "tenders" && renderTendersTab()}
+          {activeTab === "recruitment" && renderRecruitmentTab()}
         </main>
       </div>
     </div>

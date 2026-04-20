@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileText, Newspaper, CalendarDays, FileDown, File, Archive, CircleCheck, ExternalLink } from 'lucide-react';
 
-const RecruitmentContent = ({ tabId }) => {
+const RecruitmentContent = ({ tabId, data }) => {
 
   const baseData = {
     professors: { ref: 'GBU/Admn/2025/01', date: '15 May 2025', title: "Advertisement of Professor's", status: 'active' },
@@ -20,15 +20,35 @@ const RecruitmentContent = ({ tabId }) => {
   };
 
   const isArchived = tabId.startsWith('archived');
-  const tabData = isArchived ? archivedData[tabId] || archivedData.archived2023 : baseData[tabId] || baseData.professors;
+  const fallbackData = isArchived
+    ? archivedData[tabId] || archivedData.archived2023
+    : baseData[tabId] || baseData.professors;
+  const tabData = data && typeof data === 'object' ? data : fallbackData;
 
-  const documents = [
+  const fallbackDocuments = [
     { name: 'Extension Notice', description: 'Official extension notification', icon: CalendarDays },
     { name: 'Detailed Advertisement', description: 'Complete vacancy details', icon: FileText },
     { name: 'Newspaper Publication', description: 'Published notice copy', icon: Newspaper },
     { name: 'Application Form (PDF)', description: 'Download PDF format', icon: FileDown },
     { name: 'Application Form (Word)', description: 'Download editable format', icon: File },
   ];
+
+  const iconMap = {
+    'Extension Notice': CalendarDays,
+    'Detailed Advertisement': FileText,
+    'Newspaper Publication': Newspaper,
+    'Application Form (PDF)': FileDown,
+    'Application Form (Word)': File,
+  };
+
+  const documents = Array.isArray(tabData.documents) && tabData.documents.length
+    ? tabData.documents.map((doc) => ({
+        name: doc.name || 'Document',
+        description: doc.description || 'Official recruitment document',
+        icon: iconMap[doc.name] || FileText,
+        url: doc.url || '#',
+      }))
+    : fallbackDocuments.map((doc) => ({ ...doc, url: '#' }));
 
   return (
     <div className="space-y-4">
@@ -80,12 +100,14 @@ const RecruitmentContent = ({ tabId }) => {
                   </div>
                 </div>
 
-                <button
-                  type="button"
+                <a
+                  href={doc.url || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                 >
                   Open <ExternalLink className="h-3.5 w-3.5" />
-                </button>
+                </a>
               </div>
             );
           })}

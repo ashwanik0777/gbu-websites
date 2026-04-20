@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { GraduationCap, Users, FlaskConical, BriefcaseBusiness, Archive } from "lucide-react";
 import RecruitmentBlock from "../../components/recruitments/RecruitmentBlock";
 import RecruitmentContent from "../../components/recruitments/RecruitmentContent";
 import BannerSection from "../../components/HeroBanner";
+import { getRecruitmentDataFromStorage } from "../../Data/recruitmentData";
 
 // ✅ Utility
 function cn(...classes) {
@@ -13,13 +14,37 @@ function cn(...classes) {
 const RecruitMain = () => {
   const [activeTab, setActiveTab] = useState("current");
   const [activeArchiveTab, setActiveArchiveTab] = useState("archived2023");
+  const [recruitmentData, setRecruitmentData] = useState(getRecruitmentDataFromStorage);
 
-  const currentCategories = [
-    { title: "Teaching", type: "teaching", icon: GraduationCap },
-    { title: "Non-Teaching", type: "non-teaching", icon: Users },
-    { title: "Project / Research", type: "project-research", icon: FlaskConical },
-    { title: "Others", type: "others", icon: BriefcaseBusiness },
-  ];
+  const iconMap = {
+    GraduationCap,
+    Users,
+    FlaskConical,
+    BriefcaseBusiness,
+  };
+
+  useEffect(() => {
+    const syncRecruitmentData = () => setRecruitmentData(getRecruitmentDataFromStorage());
+    window.addEventListener("storage", syncRecruitmentData);
+    window.addEventListener("recruitment-data-updated", syncRecruitmentData);
+    return () => {
+      window.removeEventListener("storage", syncRecruitmentData);
+      window.removeEventListener("recruitment-data-updated", syncRecruitmentData);
+    };
+  }, []);
+
+  const currentCategories = useMemo(
+    () =>
+      (recruitmentData.categories || []).map((item) => ({
+        ...item,
+        iconComponent: iconMap[item.icon] || BriefcaseBusiness,
+      })),
+    [recruitmentData.categories],
+  );
+
+  const archivedEntries = recruitmentData.archived || [];
+  const activeArchivedData =
+    archivedEntries.find((item) => item.id === activeArchiveTab) || archivedEntries[0] || null;
 
   return (
     <motion.section
@@ -75,7 +100,8 @@ const RecruitMain = () => {
                 key={item.type}
                 title={item.title}
                 type={item.type}
-                icon={item.icon}
+                icon={item.iconComponent}
+                tabs={item.tabs || []}
               />
             ))}
           </motion.div>
@@ -86,23 +112,23 @@ const RecruitMain = () => {
             transition={{ duration: 0.3 }}
           >
             <div className="mb-6 flex flex-wrap gap-3">
-              {["archived2023", "archived2022", "archived2021"].map((year) => (
+              {archivedEntries.map((entry) => (
                 <button
-                  key={year}
+                  key={entry.id}
                   type="button"
-                  onClick={() => setActiveArchiveTab(year)}
+                  onClick={() => setActiveArchiveTab(entry.id)}
                   className={cn(
                     "rounded-xl px-4 py-2 text-sm font-semibold transition",
-                    activeArchiveTab === year
+                    activeArchiveTab === entry.id
                       ? "bg-slate-900 text-white"
                       : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
                   )}
                 >
-                  {year.replace("archived", "")}
+                  {entry.year || entry.id.replace("archived", "")}
                 </button>
               ))}
             </div>
-            <RecruitmentContent tabId={activeArchiveTab} />
+            <RecruitmentContent tabId={activeArchiveTab} data={activeArchivedData} />
           </motion.div>
         )}
       </div>

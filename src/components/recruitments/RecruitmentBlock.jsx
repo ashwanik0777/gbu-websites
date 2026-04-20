@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import RecruitmentContent from './RecruitmentContent';
 
-const RecruitmentBlock = ({ title, type, icon }) => {
+const RecruitmentBlock = ({ title, type, icon, tabs: dynamicTabs = [] }) => {
   const Icon = icon;
   const [activeTab, setActiveTab] = useState('professors');
 
@@ -26,11 +26,14 @@ const RecruitmentBlock = ({ title, type, icon }) => {
     }
   };
 
-  const tabs = getTabsForType();
+  const tabs = dynamicTabs.length ? dynamicTabs : getTabsForType();
+  const activeTabData = tabs.find((tab) => tab.id === activeTab) || tabs[0] || null;
 
   useEffect(() => {
-    setActiveTab(tabs[0].id);
-  }, [type, tabs]);
+    if (tabs[0]?.id) {
+      setActiveTab(tabs[0].id);
+    }
+  }, [type, dynamicTabs]);
 
   return (
     <motion.div
@@ -73,7 +76,7 @@ const RecruitmentBlock = ({ title, type, icon }) => {
         </div>
 
         <div className="flex-grow flex flex-col">
-          <RecruitmentContent tabId={activeTab} blockType={type} />
+          <RecruitmentContent tabId={activeTab} blockType={type} data={activeTabData} />
         </div>
       </div>
     </motion.div>
