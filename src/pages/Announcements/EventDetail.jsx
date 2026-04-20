@@ -15,7 +15,11 @@ import {
 import Header from "../../components/announcement/Header";
 import SocialShare from "../../components/announcement/SocialShare";
 import RelatedEvents from "../../components/announcement/RelatedEvents";
-import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
+import {
+  getSchoolAnnouncements,
+  refreshSchoolAnnouncements,
+  syncAnnouncementsFromCache,
+} from "../../utils/schoolAnnouncements";
 
 // --- Solid Color Button ---
 const Button = ({
@@ -425,9 +429,18 @@ const EventDetail = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const loadEvent = () => {
+    let isMounted = true;
+
+    const loadEvent = async () => {
+      try {
+        await refreshSchoolAnnouncements();
+      } catch {
+        syncAnnouncementsFromCache();
+      }
+
       const eventList = getSchoolAnnouncements().events;
       const selected = eventList.find((item) => String(item.id) === String(id));
+      if (!isMounted) return;
       setEvent(selected || null);
       setLoading(false);
     };
@@ -435,10 +448,13 @@ const EventDetail = () => {
     loadEvent();
     window.addEventListener("storage", loadEvent);
     window.addEventListener("focus", loadEvent);
+    window.addEventListener("announcements-data-updated", loadEvent);
 
     return () => {
+      isMounted = false;
       window.removeEventListener("storage", loadEvent);
       window.removeEventListener("focus", loadEvent);
+      window.removeEventListener("announcements-data-updated", loadEvent);
     };
   }, [id]);
   // const event = mockEvents.find((item) => String(item.id) === String(id));

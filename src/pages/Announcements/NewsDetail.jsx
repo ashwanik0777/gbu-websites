@@ -3,7 +3,11 @@ import Header from '../../components/announcement/Header';
 import SocialShare from '../../components/announcement/SocialShare';
 import { ArrowLeft, ArrowRight, Calendar, User } from 'lucide-react';
 import { useState, useMemo, useEffect } from "react";
-import { getSchoolAnnouncements } from '../../utils/schoolAnnouncements';
+import {
+  getSchoolAnnouncements,
+  refreshSchoolAnnouncements,
+  syncAnnouncementsFromCache,
+} from '../../utils/schoolAnnouncements';
 // Button component
 const Button = ({
   children,
@@ -218,15 +222,30 @@ const NewsDetail = () => {
 
 
 useEffect(() => {
-  const loadNews = () => setMockNews(getSchoolAnnouncements().news);
+  let isMounted = true;
+
+  const loadNews = async () => {
+    try {
+      await refreshSchoolAnnouncements();
+    } catch {
+      syncAnnouncementsFromCache();
+    }
+
+    if (isMounted) {
+      setMockNews(getSchoolAnnouncements().news);
+    }
+  };
 
   loadNews();
   window.addEventListener("storage", loadNews);
   window.addEventListener("focus", loadNews);
+  window.addEventListener("announcements-data-updated", loadNews);
 
   return () => {
+    isMounted = false;
     window.removeEventListener("storage", loadNews);
     window.removeEventListener("focus", loadNews);
+    window.removeEventListener("announcements-data-updated", loadNews);
   };
 }, []);
 

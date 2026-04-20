@@ -1,6 +1,10 @@
 import { Calendar } from "lucide-react";
-import { useRef, useEffect } from "react";
-import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
+import { useRef, useEffect, useState } from "react";
+import {
+  getSchoolAnnouncements,
+  refreshSchoolAnnouncements,
+  syncAnnouncementsFromCache,
+} from "../../utils/schoolAnnouncements";
 
 // Card Components
 const Card = ({ children, className = "", ...props }) => {
@@ -55,6 +59,7 @@ const Badge = ({ children, className = "", ...props }) => {
 
 const NoticeEvents = () => {
   const scrollRef = useRef(null);
+  const [announcements, setAnnouncements] = useState(() => getSchoolAnnouncements());
 
   // Auto-scroll effect
   useEffect(() => {
@@ -78,7 +83,35 @@ const NoticeEvents = () => {
 
     return () => clearInterval(intervalId);
   }, []);
-  const { notices, events } = getSchoolAnnouncements();
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadAnnouncements = async () => {
+      try {
+        await refreshSchoolAnnouncements();
+      } catch {
+        syncAnnouncementsFromCache();
+      }
+
+      if (mounted) {
+        setAnnouncements(getSchoolAnnouncements());
+      }
+    };
+
+    loadAnnouncements();
+    window.addEventListener("announcements-data-updated", loadAnnouncements);
+    window.addEventListener("focus", loadAnnouncements);
+
+    return () => {
+      mounted = false;
+      window.removeEventListener("announcements-data-updated", loadAnnouncements);
+      window.removeEventListener("focus", loadAnnouncements);
+    };
+  }, []);
+
+  const notices = announcements.notices || [];
+  const events = announcements.events || [];
 
   return (
     <section className="py-20 bg-gray-100">
@@ -132,6 +165,9 @@ const NoticeEvents = () => {
                     <p className="text-xs text-gray-500">{notice.date}</p>
                   </div>
                 ))}
+                {notices.length === 0 ? (
+                  <p className="text-sm text-gray-500">No notices available.</p>
+                ) : null}
               </div>
 
             </div>
@@ -165,6 +201,9 @@ const NoticeEvents = () => {
                     </p>
                   </div>
                 ))}
+                {events.length === 0 ? (
+                  <p className="text-sm text-gray-500">No events available.</p>
+                ) : null}
               </div>
             </div>
           </div>

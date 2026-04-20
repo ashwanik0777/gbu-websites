@@ -4,29 +4,9 @@ import RecruitmentContent from './RecruitmentContent';
 
 const RecruitmentBlock = ({ title, type, icon, tabs: dynamicTabs = [] }) => {
   const Icon = icon;
-  const [activeTab, setActiveTab] = useState('professors');
+  const [activeTab, setActiveTab] = useState('');
 
-  const getTabsForType = () => {
-    switch (type) {
-      case 'teaching':
-        return [
-          { id: 'professors', label: "Professor's" },
-          { id: 'retired', label: "Professor's (Retired)" },
-          { id: 'associate', label: "Associate Professor's" },
-          { id: 'assistant', label: "Assistant Professor's" }
-        ];
-      case 'non-teaching':
-        return [{ id: 'assistants', label: "Assistants" }];
-      case 'project-research':
-        return [{ id: 'interns', label: "Interns" }];
-      case 'others':
-        return [{ id: 'workers', label: "Workers" }];
-      default:
-        return [{ id: 'professors', label: "Professor's" }];
-    }
-  };
-
-  const tabs = dynamicTabs.length ? dynamicTabs : getTabsForType();
+  const tabs = dynamicTabs;
   const activeTabData = tabs.find((tab) => tab.id === activeTab) || tabs[0] || null;
 
   useEffect(() => {
@@ -68,10 +48,12 @@ const RecruitmentBlock = ({ title, type, icon, tabs: dynamicTabs = [] }) => {
                 </button>
               ))}
             </div>
-          ) : (
+          ) : tabs.length === 1 ? (
             <div className="inline-block rounded-full bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white">
               {tabs[0].label}
             </div>
+          ) : (
+            <p className="text-xs text-slate-500">No recruitment tabs available.</p>
           )}
         </div>
 

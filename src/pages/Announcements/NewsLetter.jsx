@@ -5,7 +5,11 @@ import { motion } from 'framer-motion';
 import Pagination from '../../components/announcement/Pagination';
 import BannerSection from '../../components/HeroBanner';
 import StatsCard from '../../components/StatsCard';
-import { getSchoolAnnouncements } from '../../utils/schoolAnnouncements';
+import {
+  getSchoolAnnouncements,
+  refreshSchoolAnnouncements,
+  syncAnnouncementsFromCache,
+} from '../../utils/schoolAnnouncements';
 import UnifiedAnnouncementFilter from '../../components/announcement/UnifiedAnnouncementFilter';
 
 // === Modern Card Components ===
@@ -85,7 +89,17 @@ const NewsLetter = () => {
   const itemsPerPage = 6;
 
   useEffect(() => {
-    const loadNewsletters = () => {
+    let isMounted = true;
+
+    const loadNewsletters = async () => {
+      setLoading(true);
+      try {
+        await refreshSchoolAnnouncements();
+      } catch {
+        syncAnnouncementsFromCache();
+      }
+
+      if (!isMounted) return;
       setMockNewsletters(getSchoolAnnouncements().newsletters);
       setLoading(false);
     };
@@ -93,10 +107,13 @@ const NewsLetter = () => {
     loadNewsletters();
     window.addEventListener("storage", loadNewsletters);
     window.addEventListener("focus", loadNewsletters);
+    window.addEventListener("announcements-data-updated", loadNewsletters);
 
     return () => {
+      isMounted = false;
       window.removeEventListener("storage", loadNewsletters);
       window.removeEventListener("focus", loadNewsletters);
+      window.removeEventListener("announcements-data-updated", loadNewsletters);
     };
   }, []);
 

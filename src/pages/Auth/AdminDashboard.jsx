@@ -53,6 +53,8 @@ import {
   listTenders,
   updateTender,
 } from "../../services/tendersService";
+import { clearPortalSession } from "../../utils/portalSession";
+import { getRecruitmentDashboardData } from "../../services/announcementsService";
 import {
   DEFAULT_RECRUITMENT_DASHBOARD_DATA,
   RECRUITMENT_DASHBOARD_STORAGE_KEY,
@@ -216,29 +218,29 @@ const getInitialAccounts = () => {
 const getInitialTenders = () => {
   try {
     const raw = localStorage.getItem(TENDERS_STORAGE_KEY);
-    if (!raw) return deepClone(DEFAULT_TENDERS);
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : deepClone(DEFAULT_TENDERS);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    return deepClone(DEFAULT_TENDERS);
+    return [];
   }
 };
 
 const getInitialRecruitmentData = () => {
   try {
     const raw = localStorage.getItem(RECRUITMENT_DASHBOARD_STORAGE_KEY);
-    if (!raw) return deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA);
+    if (!raw) return { categories: [], archived: [] };
     const parsed = JSON.parse(raw);
     return {
       categories: Array.isArray(parsed?.categories)
         ? parsed.categories
-        : deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA.categories),
+        : [],
       archived: Array.isArray(parsed?.archived)
         ? parsed.archived
-        : deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA.archived),
+        : [],
     };
   } catch {
-    return deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA);
+    return { categories: [], archived: [] };
   }
 };
 
@@ -321,6 +323,8 @@ const AdminDashboard = () => {
   const [isTenderSaving, setIsTenderSaving] = useState(false);
   const [tenderDeletingKey, setTenderDeletingKey] = useState("");
   const [tenderApiError, setTenderApiError] = useState("");
+  const [isRecruitmentLoading, setIsRecruitmentLoading] = useState(false);
+  const [recruitmentApiError, setRecruitmentApiError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [activityLog, setActivityLog] = useState(getInitialActivityLog);
   const [mailQueue, setMailQueue] = useState(getInitialMailQueue);
@@ -374,8 +378,8 @@ const AdminDashboard = () => {
   const resetAll = () => {
     setSchoolData(deepClone(DEFAULT_SCHOOL_DASHBOARD_DATA));
     setAccounts(deepClone(DEFAULT_ADMIN_PORTAL_ACCOUNTS));
-    setTenders(deepClone(DEFAULT_TENDERS));
-    setRecruitmentData(deepClone(DEFAULT_RECRUITMENT_DASHBOARD_DATA));
+    setTenders([]);
+    setRecruitmentData({ categories: [], archived: [] });
     setFacultyProfiles([deepClone(DUMMY_FACULTY_DETAIL)]);
     localStorage.removeItem(SCHOOL_DASHBOARD_STORAGE_KEY);
     localStorage.removeItem(ADMIN_PORTAL_ACCOUNTS_KEY);
@@ -425,14 +429,34 @@ const AdminDashboard = () => {
         setTenderApiError(
           error?.response?.data?.message ||
             error?.message ||
-            "Unable to fetch tenders from backend. Local data is being used.",
+            "Unable to fetch tenders from backend.",
         );
       } finally {
         if (isMounted) setIsTenderLoading(false);
       }
     };
 
+    const syncRecruitmentsFromServer = async () => {
+      setIsRecruitmentLoading(true);
+      setRecruitmentApiError("");
+      try {
+        const serverRecruitments = await getRecruitmentDashboardData();
+        if (!isMounted) return;
+        setRecruitmentData(serverRecruitments);
+      } catch (error) {
+        if (!isMounted) return;
+        setRecruitmentApiError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Unable to fetch recruitments from backend.",
+        );
+      } finally {
+        if (isMounted) setIsRecruitmentLoading(false);
+      }
+    };
+
     syncTendersFromServer();
+    syncRecruitmentsFromServer();
 
     return () => {
       isMounted = false;
@@ -2378,6 +2402,18 @@ const AdminDashboard = () => {
             </div>
           </div>
 
+          {isRecruitmentLoading ? (
+            <div className="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800">
+              Loading recruitments from backend API...
+            </div>
+          ) : null}
+
+          {recruitmentApiError ? (
+            <div className="mb-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
+              API Error: {recruitmentApiError}
+            </div>
+          ) : null}
+
           <FilterBar
             searchValue={recruitmentFilter}
             onSearchChange={setRecruitmentFilter}
@@ -2697,7 +2733,10 @@ const AdminDashboard = () => {
                   <RotateCcw className="h-4 w-4" /> Reset
                 </button> */}
                 <button
-                  onClick={() => navigate("/login")}
+                  onClick={() => {
+                    clearPortalSession();
+                    navigate("/login");
+                  }}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-100"
                 >
                   <LogOut className="h-4 w-4" /> Logout

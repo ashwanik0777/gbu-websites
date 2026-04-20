@@ -1,10 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserCog, School, GraduationCap, Eye, EyeOff, ShieldCheck, Building2 } from "lucide-react";
-import {
-  ADMIN_PORTAL_ACCOUNTS_KEY,
-  DEFAULT_ADMIN_PORTAL_ACCOUNTS,
-} from "../../Data/adminDashboardData";
+import { loginByRole } from "../../services/authService";
+import { getRoleHomeRoute, setPortalSession } from "../../utils/portalSession";
 
 const ROLE_OPTIONS = [
   {
@@ -34,13 +32,14 @@ const LoginPortal = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const selectedRole = useMemo(
     () => ROLE_OPTIONS.find((item) => item.id === role) || ROLE_OPTIONS[0],
     [role]
   );
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
 
@@ -49,47 +48,31 @@ const LoginPortal = () => {
       return;
     }
 
-    let accounts = DEFAULT_ADMIN_PORTAL_ACCOUNTS;
     try {
-      const raw = localStorage.getItem(ADMIN_PORTAL_ACCOUNTS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length) accounts = parsed;
+      setLoading(true);
+      const response = await loginByRole({
+        role,
+        email: username.trim(),
+        password,
+      });
+
+      const authData = response?.data;
+      if (!authData?.accessToken || !authData?.refreshToken || !authData?.user?.role) {
+        setError("Invalid login response from server.");
+        return;
       }
-    } catch {
-      accounts = DEFAULT_ADMIN_PORTAL_ACCOUNTS;
+
+      setPortalSession(authData);
+      navigate(getRoleHomeRoute(authData.user.role));
+    } catch (err) {
+      setError(
+        err?.response?.data?.errors?.[0]?.message ||
+          err?.response?.data?.message ||
+          "Invalid credentials for selected role.",
+      );
+    } finally {
+      setLoading(false);
     }
-
-    const roleMap = {
-      teacher: ["teacher", "faculty"],
-      school: ["school"],
-      admin: ["admin"],
-    };
-
-    const matched = accounts.find(
-      (acc) =>
-        acc?.status !== "inactive" &&
-        roleMap[role]?.includes(acc?.role) &&
-        String(acc?.username || "").trim() === username.trim() &&
-        String(acc?.password || "").trim() === password.trim(),
-    );
-
-    if (!matched) {
-      setError("Invalid credentials for selected role.");
-      return;
-    }
-
-    if (role === "teacher") {
-      navigate("/faculty-portal/dashboard");
-      return;
-    }
-
-    if (role === "school") {
-      navigate("/school-portal/dashboard");
-      return;
-    }
-
-    navigate("/admin-portal/dashboard");
   };
 
   return (
@@ -205,9 +188,12 @@ const LoginPortal = () => {
 
               <button
                 type="submit"
+                disabled={loading}
                 className="w-full rounded-xl bg-stone-900 px-4 py-3 font-semibold text-white transition hover:bg-stone-800"
               >
-                Login as {selectedRole.title.replace(" Login", "")}
+                {loading
+                  ? "Signing in..."
+                  : `Login as ${selectedRole.title.replace(" Login", "")}`}
               </button>
             </form>
 
@@ -215,7 +201,7 @@ const LoginPortal = () => {
               <button
                 type="button"
                 className="hover:text-stone-900"
-                onClick={() => navigate("/comingSoon")}
+                onClick={() => navigate("/login/forgot-password")}
               >
                 Forgot password?
               </button>

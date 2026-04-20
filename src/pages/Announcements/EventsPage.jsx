@@ -13,7 +13,11 @@ import {
   ChevronRight,
 } from "lucide-react";
 import BannerSection from "../../components/HeroBanner";
-import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
+import {
+  getSchoolAnnouncements,
+  refreshSchoolAnnouncements,
+  syncAnnouncementsFromCache,
+} from "../../utils/schoolAnnouncements";
 import UnifiedAnnouncementFilter from "../../components/announcement/UnifiedAnnouncementFilter";
 
 // Complete Events Data
@@ -802,15 +806,30 @@ const EventsPage = () => {
 
   const currentEvents = getCurrentEvents();
   useEffect(() => {
-    const loadEvents = () => seteventsData(getSchoolAnnouncements().events);
+    let isMounted = true;
+
+    const loadEvents = async () => {
+      try {
+        await refreshSchoolAnnouncements();
+      } catch {
+        syncAnnouncementsFromCache();
+      }
+
+      if (isMounted) {
+        seteventsData(getSchoolAnnouncements().events);
+      }
+    };
 
     loadEvents();
     window.addEventListener("storage", loadEvents);
     window.addEventListener("focus", loadEvents);
+    window.addEventListener("announcements-data-updated", loadEvents);
 
     return () => {
+      isMounted = false;
       window.removeEventListener("storage", loadEvents);
       window.removeEventListener("focus", loadEvents);
+      window.removeEventListener("announcements-data-updated", loadEvents);
     };
   }, []);
   // Get unique types and years for filters

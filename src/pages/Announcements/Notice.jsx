@@ -18,7 +18,11 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import BannerSection from "../../components/HeroBanner";
-import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
+import {
+  getSchoolAnnouncements,
+  refreshSchoolAnnouncements,
+  syncAnnouncementsFromCache,
+} from "../../utils/schoolAnnouncements";
 import UnifiedAnnouncementFilter from "../../components/announcement/UnifiedAnnouncementFilter";
 
 // Enhanced Card components with modern styling
@@ -564,7 +568,17 @@ const Notice = () => {
   //   return () => controller.abort();
   // }, []);
   useEffect(() => {
-    const loadNotices = () => {
+    let isMounted = true;
+
+    const loadNotices = async () => {
+      setIsLoading(true);
+      try {
+        await refreshSchoolAnnouncements();
+      } catch {
+        syncAnnouncementsFromCache();
+      }
+
+      if (!isMounted) return;
       setMockNotices(getSchoolAnnouncements().notices);
       setIsLoading(false);
     };
@@ -572,10 +586,13 @@ const Notice = () => {
     loadNotices();
     window.addEventListener("storage", loadNotices);
     window.addEventListener("focus", loadNotices);
+    window.addEventListener("announcements-data-updated", loadNotices);
 
     return () => {
+      isMounted = false;
       window.removeEventListener("storage", loadNotices);
       window.removeEventListener("focus", loadNotices);
+      window.removeEventListener("announcements-data-updated", loadNotices);
     };
   }, []);
 

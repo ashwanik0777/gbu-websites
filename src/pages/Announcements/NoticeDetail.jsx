@@ -2,7 +2,11 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Download } from 'lucide-react';
 import SocialShare from '../../components/announcement/SocialShare';
 import { useState, useMemo, useEffect } from "react";
-import { getSchoolAnnouncements } from '../../utils/schoolAnnouncements';
+import {
+  getSchoolAnnouncements,
+  refreshSchoolAnnouncements,
+  syncAnnouncementsFromCache,
+} from '../../utils/schoolAnnouncements';
 // Button component
 const Button = ({ children, variant = "default", size = "md", className = "", ...props }) => {
   const base =
@@ -136,15 +140,30 @@ const NoticeDetail = () => {
   const notice = mockNotices.find((item) => String(item.id) === String(id));
   
   useEffect(() => {
-    const loadNotices = () => setMockNotices(getSchoolAnnouncements().notices);
+    let isMounted = true;
+
+    const loadNotices = async () => {
+      try {
+        await refreshSchoolAnnouncements();
+      } catch {
+        syncAnnouncementsFromCache();
+      }
+
+      if (isMounted) {
+        setMockNotices(getSchoolAnnouncements().notices);
+      }
+    };
 
     loadNotices();
     window.addEventListener("storage", loadNotices);
     window.addEventListener("focus", loadNotices);
+    window.addEventListener("announcements-data-updated", loadNotices);
 
     return () => {
+      isMounted = false;
       window.removeEventListener("storage", loadNotices);
       window.removeEventListener("focus", loadNotices);
+      window.removeEventListener("announcements-data-updated", loadNotices);
     };
   }, []);
 

@@ -23,6 +23,7 @@ import {
   DUMMY_FACULTY_DETAIL,
   FACULTY_PROFILE_STORAGE_PREFIX,
 } from "../../Data/facultyDummyData";
+import { clearPortalSession } from "../../utils/portalSession";
 
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 
@@ -827,7 +828,10 @@ const SchoolDashboard = () => {
                 {/* <button onClick={resetAll} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
                   <RotateCcw className="h-4 w-4" /> Reset
                 </button> */}
-                <button onClick={() => navigate("/login")} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-100">
+                <button onClick={() => {
+                  clearPortalSession();
+                  navigate("/login");
+                }} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-100">
                   <LogOut className="h-4 w-4" /> Logout
                 </button>
               </div>

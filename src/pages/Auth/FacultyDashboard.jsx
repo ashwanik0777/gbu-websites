@@ -15,6 +15,7 @@ import {
   FACULTY_SIDEBAR_SECTIONS,
   parseCommaList,
 } from "../../components/faculty/dashboard/constants";
+import { clearPortalSession } from "../../utils/portalSession";
 
 const STORAGE_KEY = `${FACULTY_PROFILE_STORAGE_PREFIX}${DUMMY_FACULTY_ID}`;
 
@@ -167,7 +168,10 @@ const FacultyDashboard = () => {
           onSave={handleSave}
           onReset={handleReset}
           onViewPublic={() => navigate(`/academics/faculty/${DUMMY_FACULTY_ID}`)}
-          onLogout={() => navigate("/login")}
+          onLogout={() => {
+            clearPortalSession();
+            navigate("/login");
+          }}
         />
 
         <div className="flex-1 space-y-6">

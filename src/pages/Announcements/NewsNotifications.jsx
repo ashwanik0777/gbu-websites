@@ -5,7 +5,11 @@ import EnhancedPagination from "../../components/announcement/EnhancedPagination
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import BannerSection from "../../components/HeroBanner";
-import { getSchoolAnnouncements } from "../../utils/schoolAnnouncements";
+import {
+  getSchoolAnnouncements,
+  refreshSchoolAnnouncements,
+  syncAnnouncementsFromCache,
+} from "../../utils/schoolAnnouncements";
 
 // Enhanced Card Components with Professional Design
 const Card = ({ children, className = "", featured = false, ...props }) => (
@@ -1025,15 +1029,30 @@ const NewsNotifications = () => {
   const [mockNews, setMockNews] = useState(() => getSchoolAnnouncements().news);
 
   useEffect(() => {
-    const loadNews = () => setMockNews(getSchoolAnnouncements().news);
+    let isMounted = true;
+
+    const loadNews = async () => {
+      try {
+        await refreshSchoolAnnouncements();
+      } catch {
+        syncAnnouncementsFromCache();
+      }
+
+      if (isMounted) {
+        setMockNews(getSchoolAnnouncements().news);
+      }
+    };
 
     loadNews();
     window.addEventListener("storage", loadNews);
     window.addEventListener("focus", loadNews);
+    window.addEventListener("announcements-data-updated", loadNews);
 
     return () => {
+      isMounted = false;
       window.removeEventListener("storage", loadNews);
       window.removeEventListener("focus", loadNews);
+      window.removeEventListener("announcements-data-updated", loadNews);
     };
   }, []);
   // Extract unique values

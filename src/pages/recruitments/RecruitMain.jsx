@@ -4,7 +4,10 @@ import { GraduationCap, Users, FlaskConical, BriefcaseBusiness, Archive } from "
 import RecruitmentBlock from "../../components/recruitments/RecruitmentBlock";
 import RecruitmentContent from "../../components/recruitments/RecruitmentContent";
 import BannerSection from "../../components/HeroBanner";
-import { getRecruitmentDataFromStorage } from "../../Data/recruitmentData";
+import {
+  getNoDataText,
+  getRecruitmentDashboardData,
+} from "../../services/announcementsService";
 
 // ✅ Utility
 function cn(...classes) {
@@ -13,8 +16,9 @@ function cn(...classes) {
 
 const RecruitMain = () => {
   const [activeTab, setActiveTab] = useState("current");
-  const [activeArchiveTab, setActiveArchiveTab] = useState("archived2023");
-  const [recruitmentData, setRecruitmentData] = useState(getRecruitmentDataFromStorage);
+  const [activeArchiveTab, setActiveArchiveTab] = useState("");
+  const [recruitmentData, setRecruitmentData] = useState({ categories: [], archived: [] });
+  const [isLoading, setIsLoading] = useState(false);
 
   const iconMap = {
     GraduationCap,
@@ -24,12 +28,29 @@ const RecruitMain = () => {
   };
 
   useEffect(() => {
-    const syncRecruitmentData = () => setRecruitmentData(getRecruitmentDataFromStorage());
-    window.addEventListener("storage", syncRecruitmentData);
-    window.addEventListener("recruitment-data-updated", syncRecruitmentData);
+    let isMounted = true;
+
+    const loadRecruitments = async () => {
+      setIsLoading(true);
+      try {
+        const payload = await getRecruitmentDashboardData();
+        if (!isMounted) return;
+        setRecruitmentData(payload);
+        const firstArchived = payload.archived?.[0]?.id || "";
+        setActiveArchiveTab(firstArchived);
+      } catch {
+        if (!isMounted) return;
+        setRecruitmentData({ categories: [], archived: [] });
+        setActiveArchiveTab("");
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    loadRecruitments();
+
     return () => {
-      window.removeEventListener("storage", syncRecruitmentData);
-      window.removeEventListener("recruitment-data-updated", syncRecruitmentData);
+      isMounted = false;
     };
   }, []);
 
@@ -88,7 +109,11 @@ const RecruitMain = () => {
           </button>
         </div>
 
-        {activeTab === "current" ? (
+        {isLoading ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-600">
+            Loading recruitments...
+          </div>
+        ) : activeTab === "current" ? (
           <motion.div
             className="grid grid-cols-1 gap-6 lg:grid-cols-2"
             initial={{ opacity: 0, y: 12 }}
@@ -104,6 +129,11 @@ const RecruitMain = () => {
                 tabs={item.tabs || []}
               />
             ))}
+            {currentCategories.length === 0 ? (
+              <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 lg:col-span-2">
+                {getNoDataText("recruitments")}
+              </div>
+            ) : null}
           </motion.div>
         ) : (
           <motion.div
@@ -127,6 +157,9 @@ const RecruitMain = () => {
                   {entry.year || entry.id.replace("archived", "")}
                 </button>
               ))}
+              {archivedEntries.length === 0 ? (
+                <p className="text-sm text-slate-500">No archived recruitment records available.</p>
+              ) : null}
             </div>
             <RecruitmentContent tabId={activeArchiveTab} data={activeArchivedData} />
           </motion.div>

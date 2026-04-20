@@ -73,6 +73,8 @@ import GBUHistory from "../pages/Aboutus/History.jsx";
 import Registration from "../pages/Admission/NewRegistration.jsx";
 import LoginNewStudent from "../pages/Admission/login.jsx";
 import LoginPortal from "../pages/Auth/LoginPortal.jsx";
+import ForgotPassword from "../pages/Auth/ForgotPassword.jsx";
+import ProtectedPortalRoute from "../components/Auth/ProtectedPortalRoute.jsx";
 
 
 const AcademicCalendar = React.lazy(() =>
@@ -214,10 +216,32 @@ export default function AppRouter() {
           <Route path="/academics" element={<h1>Academics</h1>} />
           <Route path="/new-registration" element={<Registration/>} />
           <Route path="/login" element={<LoginPortal />} />
+          <Route path="/login/forgot-password" element={<ForgotPassword />} />
           <Route path="/admission/login" element={<LoginNewStudent/>} />
-          <Route path="/faculty-portal/dashboard" element={<FacultyPortalDashboard />} />
-          <Route path="/school-portal/dashboard" element={<SchoolDashboard />} />
-          <Route path="/admin-portal/dashboard" element={<AdminPortalDashboard />} />
+          <Route
+            path="/faculty-portal/dashboard"
+            element={
+              <ProtectedPortalRoute>
+                <FacultyPortalDashboard />
+              </ProtectedPortalRoute>
+            }
+          />
+          <Route
+            path="/school-portal/dashboard"
+            element={
+              <ProtectedPortalRoute>
+                <SchoolDashboard />
+              </ProtectedPortalRoute>
+            }
+          />
+          <Route
+            path="/admin-portal/dashboard"
+            element={
+              <ProtectedPortalRoute>
+                <AdminPortalDashboard />
+              </ProtectedPortalRoute>
+            }
+          />
           <Route
             path="/academics/academic-calendar"
             element={<AcademicCalendar />}

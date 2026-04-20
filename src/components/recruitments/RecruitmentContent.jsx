@@ -2,28 +2,16 @@ import React from 'react';
 import { FileText, Newspaper, CalendarDays, FileDown, File, Archive, CircleCheck, ExternalLink } from 'lucide-react';
 
 const RecruitmentContent = ({ tabId, data }) => {
+  const isArchived = String(tabId || '').startsWith('archived');
+  const tabData = data && typeof data === 'object' ? data : null;
 
-  const baseData = {
-    professors: { ref: 'GBU/Admn/2025/01', date: '15 May 2025', title: "Advertisement of Professor's", status: 'active' },
-    retired: { ref: 'GBU/Admn/2025/02', date: '15 May 2025', title: "Advertisement of Professor's (Retired)", status: 'active' },
-    associate: { ref: 'GBU/Admn/2025/03', date: '20 May 2025', title: "Advertisement of Associate Professor's", status: 'active' },
-    assistant: { ref: 'GBU/Admn/2025/04', date: '22 May 2025', title: "Advertisement of Assistant Professor's", status: 'active' },
-    assistants: { ref: 'GBU/Admn/2025/05', date: '15 May 2025', title: "Advertisement for Assistants", status: 'active' },
-    interns: { ref: 'GBU/Admn/2025/06', date: '15 May 2025', title: "Advertisement for Interns", status: 'active' },
-    workers: { ref: 'GBU/Admn/2025/07', date: '15 May 2025', title: "Advertisement of Workers", status: 'active' },
-  };
-
-  const archivedData = {
-    archived2023: { ref: 'GBU/Admn/2023/01', date: '10 Jan 2023', title: "Archived Professor Recruitment 2023", status: 'archived' },
-    archived2022: { ref: 'GBU/Admn/2022/05', date: '12 Aug 2022', title: "Archived Associate Recruitment 2022", status: 'archived' },
-    archived2021: { ref: 'GBU/Admn/2021/12', date: '05 Dec 2021', title: "Archived Staff Recruitment 2021", status: 'archived' },
-  };
-
-  const isArchived = tabId.startsWith('archived');
-  const fallbackData = isArchived
-    ? archivedData[tabId] || archivedData.archived2023
-    : baseData[tabId] || baseData.professors;
-  const tabData = data && typeof data === 'object' ? data : fallbackData;
+  if (!tabData) {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+        No recruitment information available.
+      </div>
+    );
+  }
 
   const fallbackDocuments = [
     { name: 'Extension Notice', description: 'Official extension notification', icon: CalendarDays },

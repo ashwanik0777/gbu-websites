@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getSchoolAnnouncements } from '../../utils/schoolAnnouncements';
+import {
+  getSchoolAnnouncements,
+  refreshSchoolAnnouncements,
+  syncAnnouncementsFromCache,
+} from '../../utils/schoolAnnouncements';
 
 export default function LatestUpdates() {
   const [isVisible, setIsVisible] = useState(false);
@@ -55,7 +59,13 @@ export default function LatestUpdates() {
   useEffect(() => {
     setIsVisible(true);
 
-    const loadUpdates = () => {
+    const loadUpdates = async () => {
+      try {
+        await refreshSchoolAnnouncements();
+      } catch {
+        syncAnnouncementsFromCache();
+      }
+
       const notices = buildSchoolUpdates();
       setData(notices);
       const uniqueCategories = [...new Map(notices.map(item => [item.category.trim(), item])).values()];
@@ -65,10 +75,12 @@ export default function LatestUpdates() {
     loadUpdates();
     window.addEventListener('storage', loadUpdates);
     window.addEventListener('focus', loadUpdates);
+    window.addEventListener('announcements-data-updated', loadUpdates);
 
     return () => {
       window.removeEventListener('storage', loadUpdates);
       window.removeEventListener('focus', loadUpdates);
+      window.removeEventListener('announcements-data-updated', loadUpdates);
     };
   }, []);
 

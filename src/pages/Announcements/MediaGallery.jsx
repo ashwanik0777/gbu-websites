@@ -10,7 +10,11 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BannerSection from '../../components/HeroBanner';
-import { getSchoolAnnouncements } from '../../utils/schoolAnnouncements';
+import {
+  getSchoolAnnouncements,
+  refreshSchoolAnnouncements,
+  syncAnnouncementsFromCache,
+} from '../../utils/schoolAnnouncements';
 import UnifiedAnnouncementFilter from '../../components/announcement/UnifiedAnnouncementFilter';
 
 // === Professional Card Components ===
@@ -573,7 +577,17 @@ const MediaGallery = () => {
    const [mockMedia, setMockMedia] = useState(() => getSchoolAnnouncements().mediaGallery);
    const [loading, setLoading] = useState(false);
   useEffect(() => {
-    const loadMedia = () => {
+    let isMounted = true;
+
+    const loadMedia = async () => {
+      setLoading(true);
+      try {
+        await refreshSchoolAnnouncements();
+      } catch {
+        syncAnnouncementsFromCache();
+      }
+
+      if (!isMounted) return;
       setMockMedia(getSchoolAnnouncements().mediaGallery);
       setLoading(false);
     };
@@ -581,10 +595,13 @@ const MediaGallery = () => {
     loadMedia();
     window.addEventListener("storage", loadMedia);
     window.addEventListener("focus", loadMedia);
+    window.addEventListener("announcements-data-updated", loadMedia);
 
     return () => {
+      isMounted = false;
       window.removeEventListener("storage", loadMedia);
       window.removeEventListener("focus", loadMedia);
+      window.removeEventListener("announcements-data-updated", loadMedia);
     };
   }, []);
   const allCategories = Array.from(new Set(mockMedia.map(item => item.category)));
