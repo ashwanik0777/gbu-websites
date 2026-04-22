@@ -1,9 +1,8 @@
 import axios from "axios";
-
-const API_BASE = import.meta.env.VITE_BACKEND_BASE_URL || "http://localhost:3000";
+import { backendBaseUrl } from "../config/apiConfig";
 
 const authClient = axios.create({
-  baseURL: `${API_BASE}/api/auth`,
+  baseURL: `${backendBaseUrl}/api/auth`,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

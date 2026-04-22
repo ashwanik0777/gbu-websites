@@ -15,6 +15,7 @@ import {
 import Header from "../../components/announcement/Header";
 import SocialShare from "../../components/announcement/SocialShare";
 import RelatedEvents from "../../components/announcement/RelatedEvents";
+import apiClient from "../../services/apiClient";
 
 // --- Solid Color Button ---
 const Button = ({
@@ -137,260 +138,7 @@ const TabsContent = ({ value, children, className = "" }) => {
   return <div className={className}>{children}</div>;
 };
 
-// --- MOCK DATA ---
-// const mockEvents = [
-//   {
-//     id: 1,
-//     title: "GBU Tech Symposium 2024",
-//     description:
-//       "A state-level symposium with talks and presentations on cutting-edge technologies by students and industry experts.",
-//     date: "2024-07-10T09:00:00Z",
-//     endDate: "2024-07-10T17:00:00Z",
-//     venue: "Main Auditorium, GBU Campus",
-//     organizer: "School of Engineering, GBU",
-//     type: "Seminar",
-//     mode: "Offline",
-//     isUpcoming: true,
-//     registrationUrl: "https://forms.gle/gbu-tech-symposium-2024",
-//     images: [
-//       "https://www.ux4g.gov.in/assets/img/awareness-workshop/gbu-19-11-24/900x18.webp",
-//     ],
-//   },
-//   {
-//     id: 2,
-//     title: "Annual Science & Innovation Fair",
-//     description:
-//       "Students present their innovative science projects and working models to guests and faculty.",
-//     date: "2023-12-15T10:00:00Z",
-//     endDate: "2023-12-15T16:00:00Z",
-//     venue: "Exhibition Hall, GBU Campus",
-//     organizer: "School of Science, GBU",
-//     type: "Fair",
-//     mode: "Offline",
-//     isUpcoming: false,
-//     registrationUrl: "",
-//     images: [
-//       "https://images.openai.com/thumbnails/url/NS93cXicu1mSUVJSUGylr5-al1xUWVCSmqJbkpRnoJdeXJJYkpmsl5yfq5-Zm5ieWmxfaAuUsXL0S7F0Tw4KLjQzjIp3CzfKiM92zQnISzINLC8oqkpKMss0LI80zDcqMM_Mcs5w9IuwqAy19E6KSHYyD3JJSY0qcVQrBgAavCnC",
-//     ],
-//   },
-//   {
-//     id: 3,
-//     title: "Mathematics Research Workshop",
-//     description:
-//       "An intensive workshop on modern mathematics and its applications in research and industry.",
-//     date: "2024-08-05T09:30:00Z",
-//     endDate: "2024-08-05T15:30:00Z",
-//     venue: "Lecture Hall 3, Academic Block, GBU",
-//     organizer: "Department of Mathematics, GBU",
-//     type: "Workshop",
-//     mode: "Offline",
-//     isUpcoming: true,
-//     registrationUrl: "https://forms.gle/mathematics-research-workshop-gbu",
-//     images: [
-//       "https://www.ux4g.gov.in/assets/img/awareness-workshop/gbu-19-11-24/900x17.webp",
-//     ],
-//   },
-//   {
-//     id: 4,
-//     title: "Abhivyakti: Cultural Fest",
-//     description:
-//       "GBU’s flagship cultural festival showcasing dance, drama, music, and literary competitions.",
-//     date: "2023-11-20T17:00:00Z",
-//     endDate: "2023-11-20T22:00:00Z",
-//     venue: "Open Air Theatre, GBU",
-//     organizer: "Cultural Committee, GBU",
-//     type: "Festival",
-//     mode: "Offline",
-//     isUpcoming: false,
-//     registrationUrl: "",
-//     images: [
-//       "https://www.indianarrative.com/wp-content/uploads/2024/12/India-Nepal-Cultural-Festival-01-1024x683.jpeg",
-//     ],
-//   },
-//   {
-//     id: 5,
-//     title: "AI & Robotics Guest Lecture",
-//     description:
-//       "A guest lecture on Artificial Intelligence, Robotics, and future technology trends.",
-//     date: "2024-09-01T11:00:00Z",
-//     endDate: "2024-09-01T13:00:00Z",
-//     venue: "Seminar Hall B, GBU",
-//     organizer: "School of ICT, GBU",
-//     type: "Lecture",
-//     mode: "Hybrid",
-//     isUpcoming: true,
-//     registrationUrl: "https://forms.gle/ai-robotics-guest-lecture-gbu",
-//     images: ["https://gburif.org/images/intro-carousel/dsf8939-b-copy.jpg"],
-//   },
-//   {
-//     id: 6,
-//     title: "GBU Annual Sports Meet",
-//     description:
-//       "Annual inter-departmental sports meet with athletics, football, cricket, and indoor games.",
-//     date: "2023-10-10T08:00:00Z",
-//     endDate: "2023-10-10T18:00:00Z",
-//     venue: "Sports Ground, GBU",
-//     organizer: "Sports Council, GBU",
-//     type: "Sports",
-//     mode: "Offline",
-//     isUpcoming: false,
-//     registrationUrl: "",
-//     images: ["https://www.gbu.ac.in/Content/img/sports/banner2.jpg"],
-//   },
-//   {
-//     id: 7,
-//     title: "National Research Paper Presentation",
-//     description:
-//       "Students and scholars present research papers on various disciplines at national level.",
-//     date: "2024-07-25T14:00:00Z",
-//     endDate: "2024-07-25T17:00:00Z",
-//     venue: "Conference Room 1, GBU",
-//     organizer: "Research Cell, GBU",
-//     type: "Presentation",
-//     mode: "Offline",
-//     isUpcoming: true,
-//     registrationUrl: "https://forms.gle/national-research-presentation-gbu",
-//     images: ["https://www.ic3ecsbhi.com/Events/Picture1.jpg"],
-//   },
-//   {
-//     id: 8,
-//     title: "GBU Alumni Meet 2023",
-//     description:
-//       "GBU alumni reconnect and share industry insights with current students.",
-//     date: "2023-09-05T18:00:00Z",
-//     endDate: "2023-09-05T21:00:00Z",
-//     venue: "Banquet Hall, GBU",
-//     organizer: "Alumni Association, GBU",
-//     type: "Meet",
-//     mode: "Offline",
-//     isUpcoming: false,
-//     registrationUrl: "",
-//     images: [
-//       "https://images.openai.com/thumbnails/url/iYaDH3icu1mSUVJSUGylr5-al1xUWVCSmqJbkpRnoJdeXJJYkpmsl5yfq5-Zm5ieWmxfaAuUsXL0S7F0Tw42KHCJMDJ3DMnKCyuPzLdMCw9xKa_yiMgyKHNLssirqDAsTzQzzQhNdfJOTbLQ9c72cjfJSC2pSCwPKFcrBgAWxioa",
-//     ],
-//   },
-//   {
-//     id: 9,
-//     title: "NSS Blood Donation Camp",
-//     description:
-//       "Organized by NSS volunteers to collect blood for local hospitals and awareness drive.",
-//     date: "2024-07-05T09:00:00Z",
-//     endDate: "2024-07-05T15:00:00Z",
-//     venue: "Medical Centre, GBU",
-//     organizer: "NSS Unit, GBU",
-//     type: "Social Service",
-//     mode: "Offline",
-//     isUpcoming: true,
-//     registrationUrl: "https://forms.gle/nss-blood-donation-gbu",
-//     images: [
-//       "https://nss.gbu.ac.in/uploads/eventsfiles/photos/66ffb64b39157_WhatsApp%20Image%202024-04-19%20at%201.59.17%20PM.jpeg",
-//     ],
-//   },
-//   {
-//     id: 10,
-//     title: "International Yoga Day",
-//     description:
-//       "Mass yoga session for students and staff promoting healthy living and mindfulness.",
-//     date: "2023-06-21T06:00:00Z",
-//     endDate: "2023-06-21T08:00:00Z",
-//     venue: "Sports Complex Lawn, GBU",
-//     organizer: "Wellness Club, GBU",
-//     type: "Wellness",
-//     mode: "Offline",
-//     isUpcoming: false,
-//     registrationUrl: "",
-//     images: [
-//       "https://images.openai.com/thumbnails/url/-F4ohXicu1mSUVJSUGylr5-al1xUWVCSmqJbkpRnoJdeXJJYkpmsl5yfq5-Zm5ieWmxfaAuUsXL0S7F0Tw6yNHIy1zUsTgtKys-qMC0v9g41dorK8M8qSM7KDixODy8NdfTNzi9OLK6IKvc0cjKuiM8pLjVwz_RMcVQrBgAhZyqH",
-//     ],
-//   },
-//   {
-//     id: 11,
-//     title: "Guest Lecture: Industry 5.0",
-//     description:
-//       "A talk by industry leaders on Industry 5.0, smart factories, and the future of work.",
-//     date: "2024-07-18T11:00:00Z",
-//     endDate: "2024-07-18T13:00:00Z",
-//     venue: "Seminar Hall A, GBU",
-//     organizer: "School of Management, GBU",
-//     type: "Lecture",
-//     mode: "Hybrid",
-//     isUpcoming: true,
-//     registrationUrl: "https://forms.gle/guest-lecture-industry5-gbu",
-//     images: [
-//       "https://www.ux4g.gov.in/assets/img/awareness-workshop/gbu-19-11-24/900x14.webp",
-//     ],
-//   },
-//   {
-//     id: 12,
-//     title: "Coding Club Hackathon",
-//     description:
-//       "24-hour coding marathon for students to build tech solutions and win exciting prizes.",
-//     date: "2023-10-30T09:00:00Z",
-//     endDate: "2023-10-30T09:00:00Z",
-//     venue: "Innovation Lab, GBU",
-//     organizer: "Coding Club, GBU",
-//     type: "Competition",
-//     mode: "Offline",
-//     isUpcoming: false,
-//     registrationUrl: "",
-//     images: [
-//       "https://raw.githubusercontent.com/K4R7IK/Glitch-Poster/master/poster/ctf.png",
-//     ],
-//   },
-//   {
-//     id: 13,
-//     title: "GBU Startup Pitch Day",
-//     description:
-//       "Students pitch their startup ideas to investors and mentors to get funding and incubation support.",
-//     date: "2024-08-20T10:00:00Z",
-//     endDate: "2024-08-20T16:00:00Z",
-//     venue: "Innovation Centre, GBU",
-//     organizer: "Incubation Cell, GBU",
-//     type: "Competition",
-//     mode: "Offline",
-//     isUpcoming: true,
-//     registrationUrl: "https://forms.gle/gbu-startup-pitch-day",
-//     images: [
-//       "https://www.gbu.ac.in/Content/gbudata/incubation/Incubation_Pic9.jpg",
-//     ],
-//   },
-//   {
-//     id: 14,
-//     title: "GBU Photography Exhibition",
-//     description:
-//       "Photography club exhibition displaying student works on campus life and nature.",
-//     date: "2023-09-25T10:00:00Z",
-//     endDate: "2023-09-25T17:00:00Z",
-//     venue: "Art Gallery, GBU",
-//     organizer: "Photography Club, GBU",
-//     type: "Exhibition",
-//     mode: "Offline",
-//     isUpcoming: false,
-//     registrationUrl: "",
-//     images: [
-//       "https://image-static.collegedunia.com/public/college_data/images/campusimage/1421489668197469_122196337857221_100002005655347_147553_4172796_n.jpg",
-//     ],
-//   },
-//   {
-//     id: 15,
-//     title: "Environmental Awareness Drive",
-//     description:
-//       "Tree plantation and cleanliness drive by students under the GBU Eco Club.",
-//     date: "2024-09-10T08:00:00Z",
-//     endDate: "2024-09-10T12:00:00Z",
-//     venue: "GBU Campus",
-//     organizer: "Eco Club, GBU",
-//     type: "Social Service",
-//     mode: "Offline",
-//     isUpcoming: true,
-//     registrationUrl: "https://forms.gle/environmental-awareness-drive-gbu",
-//     images: [
-//       "https://www.gniotgroup.edu.in/lifegniotimg/1633936837-244588932_4383100388473842_7973588752178033120_n.jpg",
-//     ],
-//   },
-// ];
 
-// --- UTILS ---
 function format(date, formatStr) {
   const d = typeof date === "string" ? new Date(date) : date;
   const pad = (n) => n.toString().padStart(2, "0");
@@ -424,11 +172,10 @@ const EventDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/v1/eventss/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setEvent(data.data);
+    apiClient
+      .get(`/eventss/${id}`)
+      .then((response) => {
+        setEvent(response?.data?.data || null);
         setLoading(false);
       })
       .catch((err) => {
@@ -436,7 +183,7 @@ const EventDetail = () => {
         setLoading(false);
       });
   }, [id]);
-  // const event = mockEvents.find((item) => String(item.id) === String(id));
+
   if (!event) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">

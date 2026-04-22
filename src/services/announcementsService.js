@@ -1,6 +1,7 @@
 import apiClient from "./apiClient";
+import { backendBaseUrl } from "../config/apiConfig";
 
-const apiRoot = (import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1").replace(/\/api\/v1\/?$/, "");
+const apiRoot = backendBaseUrl;
 
 const toArray = (value) => (Array.isArray(value) ? value : []);
 
