@@ -612,6 +612,7 @@ const AdminDashboard = () => {
       status: "active",
       linkedFacultyId: faculty.id || "",
       linkedSchool: faculty.school || schoolData.schoolCode || "",
+      linkedDepartment: faculty.department || "",
     };
   };
 
@@ -1019,6 +1020,57 @@ const AdminDashboard = () => {
       return;
     }
 
+    const normalizedRole = String(form.role || "").toLowerCase();
+    const normalizedSchool = String(form.linkedSchool || "").trim().toLowerCase();
+    const normalizedFacultyId = String(form.linkedFacultyId || "").trim().toLowerCase();
+    const normalizedDepartment = String(form.linkedDepartment || "").trim();
+
+    if (normalizedRole === "school" && !normalizedSchool) {
+      setMessage("School account ke liye Linked School required hai.");
+      return;
+    }
+
+    if (normalizedRole === "school") {
+      const duplicateSchool = accounts.some((item, idx) => {
+        if (idx === accountEditor.index) return false;
+        if (String(item.role || "").toLowerCase() !== "school") return false;
+        return String(item.linkedSchool || "").trim().toLowerCase() === normalizedSchool;
+      });
+
+      if (duplicateSchool) {
+        setMessage("Is school ka account pehle se bana hua hai. Ek school ka sirf ek login allow hai.");
+        return;
+      }
+    }
+
+    if (normalizedRole === "teacher") {
+      if (!normalizedFacultyId) {
+        setMessage("Faculty account ke liye Linked Faculty ID required hai.");
+        return;
+      }
+
+      if (!normalizedSchool) {
+        setMessage("Faculty account ke liye Linked School required hai.");
+        return;
+      }
+
+      if (!normalizedDepartment) {
+        setMessage("Faculty account ke liye Linked Department required hai.");
+        return;
+      }
+
+      const duplicateFacultyAccount = accounts.some((item, idx) => {
+        if (idx === accountEditor.index) return false;
+        if (String(item.role || "").toLowerCase() !== "teacher") return false;
+        return String(item.linkedFacultyId || "").trim().toLowerCase() === normalizedFacultyId;
+      });
+
+      if (duplicateFacultyAccount) {
+        setMessage("Is faculty ke liye login account pehle se exist karta hai.");
+        return;
+      }
+    }
+
     setIsAccountSaving(true);
     setAccountApiError("");
 
@@ -1066,6 +1118,29 @@ const AdminDashboard = () => {
       .filter(Boolean);
     return [...new Set(allDepartments)].sort((a, b) => a.localeCompare(b));
   }, [facultyProfiles]);
+
+  const schoolOptions = useMemo(() => {
+    const options = [
+      String(schoolData.schoolCode || "").trim(),
+      String(schoolData.schoolName || "").trim(),
+      ...facultyProfiles.map((item) => String(item.school || "").trim()),
+      ...accounts.map((item) => String(item.linkedSchool || "").trim()),
+    ].filter(Boolean);
+    return [...new Set(options)].sort((a, b) => a.localeCompare(b));
+  }, [schoolData.schoolCode, schoolData.schoolName, facultyProfiles, accounts]);
+
+  const roleAwareDepartmentOptions = useMemo(() => {
+    const activeSchool = String(accountEditor?.form?.linkedSchool || "").trim().toLowerCase();
+    if (!activeSchool) return departmentOptions;
+
+    const scopedDepartments = facultyProfiles
+      .filter((item) => String(item.school || "").trim().toLowerCase() === activeSchool)
+      .map((item) => String(item.department || "").trim())
+      .filter(Boolean);
+
+    if (!scopedDepartments.length) return departmentOptions;
+    return [...new Set(scopedDepartments)].sort((a, b) => a.localeCompare(b));
+  }, [accountEditor?.form?.linkedSchool, departmentOptions, facultyProfiles]);
 
   const filteredFacultyProfiles = useMemo(() => {
     const query = facultyFilters.query.trim().toLowerCase();
@@ -1607,6 +1682,7 @@ const AdminDashboard = () => {
                   status: "active",
                   linkedFacultyId: "",
                   linkedSchool: schoolData.schoolCode || "",
+                  linkedDepartment: "",
                 },
               })
             }
@@ -1821,9 +1897,47 @@ const AdminDashboard = () => {
                     <select
                       className={inputClass}
                       value={accountEditor.form.role || "teacher"}
-                      onChange={(e) =>
-                        setAccountEditor((prev) => ({ ...prev, form: { ...prev.form, role: e.target.value } }))
-                      }
+                      onChange={(e) => {
+                        const nextRole = e.target.value;
+                        setAccountEditor((prev) => {
+                          const current = prev.form || {};
+                          if (nextRole === "admin") {
+                            return {
+                              ...prev,
+                              form: {
+                                ...current,
+                                role: nextRole,
+                                linkedFacultyId: "",
+                                linkedSchool: "",
+                                linkedDepartment: "",
+                              },
+                            };
+                          }
+
+                          if (nextRole === "school") {
+                            return {
+                              ...prev,
+                              form: {
+                                ...current,
+                                role: nextRole,
+                                linkedFacultyId: "",
+                                linkedDepartment: "",
+                                linkedSchool: current.linkedSchool || schoolData.schoolCode || "",
+                              },
+                            };
+                          }
+
+                          return {
+                            ...prev,
+                            form: {
+                              ...current,
+                              role: nextRole,
+                              linkedSchool: current.linkedSchool || schoolData.schoolCode || "",
+                              linkedDepartment: current.linkedDepartment || "",
+                            },
+                          };
+                        });
+                      }}
                     >
                       <option value="admin">admin</option>
                       <option value="school">school</option>
@@ -1842,7 +1956,13 @@ const AdminDashboard = () => {
                       <option value="inactive">inactive</option>
                     </select>
                   </Field>
-                  <Field label="Linked Faculty ID (optional)">
+                  <Field
+                    label={
+                      accountEditor.form.role === "teacher"
+                        ? "Linked Faculty ID (required)"
+                        : "Linked Faculty ID"
+                    }
+                  >
                     <input
                       className={inputClass}
                       value={accountEditor.form.linkedFacultyId || ""}
@@ -1852,18 +1972,73 @@ const AdminDashboard = () => {
                           form: { ...prev.form, linkedFacultyId: e.target.value },
                         }))
                       }
+                      list="faculty-id-options"
+                      placeholder={
+                        accountEditor.form.role === "teacher"
+                          ? "Example: gbu-faculty-101"
+                          : "Optional"
+                      }
+                      disabled={accountEditor.form.role === "admin" || accountEditor.form.role === "school"}
                     />
                   </Field>
-                  <Field label="Linked School Code">
+                  <Field
+                    label={
+                      accountEditor.form.role === "admin"
+                        ? "Linked School"
+                        : "Linked School (required for school/teacher)"
+                    }
+                  >
                     <input
                       className={inputClass}
                       value={accountEditor.form.linkedSchool || ""}
                       onChange={(e) =>
                         setAccountEditor((prev) => ({ ...prev, form: { ...prev.form, linkedSchool: e.target.value } }))
                       }
+                      list="school-options"
+                      placeholder="Example: SOICT"
+                      disabled={accountEditor.form.role === "admin"}
                     />
                   </Field>
+
+                  {accountEditor.form.role === "teacher" ? (
+                    <Field label="Linked Department (required)">
+                      <input
+                        className={inputClass}
+                        value={accountEditor.form.linkedDepartment || ""}
+                        onChange={(e) =>
+                          setAccountEditor((prev) => ({
+                            ...prev,
+                            form: { ...prev.form, linkedDepartment: e.target.value },
+                          }))
+                        }
+                        list="department-options"
+                        placeholder="Example: Computer Science"
+                      />
+                    </Field>
+                  ) : null}
                 </div>
+
+                <datalist id="faculty-id-options">
+                  {facultyProfiles
+                    .filter((item) => item?.id)
+                    .map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name || item.id}
+                      </option>
+                    ))}
+                </datalist>
+
+                <datalist id="school-options">
+                  {schoolOptions.map((option) => (
+                    <option key={option} value={option} />
+                  ))}
+                </datalist>
+
+                <datalist id="department-options">
+                  {roleAwareDepartmentOptions.map((option) => (
+                    <option key={option} value={option} />
+                  ))}
+                </datalist>
 
                 <button
                   type="button"

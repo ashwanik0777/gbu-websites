@@ -27,6 +27,7 @@ const normalizeAccount = (item) => ({
   status: String(item?.status || "active"),
   linkedFacultyId: String(item?.linkedFacultyId || ""),
   linkedSchool: String(item?.linkedSchool || ""),
+  linkedDepartment: String(item?.linkedDepartment || ""),
 });
 
 const normalizeAuditLog = (item) => ({
@@ -53,6 +54,7 @@ const toPayload = (account) => ({
   status: String(account?.status || "active"),
   linkedFacultyId: String(account?.linkedFacultyId || "").trim(),
   linkedSchool: String(account?.linkedSchool || "").trim(),
+  linkedDepartment: String(account?.linkedDepartment || "").trim(),
 });
 
 export const listAdminAccounts = async (params = {}) => {

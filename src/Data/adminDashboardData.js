@@ -10,6 +10,7 @@ export const DEFAULT_ADMIN_PORTAL_ACCOUNTS = [
     status: "active",
     linkedFacultyId: "",
     linkedSchool: "",
+    linkedDepartment: "",
   },
   {
     id: "acc-school-1",
@@ -20,6 +21,7 @@ export const DEFAULT_ADMIN_PORTAL_ACCOUNTS = [
     status: "active",
     linkedFacultyId: "",
     linkedSchool: "SOICT",
+    linkedDepartment: "",
   },
   {
     id: "acc-faculty-1",
@@ -30,5 +32,6 @@ export const DEFAULT_ADMIN_PORTAL_ACCOUNTS = [
     status: "active",
     linkedFacultyId: "gbu-faculty-demo-1",
     linkedSchool: "SOICT",
+    linkedDepartment: "Computer Science",
   },
 ];
