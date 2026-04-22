@@ -7,23 +7,25 @@ import FacultyTabs from '../../components/faculty/FacultyTabs';
 import TabContent from '../../components/faculty/TabContent';
 import { TrendingUp, BookOpenCheck, Presentation, FolderOpen, FileText, FlaskConical, GraduationCap, Newspaper } from 'lucide-react';
 import { DUMMY_FACULTY_ID, DUMMY_FACULTY_DETAIL, FACULTY_PROFILE_STORAGE_PREFIX } from '../../Data/facultyDummyData';
+import { fetchFacultyPublicProfile } from '../../services/facultyDashboardService';
 
 import SearchableWrapper from "../../components/Searchbar/SearchableWrapper.jsx";
 
 const FacultyDetail = () => {
-    const getSavedDummyProfile = () => {
-      try {
-        const raw = localStorage.getItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${DUMMY_FACULTY_ID}`);
-        if (!raw) return DUMMY_FACULTY_DETAIL;
-        return { ...DUMMY_FACULTY_DETAIL, ...JSON.parse(raw) };
-      } catch {
-        return DUMMY_FACULTY_DETAIL;
-      }
-    };
+  const getSavedDummyProfile = () => {
+    try {
+      const raw = localStorage.getItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${DUMMY_FACULTY_ID}`);
+      if (!raw) return DUMMY_FACULTY_DETAIL;
+      return { ...DUMMY_FACULTY_DETAIL, ...JSON.parse(raw) };
+    } catch {
+      return DUMMY_FACULTY_DETAIL;
+    }
+  };
 
-  const { id } = useParams(); // 👈 get id from URL
+  const { id } = useParams();
   const [faculty, setFaculty] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [loading, setLoading] = useState(true);
 
   const normalizeFacultyProfile = (member) => ({
     ...member,
@@ -55,30 +57,53 @@ const FacultyDetail = () => {
 
   useEffect(() => {
     const fetchFaculty = async () => {
+      setLoading(true);
       try {
+      
+        const backendProfile = await fetchFacultyPublicProfile(id);
+        if (backendProfile) {
+          setFaculty(normalizeFacultyProfile(backendProfile));
+          setLoading(false);
+          return;
+        }
+      } catch (backendErr) {
+        console.warn('Backend fetch failed, trying fallbacks:', backendErr?.response?.status);
+      }
+
+      try {
+        // 2. Try external API
         const res = await fetch(`${import.meta.env.VITE_HOST}/academic/faculty/members/`);
         const data = await res.json();
         const member = data.find((f) => String(f.id) === id);
         if (member) {
           setFaculty(normalizeFacultyProfile(member));
+          setLoading(false);
           return;
         }
-
-        if (String(id) === String(DUMMY_FACULTY_ID)) {
-          setFaculty(normalizeFacultyProfile(getSavedDummyProfile()));
-        }
       } catch (err) {
-        console.error('Error loading faculty:', err);
-        if (String(id) === String(DUMMY_FACULTY_ID)) {
-          setFaculty(normalizeFacultyProfile(getSavedDummyProfile()));
-        }
+        console.warn('External API fetch failed:', err);
       }
+
+      // 3. Fall back to dummy data
+      if (String(id) === String(DUMMY_FACULTY_ID)) {
+        setFaculty(normalizeFacultyProfile(getSavedDummyProfile()));
+      }
+      setLoading(false);
     };
 
     fetchFaculty();
   }, [id]);
 
-  if (!faculty) return <div className="p-10 text-center">Loading...</div>;
+  if (loading || !faculty) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-3" />
+          <p className="text-gray-500">Loading faculty profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   const tabItems = [
     { id: 'overview', label: 'OVERVIEW' },
@@ -128,11 +153,11 @@ const FacultyDetail = () => {
 
   return (
     <SearchableWrapper>
-    <SimpleLayout>
-      <FacultyHeader faculty={faculty} />
-      <FacultyTabs tabItems={tabItems} activeTab={activeTab} onTabChange={setActiveTab} />
-      <TabContent activeTab={activeTab} profile={faculty} />
-    </SimpleLayout>
+      <SimpleLayout>
+        <FacultyHeader faculty={faculty} />
+        <FacultyTabs tabItems={tabItems} activeTab={activeTab} onTabChange={setActiveTab} />
+        <TabContent activeTab={activeTab} profile={faculty} />
+      </SimpleLayout>
     </SearchableWrapper>
   );
 };

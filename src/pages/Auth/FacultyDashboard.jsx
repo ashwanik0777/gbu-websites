@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   DUMMY_FACULTY_DETAIL,
   DUMMY_FACULTY_ID,
-  FACULTY_PROFILE_STORAGE_PREFIX,
 } from "../../Data/facultyDummyData";
 import SidebarNav from "../../components/faculty/dashboard/SidebarNav";
 import TopSummary from "../../components/faculty/dashboard/TopSummary";
@@ -15,39 +14,61 @@ import {
   FACULTY_SIDEBAR_SECTIONS,
   parseCommaList,
 } from "../../components/faculty/dashboard/constants";
-import { clearPortalSession } from "../../utils/portalSession";
+import { clearPortalSession, getPortalSession } from "../../utils/portalSession";
+import {
+  fetchMyFacultyProfile,
+  updateMyFacultyProfile,
+} from "../../services/facultyDashboardService";
 
-const STORAGE_KEY = `${FACULTY_PROFILE_STORAGE_PREFIX}${DUMMY_FACULTY_ID}`;
-
-const getInitialProfile = () => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return deepClone(DUMMY_FACULTY_DETAIL);
-    const parsed = JSON.parse(raw);
-    return {
-      ...deepClone(DUMMY_FACULTY_DETAIL),
-      ...parsed,
-      researchAreas: Array.isArray(parsed.researchAreas)
-        ? parsed.researchAreas
-        : deepClone(DUMMY_FACULTY_DETAIL.researchAreas),
-      tabData: {
-        ...deepClone(DUMMY_FACULTY_DETAIL.tabData),
-        ...(parsed.tabData || {}),
-      },
-    };
-  } catch {
-    return deepClone(DUMMY_FACULTY_DETAIL);
-  }
-};
+const getDefaultProfile = () => deepClone(DUMMY_FACULTY_DETAIL);
 
 const FacultyDashboard = () => {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState(() => getInitialProfile());
+  const [profile, setProfile] = useState(() => getDefaultProfile());
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [newAreaTitle, setNewAreaTitle] = useState("");
   const [newAreaDesc, setNewAreaDesc] = useState("");
   const [tagsInput, setTagsInput] = useState("");
   const [activeSection, setActiveSection] = useState("dashboard-header");
+  const [linkedFacultyId, setLinkedFacultyId] = useState("");
+
+  // Load profile from backend on mount
+  useEffect(() => {
+    const loadProfile = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchMyFacultyProfile();
+        if (data) {
+          const merged = {
+            ...getDefaultProfile(),
+            ...data,
+            tabData: {
+              ...getDefaultProfile().tabData,
+              ...(data.tabData || {}),
+            },
+            researchAreas: Array.isArray(data.researchAreas)
+              ? data.researchAreas
+              : getDefaultProfile().researchAreas,
+          };
+          setProfile(merged);
+          setLinkedFacultyId(data.id || "");
+        }
+      } catch (err) {
+        console.warn("Could not load profile from backend, using defaults:", err?.response?.status || err.message);
+        // If 404, faculty profile not linked yet - show defaults
+        setMessage(
+          err?.response?.status === 404
+            ? "⚠️ No faculty profile linked to your account. Contact admin to set up your profile."
+            : ""
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProfile();
+  }, []);
 
   useEffect(() => {
     setTagsInput(Array.isArray(profile.tags) ? profile.tags.join(", ") : "");
@@ -116,18 +137,47 @@ const FacultyDashboard = () => {
     setMessage("");
   };
 
-  const handleSave = () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-    setMessage("Faculty dashboard data saved successfully.");
-  };
+  const handleSave = useCallback(async () => {
+    setSaving(true);
+    setMessage("");
+    try {
+      const payload = {
+        name: profile.name,
+        designation: profile.designation,
+        specialization: profile.specialization,
+        experience_years: profile.experience_years || 0,
+        publications: profile.publications || 0,
+        education: profile.education,
+        shortBio: profile.shortBio,
+        fullBio: profile.fullBio,
+        office: profile.office,
+        image_url: profile.image_url,
+        faculty_url: profile.faculty_url,
+        cv: profile.cv,
+        googleScholar: profile.googleScholar,
+        orcid: profile.orcid,
+        phone: profile.phone,
+        email: profile.email,
+        department: profile.department,
+        school: profile.school,
+        tags: profile.tags || [],
+        researchAreas: profile.researchAreas || [],
+        tabData: profile.tabData || {},
+      };
 
-  const handleReset = () => {
-    const resetData = deepClone(DUMMY_FACULTY_DETAIL);
-    setProfile(resetData);
-    setTagsInput(Array.isArray(resetData.tags) ? resetData.tags.join(", ") : "");
-    localStorage.removeItem(STORAGE_KEY);
-    setMessage("Profile reset to default dummy data.");
-  };
+      const updated = await updateMyFacultyProfile(payload);
+      if (updated) {
+        setProfile((prev) => ({ ...prev, ...updated }));
+        setMessage("✅ Profile saved successfully to database!");
+      }
+    } catch (err) {
+      console.error("Save failed:", err);
+      const errMsg = err?.response?.data?.message || err.message || "Unknown error";
+      setMessage(`❌ Save failed: ${errMsg}`);
+    } finally {
+      setSaving(false);
+    }
+  }, [profile]);
 
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
@@ -158,6 +208,19 @@ const FacultyDashboard = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const facultyPublicId = linkedFacultyId || DUMMY_FACULTY_ID;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900 mx-auto mb-4" />
+          <p className="text-slate-600 font-medium">Loading your faculty profile...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:flex-row">
@@ -166,8 +229,8 @@ const FacultyDashboard = () => {
           activeSection={activeSection}
           onSelect={scrollToSection}
           onSave={handleSave}
-          onReset={handleReset}
-          onViewPublic={() => navigate(`/academics/faculty/${DUMMY_FACULTY_ID}`)}
+          onReset={() => {}}
+          onViewPublic={() => navigate(`/academics/faculty/${facultyPublicId}`)}
           onLogout={() => {
             clearPortalSession();
             navigate("/login");
@@ -180,8 +243,15 @@ const FacultyDashboard = () => {
             summary={summary}
             message={message}
             onSave={handleSave}
-            onOpenPublic={() => navigate(`/academics/faculty/${DUMMY_FACULTY_ID}`)}
+            onOpenPublic={() => navigate(`/academics/faculty/${facultyPublicId}`)}
           />
+
+          {saving && (
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700 font-medium flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-700" />
+              Saving to database...
+            </div>
+          )}
 
           <ProfileForms
             profile={profile}

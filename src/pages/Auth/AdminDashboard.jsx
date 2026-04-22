@@ -56,10 +56,17 @@ import {
 import {
   createAdminAccount,
   deleteAdminAccount,
+  dispatchCredentialEmails,
   listAdminAccountAuditLogs,
   listAdminAccounts,
   updateAdminAccount,
 } from "../../services/adminAccountsService";
+import {
+  createFacultyProfile,
+  deleteFacultyProfile,
+  listFacultyProfiles,
+  updateFacultyProfile,
+} from "../../services/facultyService";
 import { clearPortalSession } from "../../utils/portalSession";
 import { getRecruitmentDashboardData } from "../../services/announcementsService";
 import {
@@ -328,6 +335,11 @@ const AdminDashboard = () => {
   const [tenderFilters, setTenderFilters] = useState({ query: "", status: "all" });
   const [recruitmentFilter, setRecruitmentFilter] = useState("");
   const [collectionFilters, setCollectionFilters] = useState({});
+  const [isFacultyLoading, setIsFacultyLoading] = useState(false);
+  const [isFacultySaving, setIsFacultySaving] = useState(false);
+  const [facultyDeletingKey, setFacultyDeletingKey] = useState("");
+  const [facultyApiError, setFacultyApiError] = useState("");
+  const [facultyReloadToken, setFacultyReloadToken] = useState(0);
   const [isAccountsLoading, setIsAccountsLoading] = useState(false);
   const [isAccountSaving, setIsAccountSaving] = useState(false);
   const [accountDeletingKey, setAccountDeletingKey] = useState("");
@@ -347,6 +359,7 @@ const AdminDashboard = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activityLog, setActivityLog] = useState(getInitialActivityLog);
   const [mailQueue, setMailQueue] = useState(getInitialMailQueue);
+  const [isDispatchingMailQueue, setIsDispatchingMailQueue] = useState(false);
   const backupInputRef = useRef(null);
   const bulkFacultyInputRef = useRef(null);
 
@@ -358,6 +371,11 @@ const AdminDashboard = () => {
         0,
       ),
     [recruitmentData],
+  );
+
+  const pendingMailQueueCount = useMemo(
+    () => mailQueue.filter((item) => String(item?.status || "") === "pending-backend").length,
+    [mailQueue],
   );
 
   const summary = useMemo(
@@ -487,6 +505,39 @@ const AdminDashboard = () => {
     accountPagination.limit,
     accountsReloadToken,
   ]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncFacultyFromServer = async () => {
+      setIsFacultyLoading(true);
+      setFacultyApiError("");
+      try {
+        const response = await listFacultyProfiles({
+          query: "",
+          page: 1,
+          limit: 200,
+        });
+        if (!isMounted) return;
+        setFacultyProfiles(Array.isArray(response?.items) ? response.items : []);
+      } catch (error) {
+        if (!isMounted) return;
+        setFacultyApiError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Unable to fetch faculty profiles from backend.",
+        );
+      } finally {
+        if (isMounted) setIsFacultyLoading(false);
+      }
+    };
+
+    syncFacultyFromServer();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [facultyReloadToken]);
 
   useEffect(() => {
     let isMounted = true;
@@ -673,6 +724,7 @@ const AdminDashboard = () => {
 
       const uploadedFaculty = [];
       const queuedEmails = [];
+      const failedFacultyRows = [];
       const failedAccountRows = [];
       let createdAccountCount = 0;
 
@@ -681,7 +733,7 @@ const AdminDashboard = () => {
         const row = Object.fromEntries(headers.map((header, idx) => [header, values[idx] || ""]));
         if (!row.name) continue;
 
-        const faculty = {
+        const facultyDraft = {
           id: `faculty-${Date.now()}-${i}`,
           name: row.name,
           designation: row.designation,
@@ -690,7 +742,20 @@ const AdminDashboard = () => {
           email: row.email,
           phone: row.phone,
         };
-        uploadedFaculty.push(faculty);
+
+        let faculty;
+        try {
+          faculty = await createFacultyProfile(facultyDraft);
+          uploadedFaculty.push(faculty);
+        } catch (error) {
+          failedFacultyRows.push({
+            row: i + 1,
+            faculty: facultyDraft.name,
+            reason:
+              error?.response?.data?.message || error?.message || "Faculty save failed",
+          });
+          continue;
+        }
 
         const shouldCreateLogin = toBool(row.createLoginAccount, true);
         const shouldSendEmail = toBool(row.sendCredentialsEmail, true);
@@ -729,11 +794,19 @@ const AdminDashboard = () => {
       }
 
       if (!uploadedFaculty.length) {
-        setMessage("No valid rows found in CSV.");
+        if (failedFacultyRows.length) {
+          const sample = failedFacultyRows
+            .slice(0, 2)
+            .map((item) => `Row ${item.row} (${item.faculty}): ${item.reason}`)
+            .join(" | ");
+          setMessage(`Bulk upload failed for all rows. ${sample}`);
+        } else {
+          setMessage("No valid rows found in CSV.");
+        }
         return;
       }
 
-      setFacultyProfiles((prev) => [...prev, ...uploadedFaculty]);
+      setFacultyReloadToken((prev) => prev + 1);
       if (queuedEmails.length) {
         setMailQueue((prev) => [...queuedEmails, ...prev].slice(0, 100));
       }
@@ -758,11 +831,14 @@ const AdminDashboard = () => {
           .map((item) => `Row ${item.row} (${item.faculty}): ${item.reason}`)
           .join(" | ");
         setMessage(
-          `Bulk upload completed with partial failures: ${uploadedFaculty.length} faculty added, ${createdAccountCount} accounts created, ${failedAccountRows.length} account rows failed. ${sample}`,
+          `Bulk upload completed with partial failures: ${uploadedFaculty.length} faculty added, ${createdAccountCount} accounts created, ${failedFacultyRows.length} faculty rows failed, ${failedAccountRows.length} account rows failed. ${sample}`,
         );
       } else {
+        const facultyFailureInfo = failedFacultyRows.length
+          ? ` ${failedFacultyRows.length} faculty rows failed.`
+          : "";
         setMessage(
-          `Bulk upload completed: ${uploadedFaculty.length} faculty added, ${createdAccountCount} accounts created, ${queuedEmails.length} credential emails queued.`,
+          `Bulk upload completed: ${uploadedFaculty.length} faculty added, ${createdAccountCount} accounts created, ${queuedEmails.length} credential emails queued.${facultyFailureInfo}`,
         );
       }
     } catch {

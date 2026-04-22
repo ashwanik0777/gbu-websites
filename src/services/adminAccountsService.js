@@ -104,3 +104,30 @@ export const deleteAdminAccount = async (id) => {
   await apiClient.delete(`/admin/accounts/${id}`);
   return id;
 };
+
+export const dispatchCredentialEmails = async (items = []) => {
+  const response = await apiClient.post("/admin/accounts/dispatch-credential-emails", {
+    items: Array.isArray(items) ? items : [],
+  });
+
+  const payloadItems = Array.isArray(response?.data?.data?.items)
+    ? response.data.data.items
+    : [];
+
+  return {
+    items: payloadItems.map((item) => ({
+      id: String(item?.id || ""),
+      to: String(item?.to || ""),
+      status: String(item?.status || "failed"),
+      messageId: String(item?.messageId || ""),
+      error: String(item?.error || ""),
+    })),
+    summary: response?.data?.data?.summary || {
+      total: 0,
+      sent: 0,
+      failed: 0,
+      notConfigured: 0,
+      mailConfigured: false,
+    },
+  };
+};
