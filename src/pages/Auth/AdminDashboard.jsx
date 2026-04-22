@@ -53,6 +53,13 @@ import {
   listTenders,
   updateTender,
 } from "../../services/tendersService";
+import {
+  createAdminAccount,
+  deleteAdminAccount,
+  listAdminAccountAuditLogs,
+  listAdminAccounts,
+  updateAdminAccount,
+} from "../../services/adminAccountsService";
 import { clearPortalSession } from "../../utils/portalSession";
 import { getRecruitmentDashboardData } from "../../services/announcementsService";
 import {
@@ -315,10 +322,22 @@ const AdminDashboard = () => {
   const [tenderEditor, setTenderEditor] = useState({ index: null, form: null });
   const [recruitmentEditor, setRecruitmentEditor] = useState({ mode: null, index: null, form: null });
   const [accountFilters, setAccountFilters] = useState({ query: "", role: "all", status: "all" });
+  const [accountPagination, setAccountPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 1 });
+  const [accountsReloadToken, setAccountsReloadToken] = useState(0);
   const [facultyFilters, setFacultyFilters] = useState({ query: "", department: "all" });
   const [tenderFilters, setTenderFilters] = useState({ query: "", status: "all" });
   const [recruitmentFilter, setRecruitmentFilter] = useState("");
   const [collectionFilters, setCollectionFilters] = useState({});
+  const [isAccountsLoading, setIsAccountsLoading] = useState(false);
+  const [isAccountSaving, setIsAccountSaving] = useState(false);
+  const [accountDeletingKey, setAccountDeletingKey] = useState("");
+  const [accountApiError, setAccountApiError] = useState("");
+  const [auditFilters, setAuditFilters] = useState({ query: "", action: "all" });
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [auditPagination, setAuditPagination] = useState({ page: 1, limit: 8, total: 0, totalPages: 1 });
+  const [auditReloadToken, setAuditReloadToken] = useState(0);
+  const [isAuditLoading, setIsAuditLoading] = useState(false);
+  const [auditApiError, setAuditApiError] = useState("");
   const [isTenderLoading, setIsTenderLoading] = useState(false);
   const [isTenderSaving, setIsTenderSaving] = useState(false);
   const [tenderDeletingKey, setTenderDeletingKey] = useState("");
@@ -343,13 +362,19 @@ const AdminDashboard = () => {
 
   const summary = useMemo(
     () => [
-      { label: "Total Accounts", value: accounts.length },
+      { label: "Total Accounts", value: accountPagination.total },
       { label: "Faculty Profiles", value: facultyProfiles.length },
       { label: "School Events", value: schoolData.events?.length || 0 },
       { label: "Active Tenders", value: tenderSplit.current.length },
       { label: "Recruitment Posts", value: recruitmentPostCount },
     ],
-    [accounts, facultyProfiles, schoolData, tenderSplit.current.length, recruitmentPostCount],
+    [
+      accountPagination.total,
+      facultyProfiles,
+      schoolData,
+      tenderSplit.current.length,
+      recruitmentPostCount,
+    ],
   );
 
   const saveAll = () => {
@@ -413,6 +438,102 @@ const AdminDashboard = () => {
     localStorage.setItem(RECRUITMENT_DASHBOARD_STORAGE_KEY, JSON.stringify(recruitmentData));
     window.dispatchEvent(new Event("recruitment-data-updated"));
   }, [recruitmentData]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncAccountsFromServer = async () => {
+      setIsAccountsLoading(true);
+      setAccountApiError("");
+      try {
+        const response = await listAdminAccounts({
+          query: accountFilters.query,
+          role: accountFilters.role,
+          status: accountFilters.status,
+          page: accountPagination.page,
+          limit: accountPagination.limit,
+        });
+        if (!isMounted) return;
+        setAccounts(Array.isArray(response?.items) ? response.items : []);
+        setAccountPagination((prev) => ({
+          ...prev,
+          page: response?.pagination?.page || prev.page,
+          limit: response?.pagination?.limit || prev.limit,
+          total: response?.pagination?.total || 0,
+          totalPages: response?.pagination?.totalPages || 1,
+        }));
+      } catch (error) {
+        if (!isMounted) return;
+        setAccountApiError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Unable to fetch user accounts from backend.",
+        );
+      } finally {
+        if (isMounted) setIsAccountsLoading(false);
+      }
+    };
+
+    syncAccountsFromServer();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    accountFilters.query,
+    accountFilters.role,
+    accountFilters.status,
+    accountPagination.page,
+    accountPagination.limit,
+    accountsReloadToken,
+  ]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncAccountAuditLogs = async () => {
+      setIsAuditLoading(true);
+      setAuditApiError("");
+      try {
+        const response = await listAdminAccountAuditLogs({
+          query: auditFilters.query,
+          action: auditFilters.action,
+          page: auditPagination.page,
+          limit: auditPagination.limit,
+        });
+        if (!isMounted) return;
+        setAuditLogs(Array.isArray(response?.items) ? response.items : []);
+        setAuditPagination((prev) => ({
+          ...prev,
+          page: response?.pagination?.page || prev.page,
+          limit: response?.pagination?.limit || prev.limit,
+          total: response?.pagination?.total || 0,
+          totalPages: response?.pagination?.totalPages || 1,
+        }));
+      } catch (error) {
+        if (!isMounted) return;
+        setAuditApiError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Unable to fetch account audit logs from backend.",
+        );
+      } finally {
+        if (isMounted) setIsAuditLoading(false);
+      }
+    };
+
+    syncAccountAuditLogs();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    auditFilters.query,
+    auditFilters.action,
+    auditPagination.page,
+    auditPagination.limit,
+    auditReloadToken,
+  ]);
 
   useEffect(() => {
     let isMounted = true;
@@ -549,9 +670,10 @@ const AdminDashboard = () => {
         return;
       }
 
-      let nextAccounts = [...accounts];
       const uploadedFaculty = [];
       const queuedEmails = [];
+      const failedAccountRows = [];
+      let createdAccountCount = 0;
 
       for (let i = 1; i < lines.length; i += 1) {
         const values = parseCsvRow(lines[i]);
@@ -574,22 +696,32 @@ const AdminDashboard = () => {
 
         if (shouldCreateLogin) {
           const generatedPassword = generateStrongPassword();
-          const account = createFacultyAccount(faculty, nextAccounts, generatedPassword);
-          nextAccounts = [...nextAccounts, account];
+          const accountDraft = createFacultyAccount(faculty, accounts, generatedPassword);
+          try {
+            const createdAccount = await createAdminAccount(accountDraft);
+            createdAccountCount += 1;
 
-          if (shouldSendEmail && faculty.email) {
-            queuedEmails.push({
-              id: `mail-${Date.now()}-${i}`,
-              to: faculty.email,
-              subject: "GBU Faculty Portal Credentials",
-              status: "pending-backend",
-              payload: {
-                facultyName: faculty.name,
-                username: account.username,
-                password: account.password,
-                linkedFacultyId: account.linkedFacultyId,
-              },
-              createdAt: new Date().toISOString(),
+            if (shouldSendEmail && faculty.email) {
+              queuedEmails.push({
+                id: `mail-${Date.now()}-${i}`,
+                to: faculty.email,
+                subject: "GBU Faculty Portal Credentials",
+                status: "pending-backend",
+                payload: {
+                  facultyName: faculty.name,
+                  username: createdAccount.username,
+                  password: generatedPassword,
+                  linkedFacultyId: createdAccount.linkedFacultyId,
+                },
+                createdAt: new Date().toISOString(),
+              });
+            }
+          } catch (error) {
+            failedAccountRows.push({
+              row: i + 1,
+              faculty: faculty.name,
+              reason:
+                error?.response?.data?.message || error?.message || "Account creation failed",
             });
           }
         }
@@ -601,21 +733,37 @@ const AdminDashboard = () => {
       }
 
       setFacultyProfiles((prev) => [...prev, ...uploadedFaculty]);
-      setAccounts(nextAccounts);
       if (queuedEmails.length) {
         setMailQueue((prev) => [...queuedEmails, ...prev].slice(0, 100));
       }
+
+      setAccountPagination((prev) => ({ ...prev, page: 1 }));
+      setAccountsReloadToken((prev) => prev + 1);
+      setAuditPagination((prev) => ({ ...prev, page: 1 }));
+      setAuditReloadToken((prev) => prev + 1);
+
       setActivityLog((prev) => [
         {
           id: `log-${Date.now()}`,
-          action: `Bulk uploaded ${uploadedFaculty.length} faculty profiles`,
+          action: `Bulk uploaded ${uploadedFaculty.length} faculty profiles and created ${createdAccountCount} accounts`,
           time: new Date().toISOString(),
         },
         ...prev,
       ].slice(0, 12));
-      setMessage(
-        `Bulk upload completed: ${uploadedFaculty.length} faculty added, ${queuedEmails.length} credential emails queued.`,
-      );
+
+      if (failedAccountRows.length) {
+        const sample = failedAccountRows
+          .slice(0, 2)
+          .map((item) => `Row ${item.row} (${item.faculty}): ${item.reason}`)
+          .join(" | ");
+        setMessage(
+          `Bulk upload completed with partial failures: ${uploadedFaculty.length} faculty added, ${createdAccountCount} accounts created, ${failedAccountRows.length} account rows failed. ${sample}`,
+        );
+      } else {
+        setMessage(
+          `Bulk upload completed: ${uploadedFaculty.length} faculty added, ${createdAccountCount} accounts created, ${queuedEmails.length} credential emails queued.`,
+        );
+      }
     } catch {
       setMessage("Bulk upload failed. Please upload a valid CSV template file.");
     } finally {
@@ -811,23 +959,106 @@ const AdminDashboard = () => {
     }));
   };
 
-  const filteredAccounts = useMemo(() => {
-    const query = accountFilters.query.trim().toLowerCase();
-    return accounts
-      .map((acc, index) => ({ acc, index }))
-      .filter(({ acc }) => {
-      const matchesQuery =
-        !query ||
-        [acc.name, acc.username, acc.linkedFacultyId, acc.linkedSchool]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .includes(query);
-      const matchesRole = accountFilters.role === "all" || acc.role === accountFilters.role;
-      const matchesStatus = accountFilters.status === "all" || acc.status === accountFilters.status;
-      return matchesQuery && matchesRole && matchesStatus;
-      });
-  }, [accounts, accountFilters]);
+  const handleDeleteAccount = async (account) => {
+    const accountId = Number(account?.id);
+    if (!Number.isInteger(accountId) || accountId <= 0) {
+      setMessage("Only backend synced accounts can be deleted.");
+      return;
+    }
+
+    setAccountApiError("");
+    setAccountDeletingKey(String(accountId));
+
+    try {
+      await deleteAdminAccount(accountId);
+      const shouldMoveToPreviousPage = accounts.length === 1 && accountPagination.page > 1;
+      if (shouldMoveToPreviousPage) {
+        setAccountPagination((prev) => ({ ...prev, page: prev.page - 1 }));
+      }
+      setAccountsReloadToken((prev) => prev + 1);
+      setAuditReloadToken((prev) => prev + 1);
+      setActivityLog((prev) => [
+        {
+          id: `log-${Date.now()}`,
+          action: `Deleted login account: ${account.username || account.name || accountId}`,
+          time: new Date().toISOString(),
+        },
+        ...prev,
+      ].slice(0, 12));
+      setMessage("Login account deleted from backend.");
+    } catch (error) {
+      setAccountApiError(
+        error?.response?.data?.message || error?.message || "Failed to delete account from backend.",
+      );
+      setMessage("Account delete failed. Please retry.");
+    } finally {
+      setAccountDeletingKey("");
+    }
+  };
+
+  const handleSaveAccount = async () => {
+    const form = accountEditor.form;
+    if (!form?.username || !form?.role) {
+      setMessage("Username and role are required.");
+      return;
+    }
+
+    if (accountEditor.index === null && !form?.password) {
+      setMessage("Password is required for new account creation.");
+      return;
+    }
+
+    const duplicate = accounts.some(
+      (item, idx) =>
+        idx !== accountEditor.index &&
+        String(item.username || "").toLowerCase() === String(form.username || "").toLowerCase(),
+    );
+
+    if (duplicate) {
+      setMessage("This username already exists. Please use a unique username.");
+      return;
+    }
+
+    setIsAccountSaving(true);
+    setAccountApiError("");
+
+    try {
+      if (accountEditor.index === null) {
+        await createAdminAccount(form);
+        setAccountPagination((prev) => ({ ...prev, page: 1 }));
+      } else {
+        const current = accounts[accountEditor.index];
+        const accountId = Number(current?.id);
+        if (!Number.isInteger(accountId) || accountId <= 0) {
+          setMessage("Unable to update unsynced account. Please refresh and retry.");
+          return;
+        }
+        await updateAdminAccount(accountId, form);
+      }
+
+      setAccountsReloadToken((prev) => prev + 1);
+      setAuditReloadToken((prev) => prev + 1);
+
+      setActivityLog((prev) => [
+        {
+          id: `log-${Date.now()}`,
+          action: `Updated login account: ${form.username}`,
+          time: new Date().toISOString(),
+        },
+        ...prev,
+      ].slice(0, 12));
+
+      setAccountEditor({ index: null, form: null });
+      setMessage("Login account synced with backend successfully.");
+    } catch (error) {
+      setAccountApiError(
+        error?.response?.data?.message || error?.message || "Failed to save account to backend.",
+      );
+      setMessage("Account save failed. Please check API error.");
+    } finally {
+      setIsAccountSaving(false);
+    }
+  };
 
   const departmentOptions = useMemo(() => {
     const allDepartments = facultyProfiles
@@ -1385,18 +1616,39 @@ const AdminDashboard = () => {
           </button>
         </div>
 
+        {isAccountsLoading ? (
+          <div className="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800">
+            Loading login accounts from backend API...
+          </div>
+        ) : null}
+
+        {accountApiError ? (
+          <div className="mb-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
+            API Error: {accountApiError}
+          </div>
+        ) : null}
+
         <div className="grid gap-4 lg:grid-cols-2">
           <div>
             <FilterBar
               searchValue={accountFilters.query}
-              onSearchChange={(value) => setAccountFilters((prev) => ({ ...prev, query: value }))}
+              onSearchChange={(value) => {
+                setAccountFilters((prev) => ({ ...prev, query: value }));
+                setAccountPagination((prev) => ({ ...prev, page: 1 }));
+              }}
               searchPlaceholder="Search by name, username, faculty ID, school code..."
-              onClear={() => setAccountFilters({ query: "", role: "all", status: "all" })}
+              onClear={() => {
+                setAccountFilters({ query: "", role: "all", status: "all" });
+                setAccountPagination((prev) => ({ ...prev, page: 1 }));
+              }}
             >
               <select
                 className="rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs font-medium text-slate-700"
                 value={accountFilters.role}
-                onChange={(e) => setAccountFilters((prev) => ({ ...prev, role: e.target.value }))}
+                onChange={(e) => {
+                  setAccountFilters((prev) => ({ ...prev, role: e.target.value }));
+                  setAccountPagination((prev) => ({ ...prev, page: 1 }));
+                }}
               >
                 <option value="all">All Roles</option>
                 <option value="admin">admin</option>
@@ -1406,7 +1658,10 @@ const AdminDashboard = () => {
               <select
                 className="rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs font-medium text-slate-700"
                 value={accountFilters.status}
-                onChange={(e) => setAccountFilters((prev) => ({ ...prev, status: e.target.value }))}
+                onChange={(e) => {
+                  setAccountFilters((prev) => ({ ...prev, status: e.target.value }));
+                  setAccountPagination((prev) => ({ ...prev, page: 1 }));
+                }}
               >
                 <option value="all">All Status</option>
                 <option value="active">active</option>
@@ -1415,9 +1670,9 @@ const AdminDashboard = () => {
             </FilterBar>
 
             <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
-              {filteredAccounts.map(({ acc, index: actualIndex }, index) => {
+              {accounts.map((acc, actualIndex) => {
                 return (
-              <div key={acc.id || index} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <div key={acc.id || actualIndex} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{acc.name || acc.username}</p>
@@ -1428,6 +1683,7 @@ const AdminDashboard = () => {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
+                      disabled={isAccountSaving || accountDeletingKey === String(acc.id || "")}
                       onClick={() => setAccountEditor({ index: actualIndex, form: { ...acc } })}
                       className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
                     >
@@ -1435,16 +1691,62 @@ const AdminDashboard = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setAccounts((prev) => prev.filter((_, i) => i !== actualIndex))}
+                      disabled={isAccountSaving || accountDeletingKey === String(acc.id || "")}
+                      onClick={() => handleDeleteAccount(acc)}
                       className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
                     >
-                      <Trash2 className="h-3.5 w-3.5" /> Delete
+                      <Trash2 className="h-3.5 w-3.5" />
+                      {accountDeletingKey === String(acc.id || "") ? "Deleting..." : "Delete"}
                     </button>
                   </div>
                 </div>
               </div>
                 );
               })}
+              {!isAccountsLoading && !accounts.length ? (
+                <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-xs text-slate-600">
+                  No accounts found for selected filters.
+                </div>
+              ) : null}
+            </div>
+
+            <div className="mt-3 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+              <span>
+                Showing {accountPagination.total ? (accountPagination.page - 1) * accountPagination.limit + 1 : 0}
+                -
+                {Math.min(accountPagination.page * accountPagination.limit, accountPagination.total)} of{" "}
+                {accountPagination.total}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={isAccountsLoading || accountPagination.page <= 1}
+                  onClick={() =>
+                    setAccountPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))
+                  }
+                  className="rounded-md border border-slate-300 bg-white px-2 py-1 font-medium text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Previous
+                </button>
+                <span>
+                  Page {accountPagination.page} / {accountPagination.totalPages}
+                </span>
+                <button
+                  type="button"
+                  disabled={
+                    isAccountsLoading || accountPagination.page >= accountPagination.totalPages
+                  }
+                  onClick={() =>
+                    setAccountPagination((prev) => ({
+                      ...prev,
+                      page: Math.min(prev.totalPages, prev.page + 1),
+                    }))
+                  }
+                  className="rounded-md border border-slate-300 bg-white px-2 py-1 font-medium text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1565,41 +1867,11 @@ const AdminDashboard = () => {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    const form = accountEditor.form;
-                    if (!form.username || !form.password || !form.role) {
-                      setMessage("Username, password and role are required.");
-                      return;
-                    }
-                    const duplicate = accounts.some(
-                      (item, idx) =>
-                        idx !== accountEditor.index &&
-                        String(item.username || "").toLowerCase() === String(form.username || "").toLowerCase(),
-                    );
-                    if (duplicate) {
-                      setMessage("This username already exists. Please use a unique username.");
-                      return;
-                    }
-                    setAccounts((prev) => {
-                      const next = [...prev];
-                      if (accountEditor.index === null) next.push(form);
-                      else next[accountEditor.index] = form;
-                      return next;
-                    });
-                    setAccountEditor({ index: null, form: null });
-                    setActivityLog((prev) => [
-                      {
-                        id: `log-${Date.now()}`,
-                        action: `Updated login account: ${form.username}`,
-                        time: new Date().toISOString(),
-                      },
-                      ...prev,
-                    ].slice(0, 12));
-                    setMessage("Login account updated.");
-                  }}
+                  disabled={isAccountSaving}
+                  onClick={handleSaveAccount}
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
                 >
-                  Save Account
+                  {isAccountSaving ? "Saving..." : "Save Account"}
                 </button>
               </>
             ) : (
@@ -1607,6 +1879,120 @@ const AdminDashboard = () => {
                 Select account to edit or create new login ID.
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      <div className={cardClass}>
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-semibold text-slate-900">Account Audit Logs</h3>
+            <p className="text-xs text-slate-500">Create, update and delete actions are tracked from backend.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setAuditReloadToken((prev) => prev + 1)}
+            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100"
+          >
+            Refresh Logs
+          </button>
+        </div>
+
+        <FilterBar
+          searchValue={auditFilters.query}
+          onSearchChange={(value) => {
+            setAuditFilters((prev) => ({ ...prev, query: value }));
+            setAuditPagination((prev) => ({ ...prev, page: 1 }));
+          }}
+          searchPlaceholder="Search summary, actor email, or entity id..."
+          onClear={() => {
+            setAuditFilters({ query: "", action: "all" });
+            setAuditPagination((prev) => ({ ...prev, page: 1 }));
+          }}
+        >
+          <select
+            className="rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs font-medium text-slate-700"
+            value={auditFilters.action}
+            onChange={(e) => {
+              setAuditFilters((prev) => ({ ...prev, action: e.target.value }));
+              setAuditPagination((prev) => ({ ...prev, page: 1 }));
+            }}
+          >
+            <option value="all">All Actions</option>
+            <option value="create-account">create-account</option>
+            <option value="update-account">update-account</option>
+            <option value="delete-account">delete-account</option>
+          </select>
+        </FilterBar>
+
+        {isAuditLoading ? (
+          <div className="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800">
+            Loading audit logs from backend API...
+          </div>
+        ) : null}
+
+        {auditApiError ? (
+          <div className="mb-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
+            API Error: {auditApiError}
+          </div>
+        ) : null}
+
+        <div className="space-y-2">
+          {auditLogs.map((log) => (
+            <div key={log.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="rounded-md bg-slate-900 px-2 py-1 font-semibold text-white">
+                  {log.action}
+                </span>
+                <span className="text-slate-500">{new Date(log.createdAt).toLocaleString()}</span>
+              </div>
+              <p className="mt-2 text-sm font-medium text-slate-800">{log.summary}</p>
+              <p className="mt-1 text-xs text-slate-600">
+                Actor: {log.actor?.name || "System"}
+                {log.actor?.email ? ` (${log.actor.email})` : ""}
+                {log.actor?.role ? ` • Role: ${log.actor.role}` : ""}
+              </p>
+            </div>
+          ))}
+
+          {!isAuditLoading && !auditLogs.length ? (
+            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-xs text-slate-600">
+              No audit logs found for selected filters.
+            </div>
+          ) : null}
+        </div>
+
+        <div className="mt-3 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+          <span>
+            Showing {auditPagination.total ? (auditPagination.page - 1) * auditPagination.limit + 1 : 0}
+            -
+            {Math.min(auditPagination.page * auditPagination.limit, auditPagination.total)} of {auditPagination.total}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={isAuditLoading || auditPagination.page <= 1}
+              onClick={() => setAuditPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+              className="rounded-md border border-slate-300 bg-white px-2 py-1 font-medium text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Previous
+            </button>
+            <span>
+              Page {auditPagination.page} / {auditPagination.totalPages}
+            </span>
+            <button
+              type="button"
+              disabled={isAuditLoading || auditPagination.page >= auditPagination.totalPages}
+              onClick={() =>
+                setAuditPagination((prev) => ({
+                  ...prev,
+                  page: Math.min(prev.totalPages, prev.page + 1),
+                }))
+              }
+              className="rounded-md border border-slate-300 bg-white px-2 py-1 font-medium text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>
