@@ -6,22 +6,11 @@ import SummaryDashboard from '../../components/faculty/SummaryDashboard';
 import FacultyTabs from '../../components/faculty/FacultyTabs';
 import TabContent from '../../components/faculty/TabContent';
 import { TrendingUp, BookOpenCheck, Presentation, FolderOpen, FileText, FlaskConical, GraduationCap, Newspaper } from 'lucide-react';
-import { DUMMY_FACULTY_ID, DUMMY_FACULTY_DETAIL, FACULTY_PROFILE_STORAGE_PREFIX } from '../../Data/facultyDummyData';
 import { fetchFacultyPublicProfile } from '../../services/facultyDashboardService';
 
 import SearchableWrapper from "../../components/Searchbar/SearchableWrapper.jsx";
 
 const FacultyDetail = () => {
-  const getSavedDummyProfile = () => {
-    try {
-      const raw = localStorage.getItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${DUMMY_FACULTY_ID}`);
-      if (!raw) return DUMMY_FACULTY_DETAIL;
-      return { ...DUMMY_FACULTY_DETAIL, ...JSON.parse(raw) };
-    } catch {
-      return DUMMY_FACULTY_DETAIL;
-    }
-  };
-
   const { id } = useParams();
   const [faculty, setFaculty] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
@@ -34,19 +23,19 @@ const FacultyDetail = () => {
     bio: member.faculty_url ? `View detailed profile here: ${member.faculty_url}` : '',
     shortBio: member.shortBio || member.bio || 'Faculty profile is available.',
     fullBio: member.fullBio || member.bio || 'Faculty profile details are available.',
-    qualifications: member.qualifications || [member.education].filter(Boolean),
-    experiences: member.experiences || [],
-    researchInterests: member.researchInterests || [],
-    courses: member.courses || [],
-    administrations: member.administrations || [],
-    achievements: member.achievements || [],
-    recentPublications: member.recentPublications || [],
-    projects: member.projects || [],
-    researchGroup: member.researchGroup || [],
-    patents: member.patents || [],
-    certifications: member.certifications || [],
-    invitedTalks: member.invitedTalks || [],
-    socialImpact: member.socialImpact || [],
+    qualifications: member.tabData?.qualifications || member.qualifications || [member.education].filter(Boolean),
+    experiences: member.tabData?.experiences || member.experiences || [],
+    researchInterests: member.tabData?.researchInterests || member.researchInterests || [],
+    courses: member.tabData?.courses || member.courses || [],
+    administrations: member.tabData?.administrations || member.administrations || [],
+    achievements: member.tabData?.achievements || member.achievements || [],
+    recentPublications: member.tabData?.recentPublications || member.recentPublications || [],
+    projects: member.tabData?.projects || member.projects || [],
+    researchGroup: member.tabData?.researchGroup || member.researchGroup || [],
+    patents: member.tabData?.patents || member.patents || [],
+    certifications: member.tabData?.certifications || member.certifications || [],
+    invitedTalks: member.tabData?.invitedTalks || member.invitedTalks || [],
+    socialImpact: member.tabData?.socialImpact || member.socialImpact || [],
     quickLinks: member.quickLinks || [
       { label: 'Curriculum Vitae', icon: FileText, color: 'blue' },
       { label: 'Research Profile', icon: FlaskConical, color: 'green' },
@@ -59,47 +48,39 @@ const FacultyDetail = () => {
     const fetchFaculty = async () => {
       setLoading(true);
       try {
-      
         const backendProfile = await fetchFacultyPublicProfile(id);
         if (backendProfile) {
           setFaculty(normalizeFacultyProfile(backendProfile));
-          setLoading(false);
-          return;
+        } else {
+          setFaculty(null); // Explicitly handle null if not found
         }
       } catch (backendErr) {
-        console.warn('Backend fetch failed, trying fallbacks:', backendErr?.response?.status);
+        console.warn('Backend fetch failed:', backendErr?.response?.status);
+        setFaculty(null);
+      } finally {
+        setLoading(false);
       }
-
-      try {
-        // 2. Try external API
-        const res = await fetch(`${import.meta.env.VITE_HOST}/academic/faculty/members/`);
-        const data = await res.json();
-        const member = data.find((f) => String(f.id) === id);
-        if (member) {
-          setFaculty(normalizeFacultyProfile(member));
-          setLoading(false);
-          return;
-        }
-      } catch (err) {
-        console.warn('External API fetch failed:', err);
-      }
-
-      // 3. Fall back to dummy data
-      if (String(id) === String(DUMMY_FACULTY_ID)) {
-        setFaculty(normalizeFacultyProfile(getSavedDummyProfile()));
-      }
-      setLoading(false);
     };
 
     fetchFaculty();
   }, [id]);
 
-  if (loading || !faculty) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-3" />
           <p className="text-gray-500">Loading faculty profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!faculty) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-center">
+          <p className="text-gray-500 text-lg">Faculty profile not found.</p>
         </div>
       </div>
     );

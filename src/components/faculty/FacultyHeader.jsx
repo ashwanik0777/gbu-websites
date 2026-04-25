@@ -112,7 +112,13 @@ const Button = ({ className = '', variant = 'solid', children, ...props }) => {
 };
 
 const FacultyHeader = ({ faculty }) => {
-  const profileImage = faculty?.image_url || `${import.meta.env.VITE_HOST}/media/${faculty?.image || 'default.png'}`;
+  const getImageUrl = (url, image) => {
+    if (url && (url.startsWith('http') || url.startsWith('data:'))) return url;
+    if (url) return `${import.meta.env.VITE_HOST}${url.startsWith('/') ? '' : '/'}${url}`;
+    if (image) return `${import.meta.env.VITE_HOST}/media/${image}`;
+    return "https://ui-avatars.com/api/?name=" + encodeURIComponent(faculty?.name || 'Faculty') + "&background=0D8ABC&color=fff&size=150";
+  };
+  const profileImage = getImageUrl(faculty?.image_url, faculty?.image);
 
   return (
     <Card className="p-8 my-8 shadow-lg mx-auto w-5/6 hover:shadow-xl transition-shadow duration-300">

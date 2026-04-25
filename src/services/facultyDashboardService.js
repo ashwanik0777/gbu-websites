@@ -47,7 +47,30 @@ export const fetchFacultyPublicList = async (params = {}) => {
 
 /* ─── Admin endpoints ─── */
 
+export const adminGetFacultyList = async (params = {}) => {
+  const response = await authApiClient().get("/admin/faculty", { params });
+  return {
+    items: response?.data?.data?.items || [],
+    pagination: response?.data?.data?.pagination || {},
+  };
+};
+
 export const adminGetFacultyProfile = async (facultyId) => {
   const response = await authApiClient().get(`/admin/faculty/${facultyId}`);
+  return response?.data?.data || null;
+};
+
+export const adminCreateFacultyProfile = async (profileData) => {
+  const response = await authApiClient().post("/admin/faculty", profileData);
+  return response?.data?.data || null;
+};
+
+export const adminUpdateFacultyProfile = async (facultyId, profileData) => {
+  const response = await authApiClient().put(`/admin/faculty/${facultyId}`, profileData);
+  return response?.data?.data || null;
+};
+
+export const adminDeleteFacultyProfile = async (facultyId) => {
+  const response = await authApiClient().delete(`/admin/faculty/${facultyId}`);
   return response?.data?.data || null;
 };

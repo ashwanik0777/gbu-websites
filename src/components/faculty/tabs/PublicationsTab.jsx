@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 import {
   Filter,
   Calendar,
@@ -98,7 +97,7 @@ export default function PublicationsTab({ profile }) {
   const [activeTab, setActiveTab] = useState("publications");
   const [selectedYear, setSelectedYear] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
-  const tabData = profile?.tabData?.publications || DUMMY_FACULTY_TAB_DATA.publications;
+  const tabData = profile?.tabData?.publications || {};
   const publications = tabData.publications || [];
   const patents = tabData.patents || [];
 

@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Card Component
 const Card = ({ className = "", children }) => (
   <div className={`rounded-xl bg-white border shadow-sm ${className}`}>{children}</div>
@@ -53,7 +52,7 @@ const Button = ({
 import { Users, Mail, ExternalLink, Calendar, FileText } from 'lucide-react';
 
 export const ResearchGroupTab = ({ profile }) => {
-  const tabData = profile?.tabData?.researchGroup || DUMMY_FACULTY_TAB_DATA.researchGroup;
+  const tabData = profile?.tabData?.researchGroup || {};
   const phdScholars = tabData.phdScholars || [];
   const postdocs = tabData.postdocs || [];
   const researchAssistants = tabData.researchAssistants || [];

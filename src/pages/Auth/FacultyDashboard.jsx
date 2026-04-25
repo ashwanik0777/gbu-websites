@@ -1,9 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  DUMMY_FACULTY_DETAIL,
-  DUMMY_FACULTY_ID,
-} from "../../Data/facultyDummyData";
+
 import SidebarNav from "../../components/faculty/dashboard/SidebarNav";
 import TopSummary from "../../components/faculty/dashboard/TopSummary";
 import ProfileForms from "../../components/faculty/dashboard/ProfileForms";
@@ -20,7 +17,12 @@ import {
   updateMyFacultyProfile,
 } from "../../services/facultyDashboardService";
 
-const getDefaultProfile = () => deepClone(DUMMY_FACULTY_DETAIL);
+const getDefaultProfile = () => ({
+  name: "", designation: "", department: "", school: "", email: "", phone: "",
+  experience_years: 0, publications: 0, education: "", shortBio: "", fullBio: "",
+  office: "", image_url: "", faculty_url: "", cv: "", googleScholar: "", orcid: "",
+  tags: [], researchAreas: [], tabData: {}
+});
 
 const FacultyDashboard = () => {
   const navigate = useNavigate();
@@ -168,12 +170,12 @@ const FacultyDashboard = () => {
       const updated = await updateMyFacultyProfile(payload);
       if (updated) {
         setProfile((prev) => ({ ...prev, ...updated }));
-        setMessage("✅ Profile saved successfully to database!");
+        setMessage("Profile saved successfully to database!");
       }
     } catch (err) {
       console.error("Save failed:", err);
       const errMsg = err?.response?.data?.message || err.message || "Unknown error";
-      setMessage(`❌ Save failed: ${errMsg}`);
+      setMessage(`Save failed: ${errMsg}`);
     } finally {
       setSaving(false);
     }
@@ -208,7 +210,7 @@ const FacultyDashboard = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const facultyPublicId = linkedFacultyId || DUMMY_FACULTY_ID;
+  const facultyPublicId = linkedFacultyId || "";
 
   if (loading) {
     return (
@@ -230,7 +232,7 @@ const FacultyDashboard = () => {
           onSelect={scrollToSection}
           onSave={handleSave}
           onReset={() => {}}
-          onViewPublic={() => navigate(`/academics/faculty/${facultyPublicId}`)}
+          onViewPublic={() => facultyPublicId ? navigate(`/academics/faculty/${facultyPublicId}`) : alert("Profile not linked yet.")}
           onLogout={() => {
             clearPortalSession();
             navigate("/login");
@@ -243,7 +245,7 @@ const FacultyDashboard = () => {
             summary={summary}
             message={message}
             onSave={handleSave}
-            onOpenPublic={() => navigate(`/academics/faculty/${facultyPublicId}`)}
+            onOpenPublic={() => facultyPublicId ? navigate(`/academics/faculty/${facultyPublicId}`) : alert("Profile not linked yet.")}
           />
 
           {saving && (

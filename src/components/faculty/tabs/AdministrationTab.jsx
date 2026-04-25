@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Card, CardHeader, CardTitle, CardContent, and Badge components defined here for best UI/UX
 
 const Card = ({ className = '', children }) => (
@@ -31,7 +30,7 @@ const Badge = ({ children, className = '' }) => (
 import { Calendar, MapPin, Settings, Users } from 'lucide-react';
 
 export const AdministrationTab = ({ profile }) => {
-  const tabData = profile?.tabData?.administration || DUMMY_FACULTY_TAB_DATA.administration;
+  const tabData = profile?.tabData?.administration || {};
   const administrativeRoles = tabData.administrativeRoles || [];
   const committees = tabData.committees || [];
 

@@ -8,9 +8,16 @@ import { Mail, Phone, Globe, Award, BookOpen, Users, Search, X } from 'lucide-re
 import BannerSection from "../../components/HeroBanner.jsx";
 import StatsCard from "../../components/StatsCard.jsx";
 import SearchableWrapper from "../../components/Searchbar/SearchableWrapper.jsx";
-import { DUMMY_FACULTY_MEMBER, DUMMY_FACULTY_ID, FACULTY_PROFILE_STORAGE_PREFIX } from "../../Data/facultyDummyData";
 
 const VITE_HOST = import.meta.env.VITE_HOST;
+import { fetchFacultyPublicList } from '../../services/facultyDashboardService';
+
+const getImageUrl = (url, image) => {
+  if (url && (url.startsWith('http') || url.startsWith('data:'))) return url;
+  if (url) return `${VITE_HOST}${url.startsWith('/') ? '' : '/'}${url}`;
+  if (image) return `${VITE_HOST}/media/${image}`;
+  return "https://ui-avatars.com/api/?name=Faculty&background=0D8ABC&color=fff&size=150";
+};
 
 const Faculty = () => {
   const [facultyMembers, setFacultyMembers] = useState([]);
@@ -26,33 +33,39 @@ const Faculty = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    const getSavedDummyMember = () => {
-      try {
-        const raw = localStorage.getItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${DUMMY_FACULTY_ID}`);
-        if (!raw) return DUMMY_FACULTY_MEMBER;
-        return { ...DUMMY_FACULTY_MEMBER, ...JSON.parse(raw) };
-      } catch {
-        return DUMMY_FACULTY_MEMBER;
-      }
-    };
-
     const fetchAllData = async () => {
       try {
-        const [facultyRes, directoryRes, joinRes] = await Promise.all([
-          axios.get(`${VITE_HOST}/academic/faculty/members/`),
-          axios.get(`${VITE_HOST}/academic/faculty/directory/`),
-          axios.get(`${VITE_HOST}/academic/faculty/join/`)
-        ]);
-        const fetchedMembers = Array.isArray(facultyRes.data) ? facultyRes.data : [];
-        const dummyMember = getSavedDummyMember();
-        const hasDummy = fetchedMembers.some((member) => String(member.id) === String(dummyMember.id));
-        setFacultyMembers(hasDummy ? fetchedMembers : [...fetchedMembers, dummyMember]);
-        setDirectoryStats(directoryRes.data[0]);
-        setJoinData(joinRes.data[0]);
+        const data = await fetchFacultyPublicList({ limit: 1000 });
+        const allMembers = data?.items || [];
+        
+        setFacultyMembers(allMembers);
+
+        // Derive stats from members
+        const phdCount = allMembers.filter(m => String(m.education || '').toLowerCase().includes('phd')).length;
+        const totalPubs = allMembers.reduce((sum, m) => sum + (Number(m.publications) || 0), 0);
+        
+        setDirectoryStats({
+          title: 'Faculty Directory',
+          description: 'Meet our faculty who are leaders in their fields.',
+          faculty_members: allMembers.length,
+          phd_qualified: allMembers.length > 0 ? Math.round((phdCount / allMembers.length) * 100) : 0,
+          Research_publications: totalPubs,
+          collaborations_count: 15 // Mock default
+        });
+
+        setJoinData({
+          title: 'Join Our Faculty',
+          description: 'We are always looking for passionate educators and researchers to join our academic community. Explore career opportunities and become part of an institution dedicated to excellence.',
+          button1_text: 'View Open Positions',
+          url1: '#',
+          button2_text: 'Learn About Benefits',
+          url2: '#'
+        });
+
         console.log('✅ Fetched all faculty data.');
       } catch (err) {
         console.error('❌ Failed to fetch:', err);
-        setFacultyMembers([getSavedDummyMember()]);
+        setFacultyMembers([]);
       }
     };
     fetchAllData();
@@ -301,9 +314,10 @@ const Faculty = () => {
                         <div className="p-6">
                           <div className="flex flex-col items-center text-center">
                             <img
-                              src={faculty.image_url || `${VITE_HOST}/media/${faculty.image}`}
+                              src={getImageUrl(faculty.image_url, faculty.image)}
                               alt={faculty.name}
-                              className="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-100 group-hover:border-blue-200 transition-colors"
+                              className="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-100 group-hover:border-blue-300 transition-colors shadow-sm"
+                              onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(faculty.name) + "&background=random&color=fff"; }}
                             />
                             <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">{faculty.name}</h3>
                             <p className="text-blue-600 font-semibold mb-4">{faculty.designation}</p>

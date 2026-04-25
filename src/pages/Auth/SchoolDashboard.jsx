@@ -20,9 +20,11 @@ import {
   SCHOOL_DASHBOARD_STORAGE_KEY,
 } from "../../Data/schoolDashboardData";
 import {
-  DUMMY_FACULTY_DETAIL,
-  FACULTY_PROFILE_STORAGE_PREFIX,
-} from "../../Data/facultyDummyData";
+  adminGetFacultyList,
+  adminCreateFacultyProfile,
+  adminUpdateFacultyProfile,
+  adminDeleteFacultyProfile
+} from "../../services/facultyDashboardService";
 import { clearPortalSession } from "../../utils/portalSession";
 
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
@@ -96,50 +98,21 @@ const getInitialSchoolData = () => {
   }
 };
 
-const getFacultyProfilesBySchool = (schoolName) => {
-  const normalizedSchool = (schoolName || "").trim().toLowerCase();
-  const list = [];
+  const [facultyProfiles, setFacultyProfiles] = useState([]);
 
-  try {
-    for (let i = 0; i < localStorage.length; i += 1) {
-      const key = localStorage.key(i);
-      if (!key || !key.startsWith(FACULTY_PROFILE_STORAGE_PREFIX)) continue;
-      const raw = localStorage.getItem(key);
-      if (!raw) continue;
-      const profile = JSON.parse(raw);
-      if (!profile || typeof profile !== "object") continue;
-
-      const profileSchool = (profile.school || "").trim().toLowerCase();
-      if (!normalizedSchool || profileSchool === normalizedSchool) {
-        list.push(profile);
+  React.useEffect(() => {
+    const fetchFaculty = async () => {
+      try {
+        const dataList = await adminGetFacultyList({ school: data.schoolName, limit: 1000 });
+        setFacultyProfiles(dataList.items || []);
+      } catch (err) {
+        console.error("Failed to fetch faculty list:", err);
       }
+    };
+    if (data.schoolName) {
+      fetchFaculty();
     }
-
-    const dummySchool = (DUMMY_FACULTY_DETAIL.school || "").trim().toLowerCase();
-    const hasDummy = list.some((item) => item.id === DUMMY_FACULTY_DETAIL.id);
-    if ((!normalizedSchool || dummySchool === normalizedSchool) && !hasDummy) {
-      list.push(DUMMY_FACULTY_DETAIL);
-    }
-  } catch {
-    return [DUMMY_FACULTY_DETAIL];
-  }
-
-  return list;
-};
-
-const SchoolDashboard = () => {
-  const navigate = useNavigate();
-  const [data, setData] = useState(getInitialSchoolData);
-  const [activeTab, setActiveTab] = useState("home");
-  const [message, setMessage] = useState("");
-  const [facultyRefreshKey, setFacultyRefreshKey] = useState(0);
-  const [collectionEditors, setCollectionEditors] = useState({});
-  const [facultyEditor, setFacultyEditor] = useState({ index: null, form: null });
-
-  const facultyProfiles = useMemo(
-    () => getFacultyProfilesBySchool(data.schoolName),
-    [data.schoolName, facultyRefreshKey]
-  );
+  }, [data.schoolName, facultyRefreshKey]);
 
   const summary = useMemo(
     () => [
@@ -182,19 +155,33 @@ const SchoolDashboard = () => {
     setMessage("School dashboard reset to default data.");
   };
 
-  const saveFacultyProfile = (faculty) => {
-    if (!faculty?.id) return;
-    localStorage.setItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${faculty.id}`, JSON.stringify(faculty));
-    setFacultyRefreshKey((prev) => prev + 1);
-    setMessage(`Faculty profile updated: ${faculty.name}`);
+  const saveFacultyProfile = async (faculty) => {
+    try {
+      if (faculty.id && faculty.id.startsWith("faculty-")) {
+        // Assume it's a new profile being created with a local timestamp ID, so remove the ID to let backend generate it or keep it depending on your API logic
+        // The backend adminCreateFacultyProfile accepts an id or generates one
+        await adminCreateFacultyProfile(faculty);
+      } else {
+        await adminUpdateFacultyProfile(faculty.id, faculty);
+      }
+      setFacultyRefreshKey((prev) => prev + 1);
+      setMessage(`Faculty profile updated: ${faculty.name}`);
+    } catch (err) {
+      console.error(err);
+      setMessage(`Failed to update faculty: ${err?.response?.data?.message || err.message}`);
+    }
   };
 
-  const deleteFacultyProfile = (facultyId) => {
-    if (!facultyId) return;
-    localStorage.removeItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${facultyId}`);
-    setFacultyRefreshKey((prev) => prev + 1);
-    setFacultyEditor({ index: null, form: null });
-    setMessage("Faculty profile deleted.");
+  const deleteFacultyProfile = async (facultyId) => {
+    try {
+      await adminDeleteFacultyProfile(facultyId);
+      setFacultyRefreshKey((prev) => prev + 1);
+      setFacultyEditor({ index: null, form: null });
+      setMessage("Faculty profile deleted.");
+    } catch (err) {
+      console.error(err);
+      setMessage(`Failed to delete faculty: ${err?.response?.data?.message || err.message}`);
+    }
   };
 
   const addFacultyProfile = () => {

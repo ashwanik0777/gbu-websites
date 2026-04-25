@@ -74,12 +74,6 @@ const Primarynavbar = () => {
             <a href="https://gbu.samarth.ac.in/" className="flex items-center gap-1 hover:underline">
               <LogIn size={14} /> Admin Login
             </a>
-            <Link
-              to="/grievance"
-              className="flex items-center gap-1 hover:underline"
-            >
-              <Map size={14} /> Grievance Portal
-            </Link>
             <a href="/contactDirectory" className="flex items-center gap-1 hover:underline">
               <Map size={14} /> Directory
             </a>
@@ -170,12 +164,6 @@ const Primarynavbar = () => {
                   Directory
                 </a>
 
-                <Link
-                  to="/grievance"
-                  className="block px-3 py-2 rounded-md hover:bg-gray-100"
-                >
-                  Grievance Portal
-                </Link>
                 <Link to="/contactUs" className="block px-3 py-2 rounded-md hover:bg-gray-100">
                   Contact Us
                 </Link>

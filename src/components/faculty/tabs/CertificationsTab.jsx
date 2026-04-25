@@ -1,5 +1,4 @@
 import React from 'react';
-import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Minimal UI components with styles matching usage in this file
  export const Card = ({ className = "", children, ...props }) => (
    <div className={`bg-white rounded-xl border border-gray-200 border-solid shadow-sm${className}`} {...props}>
@@ -73,7 +72,7 @@ export const Button = ({
 import { Award, Calendar, ExternalLink, CheckCircle } from 'lucide-react';
 
 export const CertificationsTab = ({ profile }) => {
-  const tabData = profile?.tabData?.certifications || DUMMY_FACULTY_TAB_DATA.certifications;
+  const tabData = profile?.tabData?.certifications || {};
   const certifications = tabData.certifications || [];
   const professionalDevelopment = tabData.professionalDevelopment || [];
 

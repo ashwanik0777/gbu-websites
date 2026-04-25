@@ -57,15 +57,6 @@ const Policies = () => {
       icon: FileText,
       color: "from-blue-400 to-blue-600"
     },
-    {
-      title: "Grievance Redressal Policy",
-      category: "student",
-      year: "2025",
-      description: "Mechanism for addressing student and staff grievances",
-      icon: FileText,
-      color: "from-indigo-400 to-indigo-600",
-      link: "https://gbu-website.vercel.app/escalation-policy"
-    },
 
   ];
 

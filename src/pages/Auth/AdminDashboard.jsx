@@ -36,11 +36,7 @@ import {
   ADMIN_PORTAL_ACCOUNTS_KEY,
   DEFAULT_ADMIN_PORTAL_ACCOUNTS,
 } from "../../Data/adminDashboardData";
-import {
-  DUMMY_FACULTY_DETAIL,
-  FACULTY_PROFILE_STORAGE_PREFIX,
-} from "../../Data/facultyDummyData";
-import {
+
   DEFAULT_TENDERS,
   TENDERS_STORAGE_KEY,
   getTenderAutoHideDate,
@@ -259,25 +255,7 @@ const getInitialRecruitmentData = () => {
 };
 
 const getFacultyProfiles = () => {
-  const list = [];
-  try {
-    for (let i = 0; i < localStorage.length; i += 1) {
-      const key = localStorage.key(i);
-      if (!key || !key.startsWith(FACULTY_PROFILE_STORAGE_PREFIX)) continue;
-      const raw = localStorage.getItem(key);
-      if (!raw) continue;
-      const profile = JSON.parse(raw);
-      if (profile && typeof profile === "object") {
-        list.push(profile);
-      }
-    }
-    if (!list.some((p) => p.id === DUMMY_FACULTY_DETAIL.id)) {
-      list.push(DUMMY_FACULTY_DETAIL);
-    }
-  } catch {
-    return [DUMMY_FACULTY_DETAIL];
-  }
-  return list;
+  return [];
 };
 
 const getInitialActivityLog = () => {
@@ -400,11 +378,6 @@ const AdminDashboard = () => {
     localStorage.setItem(ADMIN_PORTAL_ACCOUNTS_KEY, JSON.stringify(accounts));
     localStorage.setItem(TENDERS_STORAGE_KEY, JSON.stringify(tenders));
     localStorage.setItem(RECRUITMENT_DASHBOARD_STORAGE_KEY, JSON.stringify(recruitmentData));
-    facultyProfiles.forEach((faculty) => {
-      if (faculty?.id) {
-        localStorage.setItem(`${FACULTY_PROFILE_STORAGE_PREFIX}${faculty.id}`, JSON.stringify(faculty));
-      }
-    });
     setActivityLog((prev) => [
       {
         id: `log-${Date.now()}`,
@@ -423,7 +396,7 @@ const AdminDashboard = () => {
     setAccounts(deepClone(DEFAULT_ADMIN_PORTAL_ACCOUNTS));
     setTenders([]);
     setRecruitmentData({ categories: [], archived: [] });
-    setFacultyProfiles([deepClone(DUMMY_FACULTY_DETAIL)]);
+    setFacultyProfiles([]);
     localStorage.removeItem(SCHOOL_DASHBOARD_STORAGE_KEY);
     localStorage.removeItem(ADMIN_PORTAL_ACCOUNTS_KEY);
     localStorage.removeItem(TENDERS_STORAGE_KEY);

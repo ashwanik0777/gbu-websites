@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Minimal UI components with Tailwind CSS, matching usage and effects
 
  export const Card = ({ className = "", children, ...props }) => (
@@ -79,7 +78,7 @@ export const Button = ({
 import { Mic, Calendar, MapPin, Users, ExternalLink, Play } from 'lucide-react';
 
 export const TalksTab = ({ profile }) => {
-  const tabData = profile?.tabData?.talks || DUMMY_FACULTY_TAB_DATA.talks;
+  const tabData = profile?.tabData?.talks || {};
   const invitedTalks = tabData.invitedTalks || [];
 
   const getTypeColor = (type) => {

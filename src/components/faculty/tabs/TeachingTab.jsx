@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Minimal custom UI components styled with Tailwind CSS
  
 export const Card = ({ className = "", children, ...props }) => (
@@ -71,7 +70,7 @@ import { BookOpen, Clock, Users, Filter, Upload, FileText, Download, Eye } from 
 
 export const TeachingTab = ({ profile }) => {
   const [selectedLevel, setSelectedLevel] = useState('all');
-  const tabData = profile?.tabData?.teaching || DUMMY_FACULTY_TAB_DATA.teaching;
+  const tabData = profile?.tabData?.teaching || {};
   const courses = tabData.courses || [];
 
   const filteredCourses = selectedLevel === 'all' 

@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Card Component
 const Card = ({ className = '', children }) => (
   <div className={`rounded-xl bg-white border border-gray-200 border-solid shadow-sm${className}`}>{children}</div>
@@ -48,7 +47,7 @@ const Button = ({ variant = "solid", size = "md", className = '', children, ...p
 import { Heart, Users, Calendar, MapPin, TreePine, GraduationCap, Lightbulb, Camera } from 'lucide-react';
 
 export const SocialImpactTab = ({ profile }) => {
-  const tabData = profile?.tabData?.socialImpact || DUMMY_FACULTY_TAB_DATA.socialImpact;
+  const tabData = profile?.tabData?.socialImpact || {};
   const socialActivities = tabData.socialActivities || [];
 
   const getTypeColor = (type) => {

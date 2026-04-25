@@ -1,4 +1,3 @@
-import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 
 export const OtherTab = ({ profile }) => {
   const message =

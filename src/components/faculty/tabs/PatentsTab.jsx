@@ -1,5 +1,4 @@
 import React from 'react';
-import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Minimal custom Card, CardHeader, CardTitle, CardContent, Badge, and Button components with Tailwind CSS
 
 export const Card = ({ className = '', children, ...props }) => (
@@ -71,7 +70,7 @@ export const Button = ({
 import { Award, Calendar, MapPin, FileText, ExternalLink } from 'lucide-react';
 
 export const PatentsTab = ({ profile }) => {
-  const tabData = profile?.tabData?.patents || DUMMY_FACULTY_TAB_DATA.patents;
+  const tabData = profile?.tabData?.patents || {};
   const patents = tabData.patents || [];
 
   const getStatusColor = (status) => {

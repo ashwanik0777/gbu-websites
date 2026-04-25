@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 import {
   Filter,
   Calendar,
@@ -85,7 +84,7 @@ const Button = ({
 // Research Projects Tab Component
 const ResearchProjectsTab = ({ profile }) => {
   const [filterStatus, setFilterStatus] = useState("all");
-  const tabData = profile?.tabData?.researchProjects || DUMMY_FACULTY_TAB_DATA.researchProjects;
+  const tabData = profile?.tabData?.researchProjects || {};
   const projects = tabData.projects || [];
 
   const filteredProjects =
@@ -255,7 +254,7 @@ const ResearchProjectsTab = ({ profile }) => {
 
 // Research Group Tab Component
 const ResearchGroupTab = ({ profile }) => {
-  const tabData = profile?.tabData?.researchGroup || DUMMY_FACULTY_TAB_DATA.researchGroup;
+  const tabData = profile?.tabData?.researchGroup || {};
   const phdScholars = tabData.phdScholars || [];
   const postdocs = tabData.postdocs || [];
   const researchAssistants = tabData.researchAssistants || [];

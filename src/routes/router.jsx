@@ -39,19 +39,7 @@ import NCC from "../pages/campusLife/NCC.jsx";
 import MeditationCenter from "../pages/campusLife/MeditationCenter.jsx";
 import Overview from "../pages/campusLife/Overview.jsx";
 import ClubDetail from "../pages/clubs/ClubDetail.jsx";
-import GrievanceMain from "../pages/grievance/GrievanceMain.jsx";
-import { AuthProvider } from "../components/Grievance/contexts/AuthContext";
-import ProtectedRoute from "../components/Grievance/ProtectedRoute";
-import StudentDashboard from "../pages/grievance/StudentDashboard";
-import StaffDashboard from "../pages/grievance/StaffDashboard";
-import AdminDashboard from "../pages/grievance/AdminDashboard";
-import Login from "../pages/grievance/Login";
-import TrackComplaint from "../pages/grievance/TrackComplaint";
-import FAQ from "../pages/grievance/FAQ";
-import Contact from "../pages/grievance/Contact";
-import EscalationPolicy from "../pages/grievance/EscalationPolicy";
-import ComplaintDetail from "../pages/grievance/ComplaintDetail";
-import GrievanceFacultyDashboard from "../pages/grievance/FacultyDashboard";
+
 import FacultyPortalDashboard from "../pages/Auth/FacultyDashboard.jsx";
 import SchoolDashboard from "../pages/Auth/SchoolDashboard.jsx";
 import AdminPortalDashboard from "../pages/Auth/AdminDashboard.jsx";
@@ -185,7 +173,6 @@ export default function AppRouter() {
         </div>
       }
     >
-      <AuthProvider>
         <Routes>
           {/* About Us Routes */}
 
@@ -726,47 +713,6 @@ export default function AppRouter() {
             element={<AlumniRegistration />}
           />
 
-          {/* Grievance  */}
-          <Route path="/grievance" element={<GrievanceMain />} />
-          <Route path="/grievance/login/:role" element={<Login />} />
-          <Route
-            path="/student"
-            element={
-              <ProtectedRoute allowedRoles={["student"]}>
-                <StudentDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/staff"
-            element={
-              <ProtectedRoute allowedRoles={["staff"]}>
-                <StaffDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute allowedRoles={["admin"]}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/faculty-dashboard"
-            element={
-              <ProtectedRoute allowedRoles={["faculty"]}>
-                <GrievanceFacultyDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/complaint/:id" element={<ComplaintDetail />} />
-          <Route path="/track" element={<TrackComplaint />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/escalation-policy" element={<EscalationPolicy />} />
-
 
           {/* <Route path="/dacMain" element={<DACmain/>}/> */}
           <Route path="/dac" element={<DAC />} />
@@ -804,7 +750,6 @@ export default function AppRouter() {
           {/* <Route path="/schools/departments/courseDetailed/:school/:course" element={<CourseDetails />} /> */}
 
         </Routes>
-      </AuthProvider>
     </Suspense>
   );
 }

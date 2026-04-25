@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { Heart, Trophy, Calendar } from "lucide-react";
-import { DUMMY_FACULTY_TAB_DATA } from "../../../Data/facultyDummyData";
 
 const Card = ({ className = "", children }) => (
   <div className={`rounded-xl bg-white border border-gray-200 shadow-sm ${className}`}>
@@ -25,8 +24,8 @@ const Badge = ({ className = "", children }) => (
 const AwardsAndSocialImpactPage = ({ profile }) => {
   const [activeTab, setActiveTab] = useState("awards");
 
-  const awardsData = profile?.tabData?.awards || DUMMY_FACULTY_TAB_DATA.awards;
-  const socialData = profile?.tabData?.socialImpact || DUMMY_FACULTY_TAB_DATA.socialImpact;
+  const awardsData = profile?.tabData?.awards || {};
+  const socialData = profile?.tabData?.socialImpact || {};
 
   const awards = awardsData?.awards || [];
   const achievements = awardsData?.achievements || [];

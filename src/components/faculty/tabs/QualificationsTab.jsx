@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { DUMMY_FACULTY_TAB_DATA } from '../../../Data/facultyDummyData';
 // Card, CardHeader, CardTitle, CardContent, and Badge components defined here for best UI/UX
 
 // Card container with subtle shadow and rounded corners
@@ -36,7 +35,7 @@ const Badge = ({ className = '', children }) => (
 import { Calendar, MapPin, GraduationCap } from 'lucide-react';
 
 export const QualificationsTab = ({ profile }) => {
-  const tabData = profile?.tabData?.qualifications || DUMMY_FACULTY_TAB_DATA.qualifications;
+  const tabData = profile?.tabData?.qualifications || {};
   const qualifications = tabData.qualifications || [];
   const experience = tabData.experience || [];
 
