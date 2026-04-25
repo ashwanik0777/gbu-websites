@@ -97,8 +97,8 @@ export const AdministrationTab = ({ profile }) => {
                       </div>
                     </div>
                   </div>
-                  <Badge className={getStatusColor(role.status)}>
-                    {role.status.charAt(0).toUpperCase() + role.status.slice(1)}
+                  <Badge className={getStatusColor(role.status || 'active')}>
+                    {(role.status || 'Active').charAt(0).toUpperCase() + (role.status || 'active').slice(1)}
                   </Badge>
                 </div>
                 

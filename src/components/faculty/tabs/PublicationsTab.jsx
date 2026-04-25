@@ -342,7 +342,7 @@ export default function PublicationsTab({ profile }) {
                         className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="all">All Types</option>
-                        {types.map((type) => (
+                        {types.filter(Boolean).map((type) => (
                           <option key={type} value={type}>
                             {type.charAt(0).toUpperCase() + type.slice(1)}
                           </option>
@@ -375,8 +375,8 @@ export default function PublicationsTab({ profile }) {
 
                             <div className="flex flex-wrap gap-2 mb-4">
                               <Badge variant={getTypeColor(publication.type)}>
-                                {publication.type.charAt(0).toUpperCase() +
-                                  publication.type.slice(1)}
+                                {(publication.type || 'publication').charAt(0).toUpperCase() +
+                                  (publication.type || 'publication').slice(1)}
                               </Badge>
 
                               {publication.quartile && (

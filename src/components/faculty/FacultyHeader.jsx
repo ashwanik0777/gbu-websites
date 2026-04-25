@@ -225,25 +225,25 @@ const FacultyHeader = ({ faculty }) => {
           <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
             <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center border border-green-200 border-solid">
               <div className="text-2xl font-bold text-green-600">
-                {faculty?.experience || '--'}
+                {Array.isArray(faculty?.experience) ? faculty.experience.length : (faculty?.experienceYears || faculty?.experience || '--')}
               </div>
               <div className="text-sm text-green-700">Years Experience</div>
             </div>
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center border border-blue-200">
               <div className="text-2xl font-bold text-blue-600">
-                {faculty?.publications || '--'}
+                {Array.isArray(faculty?.publications) ? faculty.publications.length : (faculty?.publicationsCount || faculty?.publications || '--')}
               </div>
               <div className="text-sm text-blue-700">Publications</div>
             </div>
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 text-center border border-purple-200 border-solid">
               <div className="text-2xl font-bold text-purple-600">
-                {faculty?.talks || '--'}
+                {Array.isArray(faculty?.talks) ? faculty.talks.length : (faculty?.talks || '--')}
               </div>
               <div className="text-sm text-purple-700">Talks Delivered</div>
             </div>
             <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 text-center border border-orange-200 border-solid">
               <div className="text-2xl font-bold text-orange-600">
-                {faculty?.projects || '--'}
+                {Array.isArray(faculty?.projects) ? faculty.projects.length : (faculty?.projects || '--')}
               </div>
               <div className="text-sm text-orange-700">Projects</div>
             </div>

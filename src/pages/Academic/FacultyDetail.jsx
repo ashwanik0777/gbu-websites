@@ -104,28 +104,28 @@ const FacultyDetail = () => {
   const summaryStats = [
     {
       icon: TrendingUp,
-      value: faculty.experience,
+      value: Array.isArray(faculty?.experience) ? faculty.experience.length : (faculty?.experienceYears || faculty?.experience || '--'),
       label: 'Experience',
       color: 'text-green-600',
       bgColor: 'bg-green-100'
     },
     {
       icon: BookOpenCheck,
-      value: `${faculty.publications || 0}+`,
+      value: `${Array.isArray(faculty?.publications) ? faculty.publications.length : (faculty?.publicationsCount || faculty?.publications || 0)}+`,
       label: 'Publications',
       color: 'text-blue-600',
       bgColor: 'bg-blue-100'
     },
     {
       icon: Presentation,
-      value: `--`,
+      value: Array.isArray(faculty?.talks) ? faculty.talks.length : (faculty?.talks || '--'),
       label: 'Talks Delivered',
       color: 'text-purple-600',
       bgColor: 'bg-purple-100'
     },
     {
       icon: FolderOpen,
-      value: `--`,
+      value: Array.isArray(faculty?.projects) ? faculty.projects.length : (faculty?.projects || '--'),
       label: 'Projects',
       color: 'text-orange-600',
       bgColor: 'bg-orange-100'

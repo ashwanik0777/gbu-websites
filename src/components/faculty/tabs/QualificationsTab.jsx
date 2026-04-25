@@ -82,7 +82,7 @@ export const QualificationsTab = ({ profile }) => {
                       </div>
                     </div>
                     <Badge className={getTypeColor(qual.type)}>
-                      {qual.type.charAt(0).toUpperCase() + qual.type.slice(1)}
+                      {qual.type ? qual.type.charAt(0).toUpperCase() + qual.type.slice(1) : 'General'}
                     </Badge>
                   </div>
                 </div>
@@ -109,18 +109,18 @@ export const QualificationsTab = ({ profile }) => {
                   </div>
                   <div className="flex flex-col items-start lg:items-end gap-2">
                     <Badge className={getTypeColor(exp.type)}>
-                      {exp.type.charAt(0).toUpperCase() + exp.type.slice(1)}
+                      {exp.type ? exp.type.charAt(0).toUpperCase() + exp.type.slice(1) : 'Experience'}
                     </Badge>
                     <span className="text-sm text-gray-600 flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
-                      {exp.duration}
+                      {exp.duration || `${exp.from} - ${exp.to}`}
                     </span>
                   </div>
                 </div>
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Key Responsibilities:</h4>
                   <ul className="space-y-1">
-                    {exp.responsibilities.map((responsibility, idx) => (
+                    {(exp.responsibilities || []).map((responsibility, idx) => (
                       <li key={idx} className="text-sm text-gray-700 flex items-start">
                         <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
                         {responsibility}

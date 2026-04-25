@@ -200,9 +200,9 @@ const ResearchProjectsTab = ({ profile }) => {
                     </div>
                   </div>
                   <div className="flex flex-col items-start lg:items-end gap-2">
-                    <Badge className={getStatusColor(project.status)}>
-                      {project.status.charAt(0).toUpperCase() +
-                        project.status.slice(1)}
+                    <Badge className={getStatusColor(project.status || 'ongoing')}>
+                      {(project.status || 'Ongoing').charAt(0).toUpperCase() +
+                        (project.status || 'Ongoing').slice(1)}
                     </Badge>
                     <Button variant="outline" size="sm">
                       <FileText className="w-4 h-4 mr-1" />
@@ -217,7 +217,7 @@ const ResearchProjectsTab = ({ profile }) => {
                       Collaborators:
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                      {project.collaborators.map((collaborator, idx) => (
+                      {(project.collaborators || []).map((collaborator, idx) => (
                         <Badge key={idx} variant="outline" className="text-xs">
                           {collaborator}
                         </Badge>
@@ -229,7 +229,7 @@ const ResearchProjectsTab = ({ profile }) => {
                       Key Deliverables:
                     </h4>
                     <ul className="space-y-1">
-                      {project.deliverables
+                      {(project.deliverables || [])
                         .slice(0, 2)
                         .map((deliverable, idx) => (
                           <li

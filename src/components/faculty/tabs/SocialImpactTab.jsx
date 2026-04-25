@@ -73,6 +73,7 @@ export const SocialImpactTab = ({ profile }) => {
   };
 
   const formatType = (type) => {
+    if (!type) return 'Social Impact';
     return type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
@@ -164,7 +165,7 @@ export const SocialImpactTab = ({ profile }) => {
                       <div className="mb-4">
                         <h4 className="font-medium text-gray-900 mb-2">Key Impact:</h4>
                         <ul className="space-y-1">
-                          {activity.impact.map((impact, idx) => (
+                          {(activity.impact || []).map((impact, idx) => (
                             <li key={idx} className="text-sm text-gray-700 flex items-start">
                               <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
                               {impact}
