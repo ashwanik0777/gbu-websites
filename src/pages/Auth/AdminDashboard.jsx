@@ -36,7 +36,7 @@ import {
   ADMIN_PORTAL_ACCOUNTS_KEY,
   DEFAULT_ADMIN_PORTAL_ACCOUNTS,
 } from "../../Data/adminDashboardData";
-
+import {
   DEFAULT_TENDERS,
   TENDERS_STORAGE_KEY,
   getTenderAutoHideDate,

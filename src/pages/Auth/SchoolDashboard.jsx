@@ -98,6 +98,15 @@ const getInitialSchoolData = () => {
   }
 };
 
+const SchoolDashboard = () => {
+  const navigate = useNavigate();
+  const [data, setData] = useState(getInitialSchoolData);
+  const [activeTab, setActiveTab] = useState("home");
+  const [message, setMessage] = useState("");
+  const [facultyRefreshKey, setFacultyRefreshKey] = useState(0);
+  const [collectionEditors, setCollectionEditors] = useState({});
+  const [facultyEditor, setFacultyEditor] = useState({ index: null, form: null });
+
   const [facultyProfiles, setFacultyProfiles] = useState([]);
 
   React.useEffect(() => {
