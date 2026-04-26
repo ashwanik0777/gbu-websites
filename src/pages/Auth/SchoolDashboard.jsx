@@ -23,7 +23,8 @@ import {
   adminGetFacultyList,
   adminCreateFacultyProfile,
   adminUpdateFacultyProfile,
-  adminDeleteFacultyProfile
+  adminDeleteFacultyProfile,
+  adminGenerateFacultyPassword
 } from "../../services/facultyDashboardService";
 import { clearPortalSession } from "../../utils/portalSession";
 
@@ -190,6 +191,16 @@ const SchoolDashboard = () => {
     } catch (err) {
       console.error(err);
       setMessage(`Failed to delete faculty: ${err?.response?.data?.message || err.message}`);
+    }
+  };
+
+  const generateFacultyPassword = async (facultyId) => {
+    try {
+      const result = await adminGenerateFacultyPassword(facultyId);
+      setMessage(`Password generated successfully: ${result?.password || "Check Email"}`);
+    } catch (err) {
+      console.error(err);
+      setMessage(`Failed to generate password: ${err?.response?.data?.errors?.[0]?.message || err?.response?.data?.message || err.message}`);
     }
   };
 
@@ -475,6 +486,14 @@ const SchoolDashboard = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => generateFacultyPassword(faculty.id)}
+                    className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                    title="Generate Initial Login Password"
+                  >
+                    <Lock className="h-3.5 w-3.5" /> Gen Pass
+                  </button>
                   <button
                     type="button"
                     onClick={() => setFacultyEditor({ index, form: { ...faculty } })}

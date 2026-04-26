@@ -74,3 +74,8 @@ export const adminDeleteFacultyProfile = async (facultyId) => {
   const response = await authApiClient().delete(`/admin/faculty/${facultyId}`);
   return response?.data?.data || null;
 };
+
+export const adminGenerateFacultyPassword = async (facultyId) => {
+  const response = await authApiClient().post(`/admin/faculty/${facultyId}/generate-password`);
+  return response?.data?.data || null;
+};

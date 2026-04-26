@@ -14,6 +14,11 @@ export const loginByRole = async ({ role, email, password }) => {
   return response.data;
 };
 
+export const verifyLoginOtpService = async ({ email, otp, newPassword }) => {
+  const response = await authClient.post("/login/verify-otp", { email, otp, newPassword });
+  return response.data;
+};
+
 export const requestForgotPasswordOtp = async ({ email }) => {
   const response = await authClient.post("/forgot-password/request-otp", { email });
   return response.data;

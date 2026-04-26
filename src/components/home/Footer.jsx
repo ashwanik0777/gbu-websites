@@ -1,5 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import {
+  Facebook,
+  Instagram,
+  Camera,
+  Linkedin,
+  Youtube,
+} from "lucide-react";
 
 const Footer = () => {
   return (
@@ -13,13 +20,15 @@ const Footer = () => {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <img
-              src="https://images.unsplash.com/photo-1562774053-701939374585?w=60&h=60&fit=crop&crop=center"
+              src="/assets/logo1.png"
               alt="GBU Logo"
               className="w-10 h-10 rounded-full"
             />
             <div>
               <h2 className="font-bold text-lg">Gautam Buddha University</h2>
-              <p className="text-sm text-gray-300">Excellence in Education</p>
+              <p className="text-sm text-gray-300">
+                Greater Noida, Uttar Pradesh
+              </p>
             </div>
           </div>
           <p className="text-gray-400 text-sm mt-4">
@@ -27,26 +36,45 @@ const Footer = () => {
             world-class education and fostering innovation for a better
             tomorrow.
           </p>
-          <div
-            className="flex gap-4 mt-4 text-xl"
-            aria-label="Social media links"
-          >
-            <span role="img" aria-label="Facebook">
-              🟦
-            </span>
-            <span role="img" aria-label="Instagram">
-              🦩
-            </span>
-            <span role="img" aria-label="Camera">
-              📷
-            </span>
-            <span role="img" aria-label="LinkedIn">
-              💼
-            </span>
-            <span role="img" aria-label="YouTube">
-              📺
-            </span>
-          </div>
+         <div
+      className="flex gap-5 mt-4 text-[22px]"
+      aria-label="Social media links"
+    >
+      <Facebook
+        strokeWidth={1.5}
+        className="text-[#1877F2]/80 transition-all duration-300 ease-out 
+        hover:text-[#1877F2] hover:opacity-100 hover:scale-110 
+        hover:drop-shadow-[0_0_8px_rgba(24,119,242,0.35)] cursor-pointer"
+      />
+
+      <Instagram
+        strokeWidth={1.5}
+        className="text-[#E4405F]/80 transition-all duration-300 ease-out 
+        hover:text-[#E4405F] hover:opacity-100 hover:scale-110 
+        hover:drop-shadow-[0_0_8px_rgba(228,64,95,0.35)] cursor-pointer"
+      />
+
+      <Camera
+        strokeWidth={1.5}
+        className="text-gray-500/80 transition-all duration-300 ease-out 
+        hover:text-gray-700 hover:scale-110 
+        hover:drop-shadow-[0_0_6px_rgba(0,0,0,0.25)] cursor-pointer"
+      />
+
+      <Linkedin
+        strokeWidth={1.5}
+        className="text-[#0A66C2]/80 transition-all duration-300 ease-out 
+        hover:text-[#0A66C2] hover:scale-110 
+        hover:drop-shadow-[0_0_8px_rgba(10,102,194,0.35)] cursor-pointer"
+      />
+
+      <Youtube
+        strokeWidth={1.5}
+        className="text-[#FF0000]/80 transition-all duration-300 ease-out 
+        hover:text-[#FF0000] hover:scale-110 
+        hover:drop-shadow-[0_0_8px_rgba(255,0,0,0.35)] cursor-pointer"
+      />
+    </div>
         </div>
 
         {/* Quick Links */}
