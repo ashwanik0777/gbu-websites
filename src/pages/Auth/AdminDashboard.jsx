@@ -69,6 +69,30 @@ import {
   DEFAULT_RECRUITMENT_DASHBOARD_DATA,
   RECRUITMENT_DASHBOARD_STORAGE_KEY,
 } from "../../Data/recruitmentData";
+import {
+  listSchools,
+  createSchool,
+  updateSchool,
+  deleteSchool,
+} from "../../services/schoolsService";
+
+const EMPTY_SCHOOL_DATA = {
+  schoolName: "",
+  schoolCode: "",
+  deanName: "",
+  email: "",
+  phone: "",
+  websiteUrl: "",
+  address: "",
+  bannerImage: "",
+  schoolDescription: "",
+  events: [],
+  news: [],
+  notices: [],
+  newsletters: [],
+  eventGallery: [],
+  tabContent: {}
+};
 
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 const ensureArray = (value, fallback) => (Array.isArray(value) ? value : fallback);
@@ -296,6 +320,13 @@ const AdminDashboard = () => {
   const [activeSchoolSubTab, setActiveSchoolSubTab] = useState("basic");
 
   const [schoolData, setSchoolData] = useState(getInitialSchoolData);
+  const [schoolsList, setSchoolsList] = useState([]);
+  const [selectedSchoolId, setSelectedSchoolId] = useState(null);
+  const [isSchoolsLoading, setIsSchoolsLoading] = useState(false);
+  const [isSchoolSaving, setIsSchoolSaving] = useState(false);
+  const [schoolDeletingKey, setSchoolDeletingKey] = useState("");
+  const [schoolApiError, setSchoolApiError] = useState("");
+  const [schoolEditor, setSchoolEditor] = useState({ isCreating: false });
   const [accounts, setAccounts] = useState(getInitialAccounts);
   const [tenders, setTenders] = useState(getInitialTenders);
   const [recruitmentData, setRecruitmentData] = useState(getInitialRecruitmentData);
@@ -600,8 +631,28 @@ const AdminDashboard = () => {
       }
     };
 
+    const syncSchoolsFromServer = async () => {
+      setIsSchoolsLoading(true);
+      setSchoolApiError("");
+      try {
+        const serverSchools = await listSchools();
+        if (!isMounted) return;
+        setSchoolsList(serverSchools);
+      } catch (error) {
+        if (!isMounted) return;
+        setSchoolApiError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Unable to fetch schools from backend.",
+        );
+      } finally {
+        if (isMounted) setIsSchoolsLoading(false);
+      }
+    };
+
     syncTendersFromServer();
     syncRecruitmentsFromServer();
+    syncSchoolsFromServer();
 
     return () => {
       isMounted = false;
@@ -1007,6 +1058,98 @@ const AdminDashboard = () => {
       ...prev,
       [listKey]: (prev[listKey] || []).filter((_, i) => i !== index),
     }));
+  };
+
+  const openSchool = (school) => {
+    setSelectedSchoolId(school.id);
+    const content = school.content || {};
+    setSchoolData({
+        schoolCode: school.code || "",
+        schoolName: school.name || "",
+        deanName: content.deanName || "",
+        email: content.email || "",
+        phone: content.phone || "",
+        websiteUrl: content.websiteUrl || "",
+        bannerImage: content.bannerImage || "",
+        address: content.address || "",
+        schoolDescription: school.overview || "",
+        events: content.events || [],
+        news: content.news || [],
+        notices: content.notices || [],
+        newsletters: content.newsletters || [],
+        eventGallery: content.eventGallery || [],
+        tabContent: content.tabContent || {}
+    });
+    setSchoolEditor({ isCreating: false });
+    setActiveSchoolSubTab("basic");
+  };
+
+  const handleSaveSchool = async () => {
+    const payload = {
+        code: schoolData.schoolCode || schoolData.code || "",
+        name: schoolData.schoolName || schoolData.name || "",
+        overview: schoolData.schoolDescription || schoolData.overview || "",
+        content: {
+            deanName: schoolData.deanName || "",
+            email: schoolData.email || "",
+            phone: schoolData.phone || "",
+            websiteUrl: schoolData.websiteUrl || "",
+            bannerImage: schoolData.bannerImage || "",
+            address: schoolData.address || "",
+            events: schoolData.events || [],
+            news: schoolData.news || [],
+            notices: schoolData.notices || [],
+            newsletters: schoolData.newsletters || [],
+            eventGallery: schoolData.eventGallery || [],
+            tabContent: schoolData.tabContent || {},
+        },
+        is_active: true
+    };
+    
+    if (!payload.code || !payload.name) {
+      setMessage("School Code and Name are required.");
+      return;
+    }
+
+    setIsSchoolSaving(true);
+    setSchoolApiError("");
+    try {
+        if (selectedSchoolId) {
+            const updated = await updateSchool(selectedSchoolId, payload);
+            setSchoolsList(prev => prev.map(s => s.id === selectedSchoolId ? updated : s));
+            setMessage("School updated successfully!");
+        } else {
+            const created = await createSchool(payload);
+            setSchoolsList(prev => [created, ...prev]);
+            setSelectedSchoolId(created.id);
+            setSchoolEditor({ isCreating: false });
+            setMessage("School created successfully!");
+        }
+    } catch (error) {
+        setSchoolApiError(error?.response?.data?.message || error?.message || "Failed to save school");
+        setMessage("Failed to save school");
+    } finally {
+        setIsSchoolSaving(false);
+    }
+  };
+
+  const handleDeleteSchoolFromList = async (id) => {
+    setSchoolDeletingKey(String(id));
+    setSchoolApiError("");
+    try {
+      await deleteSchool(id);
+      setSchoolsList(prev => prev.filter(s => s.id !== id));
+      if (selectedSchoolId === id) {
+        setSelectedSchoolId(null);
+        setSchoolData(deepClone(EMPTY_SCHOOL_DATA));
+      }
+      setMessage("School deleted successfully.");
+    } catch (error) {
+      setSchoolApiError(error?.response?.data?.message || error?.message || "Failed to delete school");
+      setMessage("Failed to delete school.");
+    } finally {
+      setSchoolDeletingKey("");
+    }
   };
 
   const handleDeleteAccount = async (account) => {
@@ -2690,10 +2833,107 @@ const AdminDashboard = () => {
     </div>
   );
 
-  const renderSchoolTab = () => (
-    <div className="space-y-4">
+  const renderSchoolTab = () => {
+    if (selectedSchoolId === null && !schoolEditor.isCreating) {
+      return (
+        <div className="space-y-4">
+          <div className={cardClass}>
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Schools Management</h2>
+                <p className="text-sm text-slate-500">Manage school content and details across the platform.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSchoolData(deepClone(EMPTY_SCHOOL_DATA));
+                  setSelectedSchoolId(null);
+                  setSchoolEditor({ isCreating: true });
+                }}
+                className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              >
+                <Plus className="h-4 w-4" /> Add School
+              </button>
+            </div>
 
-       
+            {schoolApiError && (
+              <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                {schoolApiError}
+              </div>
+            )}
+
+            {isSchoolsLoading ? (
+              <div className="py-8 text-center text-sm text-slate-500">Loading schools...</div>
+            ) : schoolsList.length === 0 ? (
+              <div className="py-8 text-center text-sm text-slate-500 border-2 border-dashed border-slate-200 rounded-xl">
+                No schools found. Create one to get started.
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {schoolsList.map((school) => (
+                  <div key={school.id} className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-slate-300 hover:shadow-md">
+                    <div>
+                      <h3 className="font-semibold text-slate-900 line-clamp-2">{school.name}</h3>
+                      <p className="mt-1 text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full inline-block">{school.code}</p>
+                      <p className="mt-3 text-sm text-slate-600 line-clamp-2">{school.overview || "No overview provided."}</p>
+                    </div>
+                    <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+                      <button
+                        onClick={() => openSchool(school)}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700"
+                      >
+                        <Pencil className="h-3.5 w-3.5" /> Manage Content
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSchoolFromList(school.id)}
+                        disabled={schoolDeletingKey === String(school.id)}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        {schoolDeletingKey === String(school.id) ? "Deleting..." : "Delete"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setSelectedSchoolId(null);
+                setSchoolEditor({ isCreating: false });
+                setSchoolData(deepClone(EMPTY_SCHOOL_DATA));
+              }}
+              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+            >
+              <RotateCcw className="h-5 w-5" />
+            </button>
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">
+                {schoolEditor.isCreating ? "Create New School" : `Editing: ${schoolData.schoolName || schoolData.schoolCode}`}
+              </h2>
+              <p className="text-sm text-slate-500">
+                {schoolEditor.isCreating ? "Fill in the details to create a new school." : "Update school details and content."}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleSaveSchool}
+            disabled={isSchoolSaving}
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            <Save className="h-4 w-4" />
+            {isSchoolSaving ? "Saving..." : "Save School"}
+          </button>
+        </div>
 
       {activeSchoolSubTab === "basic" && (
         <div className={cardClass}>
@@ -2953,6 +3193,7 @@ const AdminDashboard = () => {
         )}
     </div>
   );
+};
 
   const renderRecruitmentTab = () => {
     const defaultDocumentsText =
