@@ -43,8 +43,9 @@ const Faculty = () => {
   React.useEffect(() => {
     const fetchFaculty = async () => {
       try {
-        const response = await apiClient.get('/faculty/public/?school=soict');
-        setFacultyData(response.data || []);
+        const response = await apiClient.get('/faculty/public?school=soict');
+        const items = response.data?.data?.items || [];
+        setFacultyData(items);
       } catch (err) {
         console.error('Error fetching faculty:', err);
       }
