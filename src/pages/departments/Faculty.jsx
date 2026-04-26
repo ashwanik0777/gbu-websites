@@ -1,4 +1,4 @@
- import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Mail, Phone, Search, Filter, X, BookOpen
 } from 'lucide-react';
@@ -12,14 +12,7 @@ const Faculty = () => {
   const [selectedQualification, setSelectedQualification] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Department data with counts
-  const departments = [
-    { id: 'All', name: 'All Departments', count: 27 },
-    { id: 'cse', name: 'CSE', count: 15 },
-    { id: 'it', name: 'IT', count: 4 },
-    { id: 'ece', name: 'ECE', count: 6 },
-    { id: 'ocfd', name: 'OCFD', count: 32 }
-  ];
+
 
   const experienceRanges = [
     'All',
@@ -65,9 +58,35 @@ const Faculty = () => {
 
   const getDeptId = (dept) => departmentMapping[dept] || 'other';
 
+  const getDesignationPriority = (designation) => {
+    const desc = (designation || "").toLowerCase();
+    if (desc.includes("assistant professor")) return 3;
+    if (desc.includes("associate professor")) return 2;
+    if (desc.includes("professor")) return 1;
+    if (desc.includes("faculty")) return 4;
+    return 5;
+  };
+
+  const sortFaculty = (a, b) => {
+    const pA = getDesignationPriority(a.designation || a.title);
+    const pB = getDesignationPriority(b.designation || b.title);
+    if (pA !== pB) return pA - pB;
+    const expA = parseInt(a.experience_years || a.experience) || 0;
+    const expB = parseInt(b.experience_years || b.experience) || 0;
+    return expB - expA;
+  };
+
+  const departments = [
+    { id: 'All', name: 'All Departments', count: facultyData.length },
+    { id: 'cse', name: 'CSE', count: facultyData.filter(f => getDeptId(f.department) === 'cse').length },
+    { id: 'it', name: 'IT', count: facultyData.filter(f => getDeptId(f.department) === 'it').length },
+    { id: 'ece', name: 'ECE', count: facultyData.filter(f => getDeptId(f.department) === 'ece').length },
+    { id: 'ocfd', name: 'OCFD', count: facultyData.filter(f => getDeptId(f.department) === 'ocfd').length }
+  ];
+
   const filteredFaculty = facultyData.filter(faculty => {
     const searchString = searchTerm.toLowerCase();
-    const matchesSearch = 
+    const matchesSearch =
       (faculty.name || '').toLowerCase().includes(searchString) ||
       (faculty.designation || '').toLowerCase().includes(searchString) ||
       (faculty.specialization || '').toLowerCase().includes(searchString) ||
@@ -75,7 +94,7 @@ const Faculty = () => {
 
     const facultyDeptId = getDeptId(faculty.department);
     const matchesDepartment = selectedDepartment === 'All' || facultyDeptId === selectedDepartment;
-    
+
     const expYears = parseInt(faculty.experience_years) || 0;
     const matchesExperience =
       selectedExperience === 'All' ||
@@ -84,11 +103,11 @@ const Faculty = () => {
       (selectedExperience === '11-15 years' && expYears >= 11 && expYears <= 15) ||
       (selectedExperience === '16+ years' && expYears >= 16);
 
-    const matchesQualification = selectedQualification === 'All' || 
+    const matchesQualification = selectedQualification === 'All' ||
       (faculty.education && faculty.education.includes(selectedQualification));
 
     return matchesSearch && matchesDepartment && matchesExperience && matchesQualification;
-  });
+  }).sort(sortFaculty);
 
   const clearFilters = () => {
     setSelectedDepartment('All');
@@ -101,11 +120,11 @@ const Faculty = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section with Dark Overlay */}
 
-<BannerSection
+      <BannerSection
         title="Meet Our Faculty Members"
         subtitle="Dedicated to Excellence in Teaching, Research, and Innovation"
         bgtheme={5}
-        />
+      />
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Department Pills */}
@@ -121,9 +140,8 @@ const Faculty = () => {
                 }`}
             >
               {dept.name}
-              <span className={`${
-                selectedDepartment === dept.id ? 'bg-blue-700' : 'bg-gray-100'
-              } px-2 py-0.5 rounded-full text-sm`}>
+              <span className={`${selectedDepartment === dept.id ? 'bg-blue-700' : 'bg-gray-100'
+                } px-2 py-0.5 rounded-full text-sm`}>
                 {dept.count}
               </span>
             </button>
@@ -141,7 +159,7 @@ const Faculty = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
             />
-        </div>
+          </div>
 
           <div className="mt-4 flex items-center gap-4">
             <button
@@ -203,7 +221,7 @@ const Faculty = () => {
             ocfd: { name: "OCFD Faculty", shortName: "OCFD" }
           };
           const deptData = deptInfo[deptId];
-          
+
           // ✅ Get filtered faculty for this department only
           const deptFilteredFaculty = filteredFaculty.filter(f => getDeptId(f.department) === deptId);
 
@@ -263,27 +281,27 @@ const Faculty = () => {
                               <p className="text-sm text-gray-800">{faculty.education}</p>
                             </div>
                           </div>
-                  <div className="w-full space-y-2">
-                    <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                      <Mail className="w-4 h-4" />
-                      <span>{faculty.email}</span>
-                    </div>
-                    <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                      <Phone className="w-4 h-4" />
-                      <span>{faculty.phone}</span>
-                    </div>
-                  </div>
+                          <div className="w-full space-y-2">
+                            <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                              <Mail className="w-4 h-4" />
+                              <span>{faculty.email}</span>
+                            </div>
+                            <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                              <Phone className="w-4 h-4" />
+                              <span>{faculty.phone}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
                 </div>
               </div>
-            </a>
-          ))}
-        </div>
-      </div>
-    );
-  }
+            );
+          }
 
-  return null;
-})}
+          return null;
+        })}
 
       </div>
     </div>

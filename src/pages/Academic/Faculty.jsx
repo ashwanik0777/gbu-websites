@@ -112,12 +112,30 @@ const Faculty = () => {
     'B.Tech'
   ];
 
+  const getDesignationPriority = (designation) => {
+    const desc = (designation || "").toLowerCase();
+    if (desc.includes("assistant professor")) return 3;
+    if (desc.includes("associate professor")) return 2;
+    if (desc.includes("professor")) return 1;
+    if (desc.includes("faculty")) return 4;
+    return 5;
+  };
+
+  const sortFaculty = (a, b) => {
+    const pA = getDesignationPriority(a.designation || a.title);
+    const pB = getDesignationPriority(b.designation || b.title);
+    if (pA !== pB) return pA - pB;
+    const expA = parseInt(a.experience_years || a.experience) || 0;
+    const expB = parseInt(b.experience_years || b.experience) || 0;
+    return expB - expA;
+  };
+
   const filteredFaculty = facultyMembers.filter(faculty => {
     const matchesSearch =
-      faculty.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      faculty.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      faculty.specialization.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      faculty.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (faculty.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (faculty.designation || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (faculty.specialization || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (faculty.department || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (faculty.researchAreas?.some?.(area =>
         area.toLowerCase().includes(searchTerm.toLowerCase())
       ) ?? false);
@@ -134,7 +152,7 @@ const Faculty = () => {
     const matchesQualification = selectedQualification === 'All' || faculty.qualification === selectedQualification;
 
     return matchesSearch && matchesDepartment && matchesSchool && matchesExperience && matchesQualification;
-  });
+  }).sort(sortFaculty);
 
   const clearFilters = () => {
     setSelectedDepartment('All Departments');
