@@ -101,7 +101,7 @@ export default function WelcomePage() {
             zIndex: 0,
           }}
         >
-          📢 Admissions open for 2025-26 academic session | Admissions open for 2025-26 academic session | Admissions open for 2025-26 academic session
+          Admissions open for 2026-27 academic session | Admissions open for 2026-27 academic session | Admissions open for 2026-27 academic session
         </div>
       </div>
 

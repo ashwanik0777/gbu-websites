@@ -509,14 +509,14 @@ const ResearchProjectsAndGroup = ({ profile }) => {
   const [activeTab, setActiveTab] = useState("projects");
 
   return (
-    <div className="min-h-screen bg-gray-50">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="w-full">
+    <div className="w-full px-2 sm:px-4 lg:px-6 py-6">
     
         {/* Tab Navigation */}
-     <div className="flex items-center space-x-8 mb-8">
+     <div className="flex flex-wrap items-center gap-4 mb-8">
   <div
     onClick={() => setActiveTab("projects")}
-    className={`flex items-center cursor-pointer text-2xl font-bold pb-2 ${
+    className={`flex items-center cursor-pointer text-xl sm:text-2xl font-bold pb-2 ${
       activeTab === "projects"
         ? "text-blue-600 border-b-4 border-blue-600"
         : "text-gray-900"
@@ -532,7 +532,7 @@ const ResearchProjectsAndGroup = ({ profile }) => {
 
   <div
     onClick={() => setActiveTab("group")}
-    className={`flex items-center cursor-pointer text-2xl font-bold pb-2 ${
+    className={`flex items-center cursor-pointer text-xl sm:text-2xl font-bold pb-2 ${
       activeTab === "group"
         ? "text-blue-600 border-b-4 border-blue-600"
         : "text-gray-900"
