@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -12,6 +12,7 @@ import { clubsData } from "../../components/clubs/data/clubsData";
 import HeroBanner from "../../components/HeroBanner";
 import StatsCard from "../../components/StatsCard";
 import SearchableWrapper from "../../components/Searchbar/SearchableWrapper";
+import apiClient from "../../services/apiClient";
 // Card component
 const Card = ({ children, className = "" }) => (
   <div className={`bg-white rounded-xl shadow-md ${className}`}>{children}</div>
@@ -71,6 +72,70 @@ const Badge = ({ children, className = "" }) => (
 // import { clubsData } from '../../components/clubs/data/clubsData';
 
 const ClubsMain = () => {
+  const [clubs, setClubs] = useState(clubsData);
+
+  useEffect(() => {
+    const toAchievements = (value) => {
+      if (!value) return [];
+      if (Array.isArray(value)) {
+        return value.map((item) => String(item).trim()).filter(Boolean);
+      }
+      if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (!trimmed) return [];
+        if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+          try {
+            const parsed = JSON.parse(trimmed);
+            return Array.isArray(parsed)
+              ? parsed.map((item) => String(item).trim()).filter(Boolean)
+              : [];
+          } catch (error) {
+            return [];
+          }
+        }
+        return trimmed
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+      return [];
+    };
+
+    const normalizeClub = (item) => ({
+      id: item?.id,
+      name: String(item?.name || "").trim(),
+      tagline: String(item?.tagline || "").trim(),
+      category: String(item?.category || "").trim(),
+      logo: String(item?.logo || "").trim(),
+      banner: String(item?.banner || "").trim(),
+      memberCount: Number(item?.memberCount ?? item?.member_count ?? 0),
+      description: String(item?.description || "").trim(),
+      achievements: toAchievements(item?.achievements),
+    });
+
+    const fetchClubs = async () => {
+      try {
+        const response = await apiClient.get("/clubs");
+        const payload = response?.data;
+        const rawData = Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload)
+            ? payload
+            : null;
+
+        if (!rawData) {
+          throw new Error("Invalid clubs API response");
+        }
+
+        setClubs(rawData.map(normalizeClub));
+      } catch (error) {
+        setClubs(clubsData);
+      }
+    };
+
+    fetchClubs();
+  }, []);
+
   const getCategoryColor = (category) => {
     switch (category) {
       case "Technical":
@@ -133,7 +198,7 @@ const ClubsMain = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {clubsData.map((club) => (
+            {clubs.map((club) => (
               <Card
                 key={club.id}
                 className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden"

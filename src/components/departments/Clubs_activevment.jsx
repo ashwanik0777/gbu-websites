@@ -1,11 +1,45 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "../ui/badge";
 import { Facebook, Instagram, Twitter, Linkedin, Mail, Youtube } from "lucide-react";
-import { clubsData as clubs } from "../clubs/data/clubsData.js";
+import apiClient from "../../services/apiClient";
+import { clubsData as fallbackClubs } from "../clubs/data/clubsData.js";
 
 const ClubsAchievements = () => {
   const navigate = useNavigate();
+  const [clubs, setClubs] = useState(fallbackClubs);
+  useEffect(() => {
+    const normalizeClub = (item) => ({
+      id: item?.id,
+      name: String(item?.name || "").trim(),
+      category: String(item?.category || "").trim(),
+      banner: String(item?.banner || item?.image || "").trim(),
+      description: String(item?.description || "").trim(),
+      team: item?.team || null,
+      facultyAdvisor: item?.facultyAdvisor || "",
+      memberCount: Number(item?.memberCount ?? item?.member_count ?? 0),
+      members: item?.members,
+      socialMedia: item?.socialMedia || {},
+    });
+    const fetchClubs = async () => {
+      try {
+        const response = await apiClient.get("/clubs");
+        const payload = response?.data;
+        const rawData = Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload)
+            ? payload
+            : null;
+        if (!rawData) {
+          throw new Error("Invalid clubs API response");
+        }
+        setClubs(rawData.map(normalizeClub));
+      } catch (error) {
+        setClubs(fallbackClubs);
+      }
+    };
+    fetchClubs();
+  }, []);
 
   const handleCardClick = (clubId) => {
     navigate(`/club/${clubId}`);
